@@ -7,8 +7,9 @@ tesseract-ocr wrapper by Golang
 
 Set Up
 
-```
+```sh
 apt-get install tesseract-ocr
+# or yum? brew? Choose the way whichever you can install `tesseract-ocr`
 go get github.com/otiai10/gosseract-ocr
 ```
 

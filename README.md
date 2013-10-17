@@ -23,9 +23,7 @@ import (
 )
 
 func main() {
-  /*
-   * sample.png
-   */
+  // sample.png
   text := gosseract.HelloWorld(sample_png)
   fmt.Printf("Result : %v", text)
 }

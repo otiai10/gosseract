@@ -8,8 +8,17 @@ tesseract-ocr wrapper by Golang
 Set Up
 
 ```
-% apt-get install tesseract-ocr
-% go get github.com/otiai10/gosseract-ocr
+apt-get install tesseract-ocr
+go get github.com/otiai10/gosseract-ocr
+```
+
+At First
+=============
+
+```sh
+cd tests
+go test -i
+go test
 ```
 
 Usage

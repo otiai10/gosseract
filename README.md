@@ -1,9 +1,11 @@
 gosseract-ocr
 =============
 
-Tesseract-ocr wrapper by Golang
+tesseract-ocr wrapper by Golang
 
-To set up
+[What is tesseract-ocr?](https://code.google.com/p/tesseract-ocr/) 
+
+Set Up
 =============
 
 ```

@@ -6,6 +6,7 @@ tesseract-ocr wrapper by Golang
 [What is tesseract-ocr?](https://code.google.com/p/tesseract-ocr/) 
 
 Set Up
+=============
 
 ```sh
 apt-get install tesseract-ocr

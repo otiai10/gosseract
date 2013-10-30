@@ -7,9 +7,9 @@ import (
 )
 
 func TestHelloGosseract(t *testing.T) {
-  Describe(t, "HelloGosseract", func() {
+  Describe(t, "HelloGosseract!!", func() {
     It("should say \"Hello,Gosseract!\"", func() {
-      Expect(gosseract.HelloGosseract()).To(Equal, "Hello,Gosseract!")
+      Expect(gosseract.Greeting()).To(Equal, "Hello,Gosseract!")
     })
   })
 }

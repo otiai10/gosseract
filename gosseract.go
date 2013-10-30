@@ -16,7 +16,7 @@ var (
   COMMAND = "tesseract"
 )
 
-func HelloGosseract() string {
+func Greeting() string {
   return "Hello,Gosseract!"
 }
 

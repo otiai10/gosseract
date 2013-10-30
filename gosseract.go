@@ -4,6 +4,8 @@ import (
   . "os"
   "os/exec"
   "io/ioutil"
+  "bytes"
+  "strings"
 )
 
 type AnywayArgs struct {
@@ -14,6 +16,7 @@ var (
   TMPDIR = "/tmp"
   OUTEXT = ".txt"
   COMMAND = "tesseract"
+  VERSION = "0.0.1"
 )
 
 func Greeting() string {
@@ -51,4 +54,20 @@ func Anyway(args AnywayArgs) string {
   out = string(buf)
 
   return out
+}
+
+/**
+ * privateなメソッドってどうやって定義するんだ？
+ */
+func getTesseractVersion() string {
+  command := exec.Command(COMMAND, "--version")
+  var stderr bytes.Buffer
+  command.Stderr = &stderr //謎に標準エラーで来るw
+  e := command.Run()
+  if e != nil {
+    panic(e)
+  }
+  // なんかクズい
+  tesseractInfo := strings.Split(stderr.String(), " ")[1]
+  return strings.TrimRight(tesseractInfo, "\n")
 }

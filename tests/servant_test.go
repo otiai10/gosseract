@@ -14,3 +14,14 @@ func TestHelloServant(t *testing.T) {
     })
   })
 }
+
+func TestServant(t *testing.T) {
+  Describe(t, "Info", func() {
+    It("shoul show version of Tesseract and Gosseract.", func() {
+      servant := gosseract.NewServant()
+      info := servant.Info()
+      Expect(info.GosseractVersion).To(Equal, "0.0.1")
+      Expect(info.TesseractVersion).To(Exist)
+    })
+  })
+}

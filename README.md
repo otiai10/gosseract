@@ -9,9 +9,10 @@ Set Up
 =============
 
 ```sh
-apt-get install tesseract-ocr
+apt-get install tesseract-ocr # Basic OCR library by C++
 # or yum? brew? Choose the way whichever you can install `tesseract-ocr`
 go get github.com/otiai10/gosseract-ocr
+go get github.com/r7kamura/gosple # for testing
 ```
 
 At First

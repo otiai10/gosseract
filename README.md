@@ -15,7 +15,7 @@ go get github.com/otiai10/gosseract-ocr
 go get github.com/r7kamura/gosple # for testing
 ```
 
-At First
+First of All, Run the Tests!!
 =============
 
 ```sh
@@ -36,8 +36,10 @@ import (
 )
 
 func main() {
-  // sample.png
-  text := gosseract.HelloWorld(sample_png)
+  args := gosseract.AnywayArgs{
+    SourcePath: "./sample.png",
+  }
+  text := gosseract.Anyway(args)
   fmt.Printf("Result : %v", text)
 }
 ```

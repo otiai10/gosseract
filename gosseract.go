@@ -1,7 +1,7 @@
 package gosseract
 
 import (
-  . "os"
+  "os"
   "os/exec"
   "io/ioutil"
   "bytes"
@@ -49,7 +49,7 @@ func Anyway(args AnywayArgs) string {
   // 出力を読む
   // tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
   fn := args.Destination + OUTEXT
-  f, _ := OpenFile(fn, 1, 1)
+  f, _ := os.OpenFile(fn, 1, 1)
   buf, _ := ioutil.ReadFile(f.Name())
   out = string(buf)
 

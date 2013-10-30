@@ -71,3 +71,18 @@ func getTesseractVersion() string {
   tesseractInfo := strings.Split(stderr.String(), " ")[1]
   return strings.TrimRight(tesseractInfo, "\n")
 }
+/**
+ * 利用可能な言語の一覧を取得する
+ */
+func getAvailableLanguages() []string {
+  command := exec.Command(COMMAND, "--list-langs")
+  var stderr bytes.Buffer
+  command.Stderr = &stderr //謎に標準エラーで来るw
+  e := command.Run()
+  if e != nil {
+    panic(e)
+  }
+  langs := strings.Split(stderr.String(), "\n")
+  langs = langs[1:len(langs) - 1]
+  return langs
+}

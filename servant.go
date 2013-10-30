@@ -31,3 +31,11 @@ func (s *Servant) Info() VersionInfo {
   }
   return info
 }
+
+func (s *Servant) AvailableLanguages() []string {
+  langs := []string{}
+  for _, lang := range getAvailableLanguages() {
+    langs = append(langs, lang)
+  }
+  return langs
+}

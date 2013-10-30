@@ -24,4 +24,24 @@ func TestServant(t *testing.T) {
       Expect(info.TesseractVersion).To(Exist)
     })
   })
+
+  Describe(t, "AvailableLanguages", func() {
+    It("should give available languages of Tesseract.", func() {
+      servant := gosseract.NewServant()
+      langs := servant.AvailableLanguages()
+      Expect(len(langs)).To(NotEqual, 0)
+    })
+    It("should contain 'eng' at least.", func() {
+      servant := gosseract.NewServant()
+      langs := servant.AvailableLanguages()
+      containEng := false
+      for _,lang := range langs {
+        if lang == "eng" {
+          containEng = true
+          break
+        }
+      }
+      Expect(containEng).To(Equal, true)
+    })
+  })
 }

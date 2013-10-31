@@ -10,11 +10,17 @@ import (
  * ヒントとかを設定できるのﾃﾞｪｽ!!
  */
 type Servant struct {
-  Lang Lang
+  Lang    Lang
+  Options Options
 }
 type Lang struct {
   Value      string
   Availables []string
+}
+type Options struct {
+  UseFile   bool
+  FilePath  string
+  WhiteList string
 }
 type VersionInfo struct {
   TesseractVersion string
@@ -24,8 +30,11 @@ type VersionInfo struct {
 func SummonServant() Servant {
   lang := Lang{}
   lang.init()
+  opts := Options{}
+  opts.init()
   return Servant{
-    Lang: lang,
+    Lang:    lang,
+    Options: opts,
   }
 }
 

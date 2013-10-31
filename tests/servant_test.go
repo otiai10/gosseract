@@ -78,3 +78,35 @@ func TestServantLang(t *testing.T) {
     })
   })
 }
+
+func TestServantOptions(t *testing.T) {
+  Describe(t, "WithFile", func() {
+    Context("with existing file", func() {
+      It("should set option file.", func() {
+        servant := gosseract.SummonServant()
+        // Do not use file in default
+        Expect(servant.Options.FilePath).To(Equal, "")
+        Expect(servant.Options.UseFile).To(Equal, false)
+        filePath := "./samples/option/digest000.txt"
+
+        // Try to Set file
+        Expect(servant.Options.WithFile(filePath)).To(Equal, true/* TODO#1 */)
+
+        Expect(servant.Options.UseFile).To(Equal, true)
+        Expect(servant.Options.FilePath).To(Equal, filePath)
+      })
+    })
+    Context("with existing file", func() {
+      It("should not set option file.", func() {
+        servant := gosseract.SummonServant()
+        filePath := "./not/existing/file/path.txt"
+
+        // Try to Set file
+        Expect(servant.Options.WithFile(filePath)).To(Equal, false/* TODO#1 */)
+
+        Expect(servant.Options.FilePath).To(Equal, "")
+        Expect(servant.Options.UseFile).To(Equal, false)
+      })
+    })
+  })
+}

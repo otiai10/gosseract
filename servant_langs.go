@@ -18,6 +18,9 @@ func (l *Lang) Have(key string) bool {
   }
   return false
 }
+func (l *Lang) Is() string {
+  return l.Value
+}
 
 func (l *Lang) init() *Lang {
   l.Value = "eng";// "eng" in default

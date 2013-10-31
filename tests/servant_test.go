@@ -52,4 +52,10 @@ func TestServantLang(t *testing.T) {
       Expect(servant.Lang.Have("eng")).To(Equal, true)
     })
   })
+  Describe(t, "Is", func() {
+    It("should give current language setting.", func() {
+      servant := gosseract.SummonServant()
+      Expect(servant.Lang.Is()).To(Equal, "eng")
+    })
+  })
 }

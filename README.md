@@ -43,3 +43,10 @@ func main() {
   fmt.Printf("Result : %v", text)
 }
 ```
+
+Memo
+============
+```sh
+tesseract tests/samples/png/sample000.png /tmp/anyway tests/samples/option/digest000.txt; cat /tmp/anyway.txt
+tesseract tests/samples/png/sample000.png /tmp/anyway tests/samples/option/digest001.txt; cat /tmp/anyway.txt
+```

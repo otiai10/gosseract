@@ -10,6 +10,14 @@ import (
 func (l *Lang) Available() []string {
   return l.Availables
 }
+func (l *Lang) Have(key string) bool {
+  for _, language := range l.Availables {
+    if language == key {
+      return true
+    }
+  }
+  return false
+}
 
 func (l *Lang) init() *Lang {
   l.Value = "eng";// "eng" in default

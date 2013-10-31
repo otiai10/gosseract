@@ -13,7 +13,8 @@ type Servant struct {
   Lang Lang
 }
 type Lang struct {
-  Value string
+  Value      string
+  Availables []string
 }
 type VersionInfo struct {
   TesseractVersion string
@@ -21,9 +22,8 @@ type VersionInfo struct {
 }
 
 func SummonServant() Servant {
-  lang := Lang{
-    Value: "eng",// "eng" in default
-  }
+  lang := Lang{}
+  lang.init()
   return Servant{
     Lang: lang,
   }

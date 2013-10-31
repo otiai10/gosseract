@@ -91,3 +91,42 @@ func getAvailableLanguages() []string {
   langs = langs[1:len(langs) - 1]
   return langs
 }
+
+/**
+ * 汎用: コマンドを実行する
+ */
+func _exec(command string, args []string) string {
+  cmd := _generateCommand(command, args)
+  var stdout, stderr bytes.Buffer
+  cmd.Stdout = &stdout
+  cmd.Stderr = &stderr
+  _ = cmd.Run()
+  if stdout.String() != "" {
+    return stdout.String()
+  }
+  return stderr.String()
+}
+/**
+ * TODO#3: こんなラッパーメソッド作らんとアカンのクソじゃね？
+ */
+func _generateCommand(_command string, args []string) *exec.Cmd {
+  if len(args) == 0 {
+    return exec.Command(_command)
+  }
+  if len(args) == 1 {
+    return exec.Command(_command, args[0])
+  }
+  if len(args) == 2 {
+    return exec.Command(_command, args[0], args[1])
+  }
+  if len(args) == 3 {
+    return exec.Command(_command, args[0], args[1], args[2])
+  }
+  if len(args) == 4 {
+    return exec.Command(_command, args[0], args[1], args[2], args[3])
+  }
+  if len(args) == 5 {
+    return exec.Command(_command, args[0], args[1], args[2], args[3], args[4])
+  }
+  return exec.Command(_command)
+}

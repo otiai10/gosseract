@@ -7,6 +7,11 @@ import (
   "bytes"
   "strings"
 )
+/* TODO#1: Error or nil っていう返し方無いか
+type Error struct {
+  Message string
+}
+TODO#1が解決されるまでコメントアウト */
 
 type AnywayArgs struct {
   SourcePath  string

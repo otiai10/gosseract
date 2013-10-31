@@ -58,4 +58,23 @@ func TestServantLang(t *testing.T) {
       Expect(servant.Lang.Is()).To(Equal, "eng")
     })
   })
+  Describe(t, "Use", func() {
+    servant := gosseract.SummonServant()
+    Context("with available language", func() {
+      It("should set Lang and return true(うーん...e == nilみたいにしたいのん...).", func() {
+        destination := "eng"// TODO#2: ここengじゃテストにならんでしょうがwww
+        Expect(servant.Lang.Use(destination)).To(Equal, true)
+        Expect(servant.Lang.Is()).To(Equal, destination)
+      })
+    })
+    Context("with not available language", func() {
+      It("should return false(eを返したい).", func() {
+        origin := servant.Lang.Is()
+        destination := "wrong lang"
+        Expect(servant.Lang.Use(destination)).To(Equal, false)
+        Expect(servant.Lang.Is()).To(NotEqual, destination)
+        Expect(servant.Lang.Is()).To(Equal, origin)
+      })
+    })
+  })
 }

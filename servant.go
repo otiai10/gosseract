@@ -16,7 +16,7 @@ type VersionInfo struct {
   GosseractVersion string
 }
 
-func NewServant() Servant {
+func SummonServant() Servant {
   return Servant{}
 }
 func (s *Servant) Greeting() string {

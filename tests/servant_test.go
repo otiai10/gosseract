@@ -9,7 +9,7 @@ import (
 func TestHelloServant(t *testing.T) {
   Describe(t, "GosseractServant", func() {
     It("should say \"Hi, I'm gosseract-ocr servant!\"", func() {
-      servant := gosseract.NewServant()
+      servant := gosseract.SummonServant()
       Expect(servant.Greeting()).To(Equal, "Hi, I'm gosseract-ocr servant!")
     })
   })
@@ -18,7 +18,7 @@ func TestHelloServant(t *testing.T) {
 func TestServant(t *testing.T) {
   Describe(t, "Info", func() {
     It("shoul show version of Tesseract and Gosseract.", func() {
-      servant := gosseract.NewServant()
+      servant := gosseract.SummonServant()
       info := servant.Info()
       Expect(info.GosseractVersion).To(Equal, "0.0.1")
       Expect(info.TesseractVersion).To(Exist)
@@ -27,12 +27,12 @@ func TestServant(t *testing.T) {
 
   Describe(t, "AvailableLanguages", func() {
     It("should give available languages of Tesseract.", func() {
-      servant := gosseract.NewServant()
+      servant := gosseract.SummonServant()
       langs := servant.AvailableLanguages()
       Expect(len(langs)).To(NotEqual, 0)
     })
     It("should contain 'eng' at least.", func() {
-      servant := gosseract.NewServant()
+      servant := gosseract.SummonServant()
       langs := servant.AvailableLanguages()
       containEng := false
       for _,lang := range langs {

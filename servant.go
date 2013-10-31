@@ -10,6 +10,10 @@ import (
  * ヒントとかを設定できるのﾃﾞｪｽ!!
  */
 type Servant struct {
+  Lang Lang
+}
+type Lang struct {
+  Value string
 }
 type VersionInfo struct {
   TesseractVersion string
@@ -17,8 +21,14 @@ type VersionInfo struct {
 }
 
 func SummonServant() Servant {
-  return Servant{}
+  lang := Lang{
+    Value: "eng",// "eng" in default
+  }
+  return Servant{
+    Lang: lang,
+  }
 }
+
 func (s *Servant) Greeting() string {
   return "Hi, I'm gosseract-ocr servant!"
 }

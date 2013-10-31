@@ -28,12 +28,12 @@ func TestServant(t *testing.T) {
   Describe(t, "AvailableLanguages", func() {
     It("should give available languages of Tesseract.", func() {
       servant := gosseract.SummonServant()
-      langs := servant.AvailableLanguages()
+      langs := servant.Lang.Availables()
       Expect(len(langs)).To(NotEqual, 0)
     })
     It("should contain 'eng' at least.", func() {
       servant := gosseract.SummonServant()
-      langs := servant.AvailableLanguages()
+      langs := servant.Lang.Availables()
       containEng := false
       for _,lang := range langs {
         if lang == "eng" {

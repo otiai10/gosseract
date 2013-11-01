@@ -113,14 +113,32 @@ func TestServantOptions(t *testing.T) {
 
 func TestServantStory(t *testing.T) {
   Describe(t, "Usage of Servant, Servant", func() {
+
     Context("with option file", func() {
-      It("can OCR correctly.", func() {
+
+      It("can OCR according to option file.", func() {
+
         servant := gosseract.SummonServant()
         servant.Options.WithFile("./samples/option/digest001.txt")
-        text, err := servant.Eat("./samples/png/sample000.png").Out()
+        filePath := "./samples/png/sample000.png"
+        text, err := servant.Eat(filePath).Out()
+
         Expect(text).To(Equal, "O    \n\n")
         Expect(err).To(Equal, false)
       })
+
+      It("can OCR also without any options.", func() {
+
+        servant := gosseract.SummonServant()
+        filePath := "./samples/png/sample000.png"
+        text, err := servant.Eat(filePath).Out()
+
+        Expect(text).To(Equal, "01:37:58\n\n")
+        Expect(err).To(Equal, false)
+      })
+
     })
+
   })
+
 }

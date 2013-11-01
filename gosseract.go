@@ -61,9 +61,6 @@ func Anyway(args AnywayArgs) string {
   return out
 }
 
-/**
- * privateなメソッドってどうやって定義するんだ？
- */
 func getTesseractVersion() string {
   command := exec.Command(COMMAND, "--version")
   var stderr bytes.Buffer
@@ -90,6 +87,36 @@ func getAvailableLanguages() []string {
   langs := strings.Split(stderr.String(), "\n")
   langs = langs[1:len(langs) - 1]
   return langs
+}
+
+/**
+ * ソースファイルパスと
+ * オプションアーギュメントのスライスを受け取り
+ * OCRしたものを返す
+ * ファイル操作などを隠蔽する
+ */
+func execute(source string, args []string) string {
+  _args := []string{}
+  _args = append(_args, source)
+
+  dest := defineDestinationFile()
+
+  _args = append(_args, dest)
+  for _, a := range args {
+    _args = append(_args, a)
+  }
+  _ = _exec(COMMAND, _args)
+
+  // 出力を読む
+  // tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
+  // TODO4: DRY
+  fn := dest + OUTEXT
+
+  f, _ := os.OpenFile(fn, 1, 1)
+  buf, _ := ioutil.ReadFile(f.Name())
+  out := string(buf)
+
+  return out
 }
 
 /**
@@ -129,4 +156,9 @@ func _generateCommand(_command string, args []string) *exec.Cmd {
     return exec.Command(_command, args[0], args[1], args[2], args[3], args[4])
   }
   return exec.Command(_command)
+}
+
+func defineDestinationFile() string {
+  // TODO#5: UUIDかなんかでハッシングする
+  return TMPDIR + "/out"
 }

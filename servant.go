@@ -10,8 +10,13 @@ import (
  * ヒントとかを設定できるのﾃﾞｪｽ!!
  */
 type Servant struct {
+  Source  Source
   Lang    Lang
   Options Options
+}
+type Source struct {
+  FilePath string
+  // 画像形式とかくるんだろうな今後
 }
 type Lang struct {
   Value      string
@@ -51,6 +56,22 @@ func (s *Servant) Info() VersionInfo {
   return info
 }
 
-func (s *Servant) Invoke() (string, /* TODO#1: Error */bool) {
-  return "O\n\n", true
+func (s *Servant) Eat(filepath string) *Servant {
+  // TODO: ファイル存在チェック
+  s.Source.FilePath = filepath
+  return s
+}
+
+func (s *Servant) Out() (string, /* TODO#1: Error */bool) {
+  result := execute(s.Source.FilePath, s.buildArguments())
+  return result, false
+}
+
+func (s *Servant) buildArguments() []string {
+  var args []string
+  args = append(args, "-l", s.Lang.Value)
+  if s.Options.UseFile {
+    args = append(args, s.Options.FilePath)
+  }
+  return args
 }

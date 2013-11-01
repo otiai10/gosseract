@@ -110,3 +110,17 @@ func TestServantOptions(t *testing.T) {
     })
   })
 }
+
+func TestServantStory(t *testing.T) {
+  Describe(t, "Usage of Servant, Servant", func() {
+    Context("with option file", func() {
+      It("can OCR correctly.", func() {
+        servant := gosseract.SummonServant()
+        servant.Options.WithFile("./samples/option/digest001.txt")
+        text, err := servant.Invoke()
+        Expect(text).To(Equal, "O\n\n")
+        Expect(err).To(Equal, false)
+      })
+    })
+  })
+}

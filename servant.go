@@ -50,3 +50,7 @@ func (s *Servant) Info() VersionInfo {
   }
   return info
 }
+
+func (s *Servant) Invoke() (string, /* TODO#1: Error */bool) {
+  return "O\n\n", true
+}

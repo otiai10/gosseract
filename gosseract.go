@@ -119,6 +119,14 @@ func execute(source string, args []string) string {
   return out
 }
 
+func tesseractInstalled() bool {
+  out := _exec("which", []string{"tesseract"}) 
+  if out == "" {
+    return false
+  }
+  return true
+}
+
 /**
  * 汎用: コマンドを実行する
  */

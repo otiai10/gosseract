@@ -36,6 +36,11 @@ type VersionInfo struct {
 }
 
 func SummonServant() Servant {
+
+  if ! tesseractInstalled() {
+    panic("Missin `tesseract` command!! install tessearct at first.")
+  }
+
   lang := Lang{}
   lang.init()
   opts := Options{}

@@ -4,6 +4,12 @@ import (
   "github.com/otiai10/gosseract-ocr"
   . "github.com/r7kamura/gospel"
   "testing"
+
+  "image"
+  "image/png"
+  "os"
+  "io/ioutil"
+  "bytes"
 )
 
 func TestHelloServant(t *testing.T) {
@@ -121,7 +127,7 @@ func TestServantStory(t *testing.T) {
         servant := gosseract.SummonServant()
         servant.Options.WithFile("./samples/option/digest001.txt")
         filePath := "./samples/png/sample000.png"
-        text, err := servant.Eat(filePath).Out()
+        text, err := servant.Target(filePath).Out()
 
         Expect(text).To(Equal, "O    \n\n")
         Expect(err).To(Equal, false)
@@ -131,7 +137,7 @@ func TestServantStory(t *testing.T) {
 
         servant := gosseract.SummonServant()
         filePath := "./samples/png/sample000.png"
-        text, err := servant.Eat(filePath).Out()
+        text, err := servant.Target(filePath).Out()
 
         Expect(text).To(Equal, "01:37:58\n\n")
         Expect(err).To(Equal, false)
@@ -141,4 +147,29 @@ func TestServantStory(t *testing.T) {
 
   })
 
+}
+
+/**
+func TestServantEat(t *testing.T) {
+  Describe(t, "Eat", func() {
+    It("can OCR from file object.", func() {
+      servant := gosseract.SummonServant()
+      img := fixtureImageObj("./samples/png/sample000.png")
+      text, err := servant.Eat(img).Out()
+      fmt.Println(
+        text,
+      )
+      Expect(text).To(Equal, "01:37:58\n\n")
+      Expect(err).To(Equal, false)
+    })
+  })
+}
+**/
+
+func fixtureImageObj(fpath string) image.Image {
+  f, _ := os.Open(fpath)
+  buf, _ := ioutil.ReadFile(f.Name())
+  img, _ := png.Decode(bytes.NewReader(buf))
+  // *image.RGBA
+  return img
 }

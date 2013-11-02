@@ -1,6 +1,9 @@
 package gosseract
 
 import (
+  "os"
+  "image"
+  "image/png"
 )
 
 /**
@@ -56,9 +59,25 @@ func (s *Servant) Info() VersionInfo {
   return info
 }
 
-func (s *Servant) Eat(filepath string) *Servant {
+// ファイルパスを受け取るメソッド
+func (s *Servant) Target(filepath string) *Servant {
   // TODO: ファイル存在チェック
   s.Source.FilePath = filepath
+  return s
+}
+
+// image.Imageを一時ファイルにしてそのファイルパスを返す
+func (s *Servant) Eat(img image.Image) *Servant {
+  filepath := "/tmp/eaten"
+  f, e := os.Create(filepath)
+  if e != nil {
+    panic(e)
+  }
+  defer f.Close()
+  png.Encode(f, img)
+
+  s.Source.FilePath = filepath
+
   return s
 }
 

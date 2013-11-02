@@ -1,7 +1,7 @@
 package gosseract
 
 import (
-  "github.com/otiai10/gosseract-ocr"
+  "github.com/otiai10/gosseract"
   . "github.com/r7kamura/gospel"
   "testing"
 )

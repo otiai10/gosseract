@@ -28,7 +28,7 @@ type Lang struct {
 type Options struct {
   UseFile   bool
   FilePath  string
-  WhiteList string
+  Digest map[string]string
 }
 type VersionInfo struct {
   TesseractVersion string
@@ -94,8 +94,24 @@ func (s *Servant) Out() (string, /* TODO#1: Error */bool) {
 func (s *Servant) buildArguments() []string {
   var args []string
   args = append(args, "-l", s.Lang.Value)
-  if s.Options.UseFile {
-    args = append(args, s.Options.FilePath)
+  if ! s.Options.UseFile {
+    s.Options.FilePath = makeUpOptionFile(s.Options.Digest)
   }
+  args = append(args, s.Options.FilePath)
   return args
+}
+func makeUpOptionFile(digestMap map[string]string) (fpath string) {
+  fpath = ""
+  var digestFileContents string
+  for k, v := range digestMap  {
+    digestFileContents = digestFileContents + k + " " + v + "\n"
+  }
+  if digestFileContents == "" {
+    return fpath
+  }
+  fpath = "/tmp/digest"
+  f, _ := os.Create(fpath)
+  defer f.Close()
+  _, _ = f.WriteString(digestFileContents)
+  return fpath
 }

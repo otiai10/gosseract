@@ -21,3 +21,14 @@ func TestServantEat(t *testing.T) {
     })
   })
 }
+
+func TestServantAllow(t *testing.T) {
+  Describe(t, "Allow", func() {
+    It("can set whitelist of OCR result chars", func() {
+      servant := gosseract.SummonServant()
+      servant.Options.Allow(":")
+      text, _ := servant.Target("./samples/png/sample002.png").Out()
+      Expect(text).To(Equal, "  :  :  \n\n")
+    })
+  })
+}

@@ -31,7 +31,7 @@ Set Up
 apt-get install tesseract-ocr # Basic OCR library by C++
 # or yum? brew? Choose the way whichever you can install `tesseract-ocr`
 go get github.com/otiai10/gosseract
-go get github.com/r7kamura/gosple # for testing
+go get github.com/r7kamura/gospel # for testing
 ```
 
 First of All, Run the Tests!!

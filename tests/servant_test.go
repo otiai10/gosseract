@@ -67,17 +67,17 @@ func TestServantLang(t *testing.T) {
   Describe(t, "Use", func() {
     servant := gosseract.SummonServant()
     Context("with available language", func() {
-      It("should set Lang and return true(うーん...e == nilみたいにしたいのん...).", func() {
+      It("should set Lang and return nil.", func() {
         destination := "eng"// TODO#2: ここengじゃテストにならんでしょうがwww
-        Expect(servant.Lang.Use(destination)).To(Equal, true)
+        Expect(servant.Lang.Use(destination)).To(Equal, nil)
         Expect(servant.Lang.Is()).To(Equal, destination)
       })
     })
     Context("with not available language", func() {
-      It("should return false(eを返したい).", func() {
+      It("should return error.", func() {
         origin := servant.Lang.Is()
         destination := "wrong lang"
-        Expect(servant.Lang.Use(destination)).To(Equal, false)
+        Expect(servant.Lang.Use(destination)).To(NotEqual, nil)
         Expect(servant.Lang.Is()).To(NotEqual, destination)
         Expect(servant.Lang.Is()).To(Equal, origin)
       })
@@ -96,7 +96,7 @@ func TestServantOptions(t *testing.T) {
         filePath := "./samples/option/digest000.txt"
 
         // Try to Set file
-        Expect(servant.Options.WithFile(filePath)).To(Equal, true/* TODO#1 */)
+        Expect(servant.Options.WithFile(filePath)).To(Equal, nil)
 
         Expect(servant.Options.UseFile).To(Equal, true)
         Expect(servant.Options.FilePath).To(Equal, filePath)
@@ -108,7 +108,7 @@ func TestServantOptions(t *testing.T) {
         filePath := "./not/existing/file/path.txt"
 
         // Try to Set file
-        Expect(servant.Options.WithFile(filePath)).To(Equal, false/* TODO#1 */)
+        Expect(servant.Options.WithFile(filePath)).To(NotEqual, nil)
 
         Expect(servant.Options.FilePath).To(Equal, "")
         Expect(servant.Options.UseFile).To(Equal, false)
@@ -130,7 +130,7 @@ func TestServantStory(t *testing.T) {
         text, err := servant.Target(filePath).Out()
 
         Expect(text).To(Equal, "O    \n\n")
-        Expect(err).To(Equal, false)
+        Expect(err).To(Equal, nil)
       })
 
       It("can OCR also without any options.", func() {
@@ -140,7 +140,7 @@ func TestServantStory(t *testing.T) {
         text, err := servant.Target(filePath).Out()
 
         Expect(text).To(Equal, "01:37:58\n\n")
-        Expect(err).To(Equal, false)
+        Expect(err).To(Equal, nil)
       })
 
     })

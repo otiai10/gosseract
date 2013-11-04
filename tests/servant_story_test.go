@@ -17,7 +17,7 @@ func TestServantEat(t *testing.T) {
       servant := gosseract.SummonServant()
       text, err := servant.Eat(img).Out()
       Expect(text).To(Equal, "03:41:26\n\n")
-      Expect(err).To(Equal, false)
+      Expect(err).To(Equal, nil)
     })
   })
 }

@@ -86,9 +86,9 @@ func (s *Servant) Eat(img image.Image) *Servant {
   return s
 }
 
-func (s *Servant) Out() (string, /* TODO#1: Error */bool) {
+func (s *Servant) Out() (string, error) {
   result := execute(s.Source.FilePath, s.buildArguments())
-  return result, false
+  return result, nil
 }
 
 func (s *Servant) buildArguments() []string {

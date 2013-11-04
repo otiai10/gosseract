@@ -5,6 +5,7 @@
 package gosseract
 
 import (
+  "errors"
 )
 
 func (l *Lang) Available() []string {
@@ -21,19 +22,12 @@ func (l *Lang) Have(key string) bool {
 func (l *Lang) Is() string {
   return l.Value
 }
-func (l *Lang) Use(key string) /* Error */bool {
+func (l *Lang) Use(key string) error {
   if l.Have(key) {
     l.Value = key
-    // TODO#1: Errorオブジェクトかnilを返すようにしたいのだが...
-    // return nil
-    return true
+    return nil
   }
-  /* TODO#1: 上に同じ
-  return Error{
-    Message: "No language `" + key + "` is found.",
-  }
-  */
-  return false
+  return errors.New("とりあえず生のエラー返します")
 }
 
 func (l *Lang) init() *Lang {

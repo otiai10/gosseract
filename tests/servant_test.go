@@ -10,6 +10,8 @@ import (
   "os"
   "io/ioutil"
   "bytes"
+
+  "reflect"
 )
 
 func TestHelloServant(t *testing.T) {
@@ -77,7 +79,8 @@ func TestServantLang(t *testing.T) {
       It("should return error.", func() {
         origin := servant.Lang.Is()
         destination := "wrong lang"
-        Expect(servant.Lang.Use(destination)).To(NotEqual, nil)
+        e := servant.Lang.Use(destination)
+        Expect(reflect.TypeOf(e).String()).To(Equal, "*errors.errorString")
         Expect(servant.Lang.Is()).To(NotEqual, destination)
         Expect(servant.Lang.Is()).To(Equal, origin)
       })
@@ -108,7 +111,8 @@ func TestServantOptions(t *testing.T) {
         filePath := "./not/existing/file/path.txt"
 
         // Try to Set file
-        Expect(servant.Options.WithFile(filePath)).To(NotEqual, nil)
+        e := servant.Options.WithFile(filePath)
+        Expect(reflect.TypeOf(e).String()).To(Equal, "*errors.errorString")
 
         Expect(servant.Options.FilePath).To(Equal, "")
         Expect(servant.Options.UseFile).To(Equal, false)

@@ -27,7 +27,7 @@ func (l *Lang) Use(key string) error {
     l.Value = key
     return nil
   }
-  return errors.New("とりあえず生のエラー返します")
+  return errors.New("Language `" + key + "` is not available.")
 }
 
 func (l *Lang) init() *Lang {

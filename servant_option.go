@@ -20,7 +20,7 @@ func (o *Options) WithFile(path string) error {
   // 存在をチェック
   _,e := os.Open(path)
   if e != nil {
-    return errors.New("このメッセージどうする")
+    return errors.New("No such option file `" + path + "` is found.")
   }
   o.UseFile  = true
   o.FilePath = path

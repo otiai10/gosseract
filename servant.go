@@ -51,10 +51,6 @@ func SummonServant() Servant {
   }
 }
 
-func (s *Servant) Greeting() string {
-  return "Hi, I'm gosseract-ocr servant!"
-}
-
 func (s *Servant) Info() VersionInfo {
   tessVersion := getTesseractVersion()
   info := VersionInfo{

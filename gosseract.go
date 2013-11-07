@@ -6,6 +6,8 @@ import (
   "io/ioutil"
   "bytes"
   "strings"
+
+  "github.com/nu7hatch/gouuid"
 )
 
 type AnywayArgs struct {
@@ -27,12 +29,10 @@ func Anyway(args AnywayArgs) string {
   // 最終的な返り値
   out := ""
 
-  // 引数で行き先を指定されない場合は
-  // (とりあえず) `/tmp/anyway,txt`に置く
   // tesseractが標準出力に対応してるハズ
   // tesseractのバージョンを見るようなメソッドを用意しないとアカンなこれ
   if args.Destination == "" {
-    args.Destination = TMPDIR + "/anyway"
+    args.Destination = genTmpFilePath()
   }
 
   // tesseractコマンドを実行
@@ -91,7 +91,7 @@ func execute(source string, args []string) string {
   _args := []string{}
   _args = append(_args, source)
 
-  dest := defineDestinationFile()
+  dest := genTmpFilePath()
 
   _args = append(_args, dest)
   for _, a := range args {
@@ -158,7 +158,7 @@ func _generateCommand(_command string, args []string) *exec.Cmd {
   return exec.Command(_command)
 }
 
-func defineDestinationFile() string {
-  // TODO#5: UUIDかなんかでハッシングする
-  return TMPDIR + "/out"
+func genTmpFilePath() string {
+  id, _ := uuid.NewV4()
+  return TMPDIR + "/" + id.String()
 }

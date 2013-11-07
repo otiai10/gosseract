@@ -23,10 +23,6 @@ func Greeting() string {
   return "Hello,Gosseract!"
 }
 
-/**
- * とにかくパラメータ喰わせて一発でOCRしたい場合の
- * コマンドラッパー
- */
 func Anyway(args AnywayArgs) string {
   // 最終的な返り値
   out := ""
@@ -68,6 +64,7 @@ func getTesseractVersion() string {
   tesseractInfo := strings.Split(stderr.String(), " ")[1]
   return strings.TrimRight(tesseractInfo, "\n")
 }
+
 /**
  * 利用可能な言語の一覧を取得する
  */

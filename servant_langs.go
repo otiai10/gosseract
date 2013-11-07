@@ -1,7 +1,3 @@
-/**
- * サーバントの言語関係のメソッドを
- * 集約するファイル
- */
 package gosseract
 
 import (

@@ -6,12 +6,6 @@ import (
   "image/png"
 )
 
-/**
- * Gosseract Servant は
- * tessearctのバージョン取得とか
- * 利用可能言語取得、設定とか
- * ヒントとかを設定できるのﾃﾞｪｽ!!
- */
 type Servant struct {
   Source  Source
   Lang    Lang

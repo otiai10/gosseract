@@ -80,33 +80,23 @@ func TestServantLang(t *testing.T) {
 }
 
 func TestServantOptions(t *testing.T) {
-  Describe(t, "WithFile", func() {
+  Describe(t, "OptionWithFile", func() {
     Context("with existing file", func() {
       It("should set option file.", func() {
         servant := gosseract.SummonServant()
         // Do not use file in default
-        Expect(servant.Options.FilePath).To(Equal, "")
-        Expect(servant.Options.UseFile).To(Equal, false)
         filePath := "./samples/option/digest000.txt"
-
         // Try to Set file
-        Expect(servant.Options.WithFile(filePath)).To(Equal, nil)
-
-        Expect(servant.Options.UseFile).To(Equal, true)
-        Expect(servant.Options.FilePath).To(Equal, filePath)
+        Expect(servant.OptionWithFile(filePath)).To(Equal, nil)
       })
     })
     Context("with existing file", func() {
       It("should not set option file.", func() {
         servant := gosseract.SummonServant()
         filePath := "./not/existing/file/path.txt"
-
         // Try to Set file
-        e := servant.Options.WithFile(filePath)
+        e := servant.OptionWithFile(filePath)
         Expect(reflect.TypeOf(e).String()).To(Equal, "*errors.errorString")
-
-        Expect(servant.Options.FilePath).To(Equal, "")
-        Expect(servant.Options.UseFile).To(Equal, false)
       })
     })
   })
@@ -120,7 +110,7 @@ func TestServantStory(t *testing.T) {
       It("can OCR according to option file.", func() {
 
         servant := gosseract.SummonServant()
-        servant.Options.WithFile("./samples/option/digest001.txt")
+        servant.OptionWithFile("./samples/option/digest001.txt")
         filePath := "./samples/png/sample000.png"
         text, err := servant.Target(filePath).Out()
 
@@ -171,7 +161,7 @@ func TestServantAllow(t *testing.T) {
   Describe(t, "Allow", func() {
     It("can set whitelist of OCR result chars", func() {
       servant := gosseract.SummonServant()
-      servant.Options.Allow(":")
+      servant.AllowChars(":")
       text, _ := servant.Target("./samples/png/sample002.png").Out()
       Expect(text).To(Equal, "  :  :  \n\n")
     })

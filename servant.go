@@ -9,7 +9,7 @@ import (
 type Servant struct {
   source  source
   lang    lang
-  Options Options
+  options options
 }
 type source struct {
   FilePath string
@@ -19,7 +19,7 @@ type lang struct {
   Value      string
   Availables []string
 }
-type Options struct {
+type options struct {
   UseFile   bool
   FilePath  string
   Digest map[string]string
@@ -37,11 +37,11 @@ func SummonServant() Servant {
 
   lang := lang{}
   lang.init()
-  opts := Options{}
+  opts := options{}
   opts.init()
   return Servant{
     lang:    lang,
-    Options: opts,
+    options: opts,
   }
 }
 
@@ -85,10 +85,10 @@ func (s *Servant) Out() (string, error) {
 func (s *Servant) buildArguments() []string {
   var args []string
   args = append(args, "-l", s.lang.Value)
-  if ! s.Options.UseFile {
-    s.Options.FilePath = makeUpOptionFile(s.Options.Digest)
+  if ! s.options.UseFile {
+    s.options.FilePath = makeUpOptionFile(s.options.Digest)
   }
-  args = append(args, s.Options.FilePath)
+  args = append(args, s.options.FilePath)
   return args
 }
 func makeUpOptionFile(digestMap map[string]string) (fpath string) {

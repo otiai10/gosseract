@@ -5,29 +5,29 @@ import (
   "errors"
 )
 
-func (o *Options) init() *Options {
+func (o *options) init() *options {
   o.UseFile   = false
   o.FilePath  = ""
   o.Digest = make(map[string]string)
   return o
 }
 
-func (o *Options) WithFile(path string) error {
+func (s *Servant) OptionWithFile(path string) error {
   // 存在をチェック
   _,e := os.Open(path)
   if e != nil {
     return errors.New("No such option file `" + path + "` is found.")
   }
-  o.UseFile  = true
-  o.FilePath = path
+  s.options.UseFile  = true
+  s.options.FilePath = path
   return nil
 }
 
 // 全部サーバントに属した方が良い気がする
-func (o *Options) Allow(charAllowed string) {
+func (s *Servant) AllowChars(charAllowed string) {
   if charAllowed == "" {
     return
   }
-  o.Digest["tessedit_char_whitelist"] = charAllowed
+  s.options.Digest["tessedit_char_whitelist"] = charAllowed
   return
 }

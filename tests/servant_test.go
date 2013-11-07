@@ -26,15 +26,15 @@ func TestServant(t *testing.T) {
 }
 
 func TestServantLang(t *testing.T) {
-  Describe(t, "Available", func() {
+  Describe(t, "LangAvailable", func() {
     It("should give available languages of Tesseract", func() {
       servant := gosseract.SummonServant()
-      langs := servant.Lang.Available()
+      langs := servant.LangAvailable()
       Expect(len(langs)).To(NotEqual, 0)
     })
     It("should contain 'eng' at least.", func() {
       servant := gosseract.SummonServant()
-      langs := servant.Lang.Available()
+      langs := servant.LangAvailable()
       containEng := false
       for _,lang := range langs {
         if lang == "eng" {
@@ -45,35 +45,35 @@ func TestServantLang(t *testing.T) {
       Expect(containEng).To(Equal, true)
     })
   })
-  Describe(t, "Have", func() {
+  Describe(t, "LangHave", func() {
     It("should give whether argument language is available or not.", func() {
       servant := gosseract.SummonServant()
-      Expect(servant.Lang.Have("eng")).To(Equal, true)
+      Expect(servant.LangHave("eng")).To(Equal, true)
     })
   })
-  Describe(t, "Is", func() {
+  Describe(t, "LangIs", func() {
     It("should give current language setting.", func() {
       servant := gosseract.SummonServant()
-      Expect(servant.Lang.Is()).To(Equal, "eng")
+      Expect(servant.LangIs()).To(Equal, "eng")
     })
   })
-  Describe(t, "Use", func() {
+  Describe(t, "LangUse", func() {
     servant := gosseract.SummonServant()
     Context("with available language", func() {
       It("should set Lang and return nil.", func() {
         destination := "eng"// TODO#2: ここengじゃテストにならんでしょうがwww
-        Expect(servant.Lang.Use(destination)).To(Equal, nil)
-        Expect(servant.Lang.Is()).To(Equal, destination)
+        Expect(servant.LangUse(destination)).To(Equal, nil)
+        Expect(servant.LangIs()).To(Equal, destination)
       })
     })
     Context("with not available language", func() {
       It("should return error.", func() {
-        origin := servant.Lang.Is()
+        origin := servant.LangIs()
         destination := "wrong lang"
-        e := servant.Lang.Use(destination)
+        e := servant.LangUse(destination)
         Expect(reflect.TypeOf(e).String()).To(Equal, "*errors.errorString")
-        Expect(servant.Lang.Is()).To(NotEqual, destination)
-        Expect(servant.Lang.Is()).To(Equal, origin)
+        Expect(servant.LangIs()).To(NotEqual, destination)
+        Expect(servant.LangIs()).To(Equal, origin)
       })
     })
   })

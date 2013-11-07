@@ -4,29 +4,29 @@ import (
   "errors"
 )
 
-func (l *Lang) Available() []string {
-  return l.Availables
+func (s *Servant) LangAvailable() []string {
+  return s.lang.Availables
 }
-func (l *Lang) Have(key string) bool {
-  for _, language := range l.Availables {
+func (s *Servant) LangHave(key string) bool {
+  for _, language := range s.lang.Availables {
     if language == key {
       return true
     }
   }
   return false
 }
-func (l *Lang) Is() string {
-  return l.Value
+func (s *Servant) LangIs() string {
+  return s.lang.Value
 }
-func (l *Lang) Use(key string) error {
-  if l.Have(key) {
-    l.Value = key
+func (s *Servant) LangUse(key string) error {
+  if s.LangHave(key) {
+    s.lang.Value = key
     return nil
   }
   return errors.New("Language `" + key + "` is not available.")
 }
 
-func (l *Lang) init() *Lang {
+func (l *lang) init() *lang {
   l.Value = "eng";// "eng" in default
   l.Availables = getAvailables();
   return l

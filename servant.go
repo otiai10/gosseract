@@ -7,15 +7,15 @@ import (
 )
 
 type Servant struct {
-  Source  Source
-  Lang    Lang
+  source  source
+  lang    lang
   Options Options
 }
-type Source struct {
+type source struct {
   FilePath string
   // 画像形式とかくるんだろうな今後
 }
-type Lang struct {
+type lang struct {
   Value      string
   Availables []string
 }
@@ -35,12 +35,12 @@ func SummonServant() Servant {
     panic("Missin `tesseract` command!! install tessearct at first.")
   }
 
-  lang := Lang{}
+  lang := lang{}
   lang.init()
   opts := Options{}
   opts.init()
   return Servant{
-    Lang:    lang,
+    lang:    lang,
     Options: opts,
   }
 }
@@ -57,13 +57,13 @@ func (s *Servant) Info() VersionInfo {
 // ファイルパスを受け取るメソッド
 func (s *Servant) Target(filepath string) *Servant {
   // TODO: ファイル存在チェック
-  s.Source.FilePath = filepath
+  s.source.FilePath = filepath
   return s
 }
 
 // image.Imageを一時ファイルにしてそのファイルパスを返す
 func (s *Servant) Eat(img image.Image) *Servant {
-  filepath := "/tmp/eaten"
+  filepath := genTmpFilePath()
   f, e := os.Create(filepath)
   if e != nil {
     panic(e)
@@ -71,20 +71,20 @@ func (s *Servant) Eat(img image.Image) *Servant {
   defer f.Close()
   png.Encode(f, img)
 
-  s.Source.FilePath = filepath
+  s.source.FilePath = filepath
 
   return s
 }
 
 func (s *Servant) Out() (string, error) {
-  result := execute(s.Source.FilePath, s.buildArguments())
+  result := execute(s.source.FilePath, s.buildArguments())
   // errorここハードにnilなら要らなくないか？
   return result, nil
 }
 
 func (s *Servant) buildArguments() []string {
   var args []string
-  args = append(args, "-l", s.Lang.Value)
+  args = append(args, "-l", s.lang.Value)
   if ! s.Options.UseFile {
     s.Options.FilePath = makeUpOptionFile(s.Options.Digest)
   }
@@ -100,7 +100,7 @@ func makeUpOptionFile(digestMap map[string]string) (fpath string) {
   if digestFileContents == "" {
     return fpath
   }
-  fpath = "/tmp/digest"
+  fpath = genTmpFilePath()
   f, _ := os.Create(fpath)
   defer f.Close()
   _, _ = f.WriteString(digestFileContents)

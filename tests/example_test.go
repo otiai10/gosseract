@@ -2,74 +2,58 @@ package gosseract
 
 import (
   "github.com/otiai10/gosseract"
-  . "github.com/r7kamura/gospel"
-  "testing"
+  "fmt"
 
   "image"
 )
 
-func ExampleAnyway(t *testing.T) {
-  Describe(t, "gosseract.Anyway", func() {
-    It("should exeute OCR anyway with args.", func() {
-      args := gosseract.AnywayArgs{
-        SourcePath: "samples/png/sample000.png",
-      }
-      out := gosseract.Anyway(args)
-      Expect(out).To(Equal, "01:37:58\n\n")
-    })
-  })
+func ExampleAnyway() {
+  args := gosseract.AnywayArgs{
+    SourcePath: "samples/png/sample000.png",
+  }
+  out := gosseract.Anyway(args)
+  fmt.Println(out)
 }
 
-func ExampleTarget(t *testing.T) {
-  Describe(t, "Servant.Target", func() {
-    It("can OCR also without any options.", func() {
+func ExampleTarget() {
+  var sourceFilePath string
+  sourceFilePath = "./samples/png/sample000.png"
 
-      var sourceFilePath string
-      sourceFilePath = "./samples/png/sample000.png"
+  servant := gosseract.SummonServant()
+  text, err := servant.Target(sourceFilePath).Out()
 
-      servant := gosseract.SummonServant()
-      text, err := servant.Target(sourceFilePath).Out()
-
-      Expect(text).To(Equal, "01:37:58\n\n")
-      Expect(err).To(Equal, nil)
-    })
-  })
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println(text)
 }
 
-func ExampleOptionWithFile(t *testing.T) {
-  Describe(t, "Servant.Target", func() {
-    Context("with option file", func() {
-      It("can OCR according to option file.", func() {
+func ExampleOptionWithFile() {
+  var optionFilePath string
+  optionFilePath = "./samples/option/digest001.txt"
 
-        var optionFilePath string
-        optionFilePath = "./samples/option/digest001.txt"
+  var sourceFilePath string
+  sourceFilePath = "./samples/png/sample000.png"
 
-        var sourceFilePath string
-        sourceFilePath = "./samples/png/sample000.png"
+  servant := gosseract.SummonServant()
+  servant.OptionWithFile(optionFilePath)
+  text, err := servant.Target(sourceFilePath).Out()
 
-        servant := gosseract.SummonServant()
-        servant.OptionWithFile(optionFilePath)
-        text, err := servant.Target(sourceFilePath).Out()
-
-        Expect(text).To(Equal, "O    \n\n")
-        Expect(err).To(Equal, nil)
-      })
-    })
-  })
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println(text)
 }
 
-func ExampleEat(t *testing.T) {
-  Describe(t, "Eat", func() {
-    It("can OCR from `image.Image`.", func() {
+func ExampleEat() {
+  var img image.Image
+  img = fixtureImageObj("./samples/png/sample001.png")
 
-      var img image.Image
-      img = fixtureImageObj("./samples/png/sample001.png")
+  servant := gosseract.SummonServant()
+  text, err := servant.Eat(img).Out()
 
-      servant := gosseract.SummonServant()
-      text, err := servant.Eat(img).Out()
-
-      Expect(text).To(Equal, "03:41:26\n\n")
-      Expect(err).To(Equal, nil)
-    })
-  })
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println(text)
 }

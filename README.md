@@ -1,12 +1,10 @@
-gosseract-ocr
-=============
+# gosseract-ocr
 
 tesseract-ocr wrapper by Golang
 
 [What is tesseract-ocr?](https://code.google.com/p/tesseract-ocr/) 
 
-Sample
-=============
+# Sample
 ```go
 package main
 
@@ -24,18 +22,16 @@ func main() {
 }
 ```
 
-Set Up
-=============
-
+# Set Up
 ```sh
 apt-get install tesseract-ocr # Basic OCR library by C++
 # or yum? brew? Choose the way whichever you can install `tesseract-ocr`
 go get github.com/otiai10/gosseract
+go get github.com/nu7hatch/gouuid
 go get github.com/r7kamura/gospel # for testing
 ```
 
-First of All, Run the Tests!!
-=============
+# First of All, Run the Tests!!
 
 ```sh
 cd tests

@@ -25,23 +25,21 @@ func Greeting() string {
   return "Hello,Gosseract!"
 }
 
+// func `gosseract.Anyway` can OCR from multi args
 func Anyway(args AnywayArgs) string {
   // 最終的な返り値
   out := ""
-
   // tesseractが標準出力に対応してるハズ
   // tesseractのバージョンを見るようなメソッドを用意しないとアカンなこれ
   if args.Destination == "" {
     args.Destination = genTmpFilePath()
   }
-
   // tesseractコマンドを実行
   command := exec.Command(COMMAND, args.SourcePath, args.Destination)
   e := command.Run()
   if e != nil {
     panic(e)
   }
-
   // 出力を読む
   // tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
   fn := args.Destination + OUTEXT

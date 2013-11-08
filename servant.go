@@ -6,6 +6,7 @@ import (
   "image/png"
 )
 
+// Servant of gosseract providing interactive setting
 type Servant struct {
   source  source
   lang    lang
@@ -29,6 +30,7 @@ type VersionInfo struct {
   GosseractVersion string
 }
 
+// Provide new servant instance
 func SummonServant() Servant {
 
   if ! tesseractInstalled() {
@@ -45,6 +47,7 @@ func SummonServant() Servant {
   }
 }
 
+// Check information of tesseract and gosseract
 func (s *Servant) Info() VersionInfo {
   tessVersion := getTesseractVersion()
   info := VersionInfo{
@@ -54,14 +57,14 @@ func (s *Servant) Info() VersionInfo {
   return info
 }
 
-// ファイルパスを受け取るメソッド
+// Give source file to servant by file path
 func (s *Servant) Target(filepath string) *Servant {
   // TODO: ファイル存在チェック
   s.source.FilePath = filepath
   return s
 }
 
-// image.Imageを一時ファイルにしてそのファイルパスを返す
+// Give source file to servant by image.Image
 func (s *Servant) Eat(img image.Image) *Servant {
   filepath := genTmpFilePath()
   f, e := os.Create(filepath)
@@ -76,6 +79,7 @@ func (s *Servant) Eat(img image.Image) *Servant {
   return s
 }
 
+// Get result (or error?)
 func (s *Servant) Out() (string, error) {
   result := execute(s.source.FilePath, s.buildArguments())
   // errorここハードにnilなら要らなくないか？

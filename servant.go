@@ -83,6 +83,8 @@ func (s *Servant) Eat(img image.Image) *Servant {
 func (s *Servant) Out() (string, error) {
   result := execute(s.source.FilePath, s.buildArguments())
   // errorここハードにnilなら要らなくないか？
+  // TODO : 利用したファイルは削除する
+  // TODO : servantディレクトリつくる
   return result, nil
 }
 

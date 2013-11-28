@@ -16,7 +16,7 @@ import (
 
 func TestServant(t *testing.T) {
   Describe(t, "Info", func() {
-    It("shoul show version of Tesseract and Gosseract.", func() {
+    It("should show version of Tesseract and Gosseract.", func() {
       servant := gosseract.SummonServant()
       info := servant.Info()
       Expect(info.GosseractVersion).To(Equal, "0.0.1")

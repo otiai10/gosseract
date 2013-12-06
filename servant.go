@@ -14,6 +14,7 @@ type Servant struct {
 }
 type source struct {
   FilePath string
+  isTmp    bool
   // 画像形式とかくるんだろうな今後
 }
 type lang struct {
@@ -75,6 +76,7 @@ func (s *Servant) Eat(img image.Image) *Servant {
   png.Encode(f, img)
 
   s.source.FilePath = filepath
+  s.source.isTmp = true
 
   return s
 }
@@ -83,8 +85,15 @@ func (s *Servant) Eat(img image.Image) *Servant {
 func (s *Servant) Out() (string, error) {
   result := execute(s.source.FilePath, s.buildArguments())
   // errorここハードにnilなら要らなくないか？
-  // TODO : 利用したファイルは削除する
   // TODO : servantディレクトリつくる
+
+  if ! s.options.UseFile {
+    _ = os.Remove(s.options.FilePath)
+  }
+  if  s.source.isTmp {
+    _ = os.Remove(s.source.FilePath)
+  }
+
   return result, nil
 }
 

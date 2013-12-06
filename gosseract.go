@@ -47,6 +47,8 @@ func Anyway(args AnywayArgs) string {
   buf, _ := ioutil.ReadFile(f.Name())
   out = string(buf)
 
+  _ = os.Remove(f.Name())
+
   return out
 }
 
@@ -105,6 +107,8 @@ func execute(source string, args []string) string {
   f, _ := os.OpenFile(fn, 1, 1)
   buf, _ := ioutil.ReadFile(f.Name())
   out := string(buf)
+
+  _ = os.Remove(fn)
 
   return out
 }

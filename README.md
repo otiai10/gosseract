@@ -1,3 +1,5 @@
+![icon](https://f.cloud.github.com/assets/931554/1795347/06dde904-6a07-11e3-8dd3-33b7d466acdb.jpg)
+
 # gosseract-ocr
 
 tesseract-ocr wrapper by Golang

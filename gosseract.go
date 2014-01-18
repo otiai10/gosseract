@@ -1,84 +1,85 @@
 package gosseract
 
 import (
-  "os"
-  "os/exec"
-  "io/ioutil"
-  "bytes"
-  "strings"
+	"bytes"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"strings"
 
-  "github.com/nu7hatch/gouuid"
+	"github.com/nu7hatch/gouuid"
 )
 
 type AnywayArgs struct {
-  SourcePath  string
-  Destination string
+	SourcePath  string
+	Destination string
 }
+
 var (
-  TMPDIR = "/tmp"
-  OUTEXT = ".txt"
-  COMMAND = "tesseract"
-  VERSION = "0.0.1"
+	TMPDIR  = "/tmp"
+	OUTEXT  = ".txt"
+	COMMAND = "tesseract"
+	VERSION = "0.0.1"
 )
 
 func Greeting() string {
-  return "Hello,Gosseract!"
+	return "Hello,Gosseract!"
 }
 
 // func `gosseract.Anyway` can OCR from multi args
 func Anyway(args AnywayArgs) string {
-  // 最終的な返り値
-  out := ""
-  // tesseractが標準出力に対応してるハズ
-  // tesseractのバージョンを見るようなメソッドを用意しないとアカンなこれ
-  if args.Destination == "" {
-    args.Destination = genTmpFilePath()
-  }
-  // tesseractコマンドを実行
-  command := exec.Command(COMMAND, args.SourcePath, args.Destination)
-  e := command.Run()
-  if e != nil {
-    panic(e)
-  }
-  // 出力を読む
-  // tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
-  fn := args.Destination + OUTEXT
-  f, _ := os.OpenFile(fn, 1, 1)
-  buf, _ := ioutil.ReadFile(f.Name())
-  out = string(buf)
+	// 最終的な返り値
+	out := ""
+	// tesseractが標準出力に対応してるハズ
+	// tesseractのバージョンを見るようなメソッドを用意しないとアカンなこれ
+	if args.Destination == "" {
+		args.Destination = genTmpFilePath()
+	}
+	// tesseractコマンドを実行
+	command := exec.Command(COMMAND, args.SourcePath, args.Destination)
+	e := command.Run()
+	if e != nil {
+		panic(e)
+	}
+	// 出力を読む
+	// tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
+	fn := args.Destination + OUTEXT
+	f, _ := os.OpenFile(fn, 1, 1)
+	buf, _ := ioutil.ReadFile(f.Name())
+	out = string(buf)
 
-  _ = os.Remove(f.Name())
+	_ = os.Remove(f.Name())
 
-  return out
+	return out
 }
 
 func getTesseractVersion() string {
-  command := exec.Command(COMMAND, "--version")
-  var stderr bytes.Buffer
-  command.Stderr = &stderr //謎に標準エラーで来るw
-  e := command.Run()
-  if e != nil {
-    panic(e)
-  }
-  // なんかクズい
-  tesseractInfo := strings.Split(stderr.String(), " ")[1]
-  return strings.TrimRight(tesseractInfo, "\n")
+	command := exec.Command(COMMAND, "--version")
+	var stderr bytes.Buffer
+	command.Stderr = &stderr //謎に標準エラーで来るw
+	e := command.Run()
+	if e != nil {
+		panic(e)
+	}
+	// なんかクズい
+	tesseractInfo := strings.Split(stderr.String(), " ")[1]
+	return strings.TrimRight(tesseractInfo, "\n")
 }
 
 /**
  * 利用可能な言語の一覧を取得する
  */
 func getAvailableLanguages() []string {
-  command := exec.Command(COMMAND, "--list-langs")
-  var stderr bytes.Buffer
-  command.Stderr = &stderr //謎に標準エラーで来るw
-  e := command.Run()
-  if e != nil {
-    panic(e)
-  }
-  langs := strings.Split(stderr.String(), "\n")
-  langs = langs[1:len(langs) - 1]
-  return langs
+	command := exec.Command(COMMAND, "--list-langs")
+	var stderr bytes.Buffer
+	command.Stderr = &stderr //謎に標準エラーで来るw
+	e := command.Run()
+	if e != nil {
+		panic(e)
+	}
+	langs := strings.Split(stderr.String(), "\n")
+	langs = langs[1 : len(langs)-1]
+	return langs
 }
 
 /**
@@ -88,79 +89,80 @@ func getAvailableLanguages() []string {
  * ファイル操作などを隠蔽する
  */
 func execute(source string, args []string) string {
-  _args := []string{}
-  _args = append(_args, source)
+	_args := []string{}
+	_args = append(_args, source)
 
-  dest := genTmpFilePath()
+	dest := genTmpFilePath()
 
-  _args = append(_args, dest)
-  for _, a := range args {
-    _args = append(_args, a)
-  }
-  _ = _exec(COMMAND, _args)
+	_args = append(_args, dest)
+	for _, a := range args {
+		_args = append(_args, a)
+	}
+	_ = _exec(COMMAND, _args)
 
-  // 出力を読む
-  // tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
-  // TODO4: DRY
-  fn := dest + OUTEXT
+	// 出力を読む
+	// tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
+	// TODO4: DRY
+	fn := dest + OUTEXT
 
-  f, _ := os.OpenFile(fn, 1, 1)
-  buf, _ := ioutil.ReadFile(f.Name())
-  out := string(buf)
+	f, _ := os.OpenFile(fn, 1, 1)
+	buf, _ := ioutil.ReadFile(f.Name())
+	out := string(buf)
 
-  _ = os.Remove(fn)
+	_ = os.Remove(fn)
 
-  return out
+	return out
 }
 
 func tesseractInstalled() bool {
-  out := _exec("which", []string{"tesseract"}) 
-  if out == "" {
-    return false
-  }
-  return true
+	out := _exec("which", []string{"tesseract"})
+	if out == "" {
+		return false
+	}
+	return true
 }
 
 /**
  * 汎用: コマンドを実行する
  */
 func _exec(command string, args []string) string {
-  cmd := _generateCommand(command, args)
-  var stdout, stderr bytes.Buffer
-  cmd.Stdout = &stdout
-  cmd.Stderr = &stderr
-  _ = cmd.Run()
-  if stdout.String() != "" {
-    return stdout.String()
-  }
-  return stderr.String()
+	cmd := _generateCommand(command, args)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	_ = cmd.Run()
+	if stdout.String() != "" {
+		return stdout.String()
+	}
+	return stderr.String()
 }
+
 /**
  * TODO#3: こんなラッパーメソッド作らんとアカンのクソじゃね？
  */
 func _generateCommand(_command string, args []string) *exec.Cmd {
-  if len(args) == 0 {
-    return exec.Command(_command)
-  }
-  if len(args) == 1 {
-    return exec.Command(_command, args[0])
-  }
-  if len(args) == 2 {
-    return exec.Command(_command, args[0], args[1])
-  }
-  if len(args) == 3 {
-    return exec.Command(_command, args[0], args[1], args[2])
-  }
-  if len(args) == 4 {
-    return exec.Command(_command, args[0], args[1], args[2], args[3])
-  }
-  if len(args) == 5 {
-    return exec.Command(_command, args[0], args[1], args[2], args[3], args[4])
-  }
-  return exec.Command(_command)
+	if len(args) == 0 {
+		return exec.Command(_command)
+	}
+	if len(args) == 1 {
+		return exec.Command(_command, args[0])
+	}
+	if len(args) == 2 {
+		return exec.Command(_command, args[0], args[1])
+	}
+	if len(args) == 3 {
+		return exec.Command(_command, args[0], args[1], args[2])
+	}
+	if len(args) == 4 {
+		return exec.Command(_command, args[0], args[1], args[2], args[3])
+	}
+	if len(args) == 5 {
+		return exec.Command(_command, args[0], args[1], args[2], args[3], args[4])
+	}
+	return exec.Command(_command)
 }
 
 func genTmpFilePath() string {
-  id, _ := uuid.NewV4()
-  return TMPDIR + "/" + id.String()
+	id, _ := uuid.NewV4()
+	return TMPDIR + "/" + id.String()
 }

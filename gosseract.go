@@ -15,6 +15,7 @@ type AnywayArgs struct {
 	Destination string
 }
 
+// TODO?: Support windows? :(
 var (
 	TMPDIR  = "/tmp"
 	OUTEXT  = ".txt"
@@ -26,23 +27,25 @@ func Greeting() string {
 	return "Hello,Gosseract!"
 }
 
-// func `gosseract.Anyway` can OCR from multi args
+// `Anyway` provide the way to execute OCR instantly and directly.
 func Anyway(args AnywayArgs) string {
-	// 最終的な返り値
 	out := ""
-	// tesseractが標準出力に対応してるハズ
-	// tesseractのバージョンを見るようなメソッドを用意しないとアカンなこれ
+	// TODO: DO NOT USE tmp files, using stdin is better
+	//	   @see https://code.google.com/p/tesseract-ocr/issues/detail?id=813
+	// TODO: Check tesseract-ocr's version?
 	if args.Destination == "" {
 		args.Destination = genTmpFilePath()
 	}
-	// tesseractコマンドを実行
+	// Execute the command
 	command := exec.Command(COMMAND, args.SourcePath, args.Destination)
 	e := command.Run()
 	if e != nil {
 		panic(e)
 	}
-	// 出力を読む
-	// tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
+
+	// TODO: DRY
+	// Reading output
+	// (outputs of `tesseract` automatically be `{second-args}.txt` format)
 	fn := args.Destination + OUTEXT
 	f, _ := os.OpenFile(fn, 1, 1)
 	buf, _ := ioutil.ReadFile(f.Name())
@@ -56,23 +59,21 @@ func Anyway(args AnywayArgs) string {
 func getTesseractVersion() string {
 	command := exec.Command(COMMAND, "--version")
 	var stderr bytes.Buffer
-	command.Stderr = &stderr //謎に標準エラーで来るw
+	command.Stderr = &stderr // XXX: Why it's stderr X(
 	e := command.Run()
 	if e != nil {
 		panic(e)
 	}
-	// なんかクズい
+	// ugly
 	tesseractInfo := strings.Split(stderr.String(), " ")[1]
 	return strings.TrimRight(tesseractInfo, "\n")
 }
 
-/**
- * 利用可能な言語の一覧を取得する
- */
+// Get all available language able to use from `tesseract`
 func getAvailableLanguages() []string {
 	command := exec.Command(COMMAND, "--list-langs")
 	var stderr bytes.Buffer
-	command.Stderr = &stderr //謎に標準エラーで来るw
+	command.Stderr = &stderr // XXX: Why it's stderr X(
 	e := command.Run()
 	if e != nil {
 		panic(e)
@@ -81,12 +82,9 @@ func getAvailableLanguages() []string {
 	return langs[1 : len(langs)-1]
 }
 
-/**
- * ソースファイルパスと
- * オプションアーギュメントのスライスを受け取り
- * OCRしたものを返す
- * ファイル操作などを隠蔽する
- */
+// Capsulize files management.
+// Takes path to source file.
+// Returns result string.
 func execute(source string, args []string) string {
 	_args := []string{}
 	_args = append(_args, source)
@@ -99,9 +97,9 @@ func execute(source string, args []string) string {
 	}
 	_ = _exec(COMMAND, _args)
 
-	// 出力を読む
-	// tesseractの出力はコマンドラインの第二引数に.txtを付けたものに置かれる
-	// TODO4: DRY
+	// TODO: DRY
+	// Reading output
+	// (outputs of `tesseract` automatically be `{second-args}.txt` format)
 	fn := dest + OUTEXT
 
 	f, _ := os.OpenFile(fn, 1, 1)
@@ -119,9 +117,7 @@ func tesseractInstalled() bool {
 	return found != ""
 }
 
-/**
- * 汎用: コマンドを実行する
- */
+// the very general command execution wrapper
 func _exec(command string, args []string) string {
 	cmd := exec.Command(command, args...)
 	var stdout, stderr bytes.Buffer
@@ -134,6 +130,7 @@ func _exec(command string, args []string) string {
 	return stderr.String()
 }
 
+// Generates tmp filepath
 func genTmpFilePath() string {
 	id, _ := uuid.NewV4()
 	return TMPDIR + "/" + id.String()

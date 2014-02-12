@@ -9,16 +9,16 @@ import (
 // Servant of gosseract providing interactive setting
 type Servant struct {
 	source  source
-	lang    lang
+	lang	lang
 	options options
 }
 type source struct {
 	FilePath string
-	isTmp    bool
-	// 画像形式とかくるんだろうな今後
+	isTmp	bool
+	// TODO: accept multiple image formats
 }
 type lang struct {
-	Value      string
+	Value	  string
 	Availables []string
 }
 type options struct {
@@ -43,7 +43,7 @@ func SummonServant() Servant {
 	opts := options{}
 	opts.init()
 	return Servant{
-		lang:    lang,
+		lang:	lang,
 		options: opts,
 	}
 }
@@ -60,7 +60,7 @@ func (s *Servant) Info() VersionInfo {
 
 // Give source file to servant by file path
 func (s *Servant) Target(filepath string) *Servant {
-	// TODO: ファイル存在チェック
+	// TODO: check existence of this file
 	s.source.FilePath = filepath
 	return s
 }
@@ -84,8 +84,7 @@ func (s *Servant) Eat(img image.Image) *Servant {
 // Get result (or error?)
 func (s *Servant) Out() (string, error) {
 	result := execute(s.source.FilePath, s.buildArguments())
-	// errorここハードにnilなら要らなくないか？
-	// TODO : servantディレクトリつくる
+	// TODO? : should make `gosseract.servant` package?
 
 	if !s.options.UseFile {
 		_ = os.Remove(s.options.FilePath)
@@ -94,9 +93,11 @@ func (s *Servant) Out() (string, error) {
 		_ = os.Remove(s.source.FilePath)
 	}
 
+	// TODO: handle errors
 	return result, nil
 }
 
+// Make up arguments appropriate to tesseract command
 func (s *Servant) buildArguments() []string {
 	var args []string
 	args = append(args, "-l", s.lang.Value)
@@ -106,6 +107,8 @@ func (s *Servant) buildArguments() []string {
 	args = append(args, s.options.FilePath)
 	return args
 }
+// Make up option file for tesseract command.
+// (is needless if tesseract accepts such options by cli options)
 func makeUpOptionFile(digestMap map[string]string) (fpath string) {
 	fpath = ""
 	var digestFileContents string

@@ -13,7 +13,6 @@ func (o *options) init() *options {
 }
 
 func (s *Servant) OptionWithFile(path string) error {
-	// 存在をチェック
 	_, e := os.Open(path)
 	if e != nil {
 		return errors.New("No such option file `" + path + "` is found.")
@@ -23,7 +22,6 @@ func (s *Servant) OptionWithFile(path string) error {
 	return nil
 }
 
-// 全部サーバントに属した方が良い気がする
 func (s *Servant) AllowChars(charAllowed string) {
 	if charAllowed == "" {
 		return

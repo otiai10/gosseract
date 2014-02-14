@@ -9,16 +9,16 @@ import (
 // Servant of gosseract providing interactive setting
 type Servant struct {
 	source  source
-	lang	lang
+	lang    lang
 	options options
 }
 type source struct {
 	FilePath string
-	isTmp	bool
+	isTmp    bool
 	// TODO: accept multiple image formats
 }
 type lang struct {
-	Value	  string
+	Value      string
 	Availables []string
 }
 type options struct {
@@ -43,7 +43,7 @@ func SummonServant() Servant {
 	opts := options{}
 	opts.init()
 	return Servant{
-		lang:	lang,
+		lang:    lang,
 		options: opts,
 	}
 }
@@ -107,6 +107,7 @@ func (s *Servant) buildArguments() []string {
 	args = append(args, s.options.FilePath)
 	return args
 }
+
 // Make up option file for tesseract command.
 // (is needless if tesseract accepts such options by cli options)
 func makeUpOptionFile(digestMap map[string]string) (fpath string) {

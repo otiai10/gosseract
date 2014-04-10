@@ -14,6 +14,8 @@ type AnywayArgs struct {
 }
 
 // TODO?: Support windows? :(
+// <- may be solved by 403cb0ff41bfa65a2e2882ed1329803ce27f4f26
+// TODO: check in windows
 var (
 	TMPFILEPREFIX = "gosseract"
 	OUTEXT        = ".txt"

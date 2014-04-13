@@ -6,8 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/nu7hatch/gouuid"
 )
 
 type AnywayArgs struct {
@@ -16,11 +14,13 @@ type AnywayArgs struct {
 }
 
 // TODO?: Support windows? :(
+// <- may be solved by 403cb0ff41bfa65a2e2882ed1329803ce27f4f26
+// TODO: check in windows
 var (
-	TMPDIR  = "/tmp"
-	OUTEXT  = ".txt"
-	COMMAND = "tesseract"
-	VERSION = "0.0.1"
+	TMPFILEPREFIX = "gosseract"
+	OUTEXT        = ".txt"
+	COMMAND       = "tesseract"
+	VERSION       = "0.0.1"
 )
 
 func Greeting() string {
@@ -132,6 +132,10 @@ func _exec(command string, args []string) string {
 
 // Generates tmp filepath
 func genTmpFilePath() string {
-	id, _ := uuid.NewV4()
-	return TMPDIR + "/" + id.String()
+	myTmpDir := "" // TODO: enable to choose optionally
+	f, e := ioutil.TempFile(myTmpDir, TMPFILEPREFIX)
+	if e != nil {
+		panic(e)
+	}
+	return f.Name()
 }

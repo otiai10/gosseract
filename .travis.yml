@@ -6,6 +6,7 @@ go:
 
 before_install:
     - sudo apt-get install tesseract-ocr
-
+before_script:
+    - go get github.com/r7kamura/gospel
 script:
     - go test -v ./tests

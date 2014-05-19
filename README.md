@@ -6,6 +6,8 @@ tesseract-ocr wrapper by Golang
 
 [What is tesseract-ocr?](https://code.google.com/p/tesseract-ocr/)
 
+[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=develop)](https://travis-ci.org/otiai10/gosseract)
+
 # Sample
 ```go
 package main

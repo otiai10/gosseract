@@ -1,0 +1,11 @@
+language: go
+
+go:
+    - 1.2
+    - tip
+
+before_install:
+    - sudo apt-get install tesseract-ocr
+
+script:
+    - go test -v ./tests

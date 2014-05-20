@@ -23,7 +23,7 @@ func TestGosseract_Greeting(t *testing.T) {
 
 func TestGosseract_Anyway(t *testing.T) {
     args := gosseract.AnywayArgs{
-        SourcePath: "tests/samples/png/sample000.png",
+        SourcePath: ".samples/png/sample000.png",
     }
     assert(
         t,

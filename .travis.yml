@@ -9,4 +9,4 @@ before_install:
 before_script:
     - go get github.com/r7kamura/gospel
 script:
-    - go test -v ./tests
+    - go test -v ./...

@@ -70,7 +70,9 @@ func getTesseractVersion() string {
 }
 
 // Get all available language able to use from `tesseract`
-func getAvailableLanguages() []string {
+func getAvailableLanguages() (langs []string) {
+    return
+    /* TODO: "--list-langs" option not found!!
 	command := exec.Command(COMMAND, "--list-langs")
 	var stderr bytes.Buffer
 	command.Stderr = &stderr // XXX: Why it's stderr X(
@@ -80,6 +82,7 @@ func getAvailableLanguages() []string {
 	}
 	langs := strings.Split(stderr.String(), "\n")
 	return langs[1 : len(langs)-1]
+    */
 }
 
 // Capsulize files management.

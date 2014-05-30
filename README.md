@@ -1,14 +1,8 @@
-This project is under reconstructing in tree [`wip/v2`](https://github.com/otiai10/gosseract/tree/wip/v2).
-
-- More effective error handling, without using `panic`.
-- More plain implementations, to make it easy to read.
-- etc...
-
-[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=develop)](https://travis-ci.org/otiai10/gosseract)
-
 # gosseract-ocr
 
 [Tesseract-OCR](https://code.google.com/p/tesseract-ocr/) command wrapper for Golang
+
+[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=develop)](https://travis-ci.org/otiai10/gosseract)
 
 # example
 ```go
@@ -26,6 +20,7 @@ func main() {
 
 	fmt.Println(text)
 }
+
 ```
 
 # setup

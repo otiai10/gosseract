@@ -27,7 +27,7 @@ func main() {
 # dependencies
 
 - [tesseract-ocr](https://code.google.com/p/tesseract-ocr/)#3.02~
-- [github.com/otiai10/mint] to simplize tests
+- [mint](https://github.com/otiai10/mint) to simplize tests
 
 # test
 ```sh

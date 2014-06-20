@@ -1,13 +1,12 @@
 package gosseract
 
-import (
-	"image"
-	"image/png"
-	"os"
-)
+import "os"
+import "errors"
+import "image"
+import "image/png"
 
-// Servant of gosseract providing interactive setting
-type Servant struct {
+// Client of gosseract providing interactive setting
+type Client struct {
 	source  source
 	lang    lang
 	options options
@@ -31,8 +30,8 @@ type VersionInfo struct {
 	GosseractVersion string
 }
 
-// Provide new servant instance
-func SummonServant() Servant {
+// Provide new client instance
+func NewClient() Client {
 
 	if !tesseractInstalled() {
 		panic("Missin `tesseract` command!! install tessearct at first.")
@@ -42,14 +41,14 @@ func SummonServant() Servant {
 	lang.init()
 	opts := options{}
 	opts.init()
-	return Servant{
+	return Client{
 		lang:    lang,
 		options: opts,
 	}
 }
 
 // Check information of tesseract and gosseract
-func (s *Servant) Info() VersionInfo {
+func (s *Client) Info() VersionInfo {
 	tessVersion := getTesseractVersion()
 	info := VersionInfo{
 		TesseractVersion: tessVersion,
@@ -58,15 +57,15 @@ func (s *Servant) Info() VersionInfo {
 	return info
 }
 
-// Give source file to servant by file path
-func (s *Servant) Target(filepath string) *Servant {
+// Give source file to client by file path
+func (s *Client) Target(filepath string) *Client {
 	// TODO: check existence of this file
 	s.source.FilePath = filepath
 	return s
 }
 
-// Give source file to servant by image.Image
-func (s *Servant) Eat(img image.Image) *Servant {
+// Give source file to client by image.Image
+func (s *Client) Eat(img image.Image) *Client {
 	filepath := genTmpFilePath()
 	f, e := os.Create(filepath)
 	if e != nil {
@@ -82,9 +81,9 @@ func (s *Servant) Eat(img image.Image) *Servant {
 }
 
 // Get result (or error?)
-func (s *Servant) Out() (string, error) {
+func (s *Client) Out() (string, error) {
 	result := execute(s.source.FilePath, s.buildArguments())
-	// TODO? : should make `gosseract.servant` package?
+	// TODO? : should make `gosseract.client` package?
 
 	if !s.options.UseFile {
 		_ = os.Remove(s.options.FilePath)
@@ -98,7 +97,7 @@ func (s *Servant) Out() (string, error) {
 }
 
 // Make up arguments appropriate to tesseract command
-func (s *Servant) buildArguments() []string {
+func (s *Client) buildArguments() []string {
 	var args []string
 	args = append(args, "-l", s.lang.Value)
 	if !s.options.UseFile {
@@ -124,4 +123,65 @@ func makeUpOptionFile(digestMap map[string]string) (fpath string) {
 	defer f.Close()
 	_, _ = f.WriteString(digestFileContents)
 	return fpath
+}
+
+func (s *Client) LangAvailable() []string {
+	return s.lang.Availables
+}
+func (s *Client) LangHave(key string) bool {
+	for _, language := range s.lang.Availables {
+		if language == key {
+			return true
+		}
+	}
+	return false
+}
+func (s *Client) LangIs() string {
+	return s.lang.Value
+}
+func (s *Client) LangUse(key string) error {
+	if s.LangHave(key) {
+		s.lang.Value = key
+		return nil
+	}
+	return errors.New("Language `" + key + "` is not available.")
+}
+
+func (l *lang) init() *lang {
+	l.Value = "eng" // "eng" in default
+	l.Availables = getAvailables()
+	return l
+}
+
+func getAvailables() []string {
+	langs := []string{}
+	for _, lang := range getAvailableLanguages() {
+		langs = append(langs, lang)
+	}
+	return langs
+}
+
+func (o *options) init() *options {
+	o.UseFile = false
+	o.FilePath = ""
+	o.Digest = make(map[string]string)
+	return o
+}
+
+func (s *Client) OptionWithFile(path string) error {
+	_, e := os.Open(path)
+	if e != nil {
+		return errors.New("No such option file `" + path + "` is found.")
+	}
+	s.options.UseFile = true
+	s.options.FilePath = path
+	return nil
+}
+
+func (s *Client) AllowChars(charAllowed string) {
+	if charAllowed == "" {
+		return
+	}
+	s.options.Digest["tessedit_char_whitelist"] = charAllowed
+	return
 }

@@ -14,21 +14,19 @@ import (
 )
 
 func main() {
-	servant := gosseract.SummonServant()
-
-	text, _ := servant.Target("your/image/file.png").Out()
+    // get client
+	client, _ := gosseract.NewClient()
+    // pass path to source image
+	text, _ := client.Target("your/image/file.png").Out()
 
 	fmt.Println(text)
 }
 
 ```
 
-# setup
-```sh
-apt-get install tesseract-ocr # Basic OCR library by C++
-# or yum? brew? Choose the way whichever you can install `tesseract-ocr`
-go get github.com/otiai10/gosseract
-```
+# dependencies
+
+- [tesseract-ocr](https://code.google.com/p/tesseract-ocr/)#3.02~
 
 # test
 ```sh

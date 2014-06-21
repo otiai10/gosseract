@@ -27,6 +27,7 @@ func main() {
 ```sh
 apt-get install tesseract-ocr # Basic OCR library by C++
 # or yum? brew? Choose the way whichever you can install `tesseract-ocr`
+# for Mac OS X 'brew install tesseract'
 go get github.com/otiai10/gosseract
 ```
 

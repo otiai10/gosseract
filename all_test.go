@@ -20,3 +20,10 @@ func Test_NewClient(t *testing.T) {
 	Expect(t, e).ToBe(nil)
 	Expect(t, client).TypeOf("*gosseract.Client")
 }
+
+func TestClient_Must(t *testing.T) {
+	client, _ := gosseract.NewClient()
+	params := map[string]string{}
+	_, e := client.Must(params)
+	Expect(t, e).Not().ToBe(nil)
+}

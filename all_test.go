@@ -27,3 +27,9 @@ func TestClient_Must(t *testing.T) {
 	_, e := client.Must(params)
 	Expect(t, e).Not().ToBe(nil)
 }
+
+func TestClient_Out(t *testing.T) {
+	client, _ := gosseract.NewClient()
+	_, e := client.Out()
+	Expect(t, e.Error()).ToBe("Source is not set")
+}

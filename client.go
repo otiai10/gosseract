@@ -11,6 +11,10 @@ type path struct {
 	value string
 }
 
+func (p *path) Ready() bool {
+	return (p.value != "")
+}
+
 // NewClient provide reference to new Client
 func NewClient() (*Client, error) {
 	return &Client{}, nil
@@ -41,5 +45,8 @@ func (c *Client) accept(params map[string]string) (e error) {
 	return
 }
 func (c *Client) ready() (e error) {
+	if !c.source.Ready() {
+		return fmt.Errorf("Source is not set")
+	}
 	return
 }

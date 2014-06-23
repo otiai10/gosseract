@@ -4,22 +4,29 @@ import "fmt"
 import "os/exec"
 import "bytes"
 import "regexp"
+import "io/ioutil"
 
 type tesseractCmd interface {
 	Version() string
+	Execute(args []string) (string, error)
 }
+
+var (
+	TMP_FILE_PREF = "gosseract"
+	OUT_FILE_EXT  = ".txt"
+)
 
 func GetTesseractCmd() (tess tesseractCmd, e error) {
 	v, e := version()
 	if e != nil {
 		return
 	}
-	if regexp.MustCompile("3.02").Match([]byte(v)) {
-		tess = tesseract0302{v}
+	if regexp.MustCompile("^3.02").Match([]byte(v)) {
+		tess = tesseract0302{version: v}
 		return
 	}
-	if regexp.MustCompile("3.03").Match([]byte(v)) {
-		tess = tesseract0303{v}
+	if regexp.MustCompile("^3.03").Match([]byte(v)) {
+		tess = tesseract0303{version: v}
 		return
 	}
 	e = fmt.Errorf("No tesseract version is found, supporting 3.02~ and 3.03~.")
@@ -46,5 +53,14 @@ func execTesseractCommandWithStderr(opt string) (res string, e error) {
 		return
 	}
 	res = stderr.String()
+	return
+}
+func generateTmpFile() (fname string, e error) {
+	myTmpDir := "" // TODO: enable to choose optionally
+	f, e := ioutil.TempFile(myTmpDir, TMP_FILE_PREF)
+	if e != nil {
+		return
+	}
+	fname = f.Name()
 	return
 }

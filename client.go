@@ -15,6 +15,9 @@ type path struct {
 func (p *path) Ready() bool {
 	return (p.value != "")
 }
+func (p *path) Get() string {
+	return p.value
+}
 
 // NewClient provide reference to new Client
 func NewClient() (c *Client, e error) {
@@ -32,7 +35,7 @@ func (c *Client) Out() (out string, e error) {
 	if e = c.ready(); e != nil {
 		return
 	}
-	out = "gosseract"
+	out, e = c.execute()
 	return
 }
 func (c *Client) Must(params map[string]string) (out string, e error) {
@@ -55,4 +58,10 @@ func (c *Client) ready() (e error) {
 		return fmt.Errorf("Source is not set")
 	}
 	return
+}
+func (c *Client) execute() (res string, e error) {
+	args := []string{
+		c.source.Get(),
+	}
+	return c.tesseract.Execute(args)
 }

@@ -10,9 +10,9 @@ func Test_Greet(t *testing.T) {
 
 func Test_Must(t *testing.T) {
 	params := map[string]string{
-		"src": "./samples/hoge.png",
+		"src": "./.samples/png/sample000.png",
 	}
-	Expect(t, gosseract.Must(params)).ToBe("gosseract")
+	Expect(t, gosseract.Must(params)).ToBe("01:37:58\n\n")
 }
 
 func Test_NewClient(t *testing.T) {

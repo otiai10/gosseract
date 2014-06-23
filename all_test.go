@@ -11,6 +11,18 @@ func Test_Must(t *testing.T) {
 	Expect(t, gosseract.Must(params)).ToBe("01:37:58\n\n")
 }
 
+// tesseract ./.samples/png/sample000.png out -l eng ./.samples/option/digest001.txt
+func Test_Must_WithDigest(t *testing.T) {
+	params := map[string]string{
+		"src": "./.samples/png/sample001.png",
+	}
+	Expect(t, gosseract.Must(params)).ToBe("03:41:26\n\n")
+
+	// add optional digest
+	params["digest"] = "./.samples/option/digest001.txt"
+	Expect(t, gosseract.Must(params)).ToBe("O   I  \n\n")
+}
+
 func Test_NewClient(t *testing.T) {
 	client, e := gosseract.NewClient()
 	Expect(t, e).ToBe(nil)

@@ -14,14 +14,24 @@ type tesseract0302 struct {
 func (t tesseract0302) Version() string {
 	return t.version
 }
-func (t tesseract0302) Execute(args []string) (res string, e error) {
+func (t tesseract0302) Execute(params []string) (res string, e error) {
+
+	// command args
+	var args []string
+	// Register source file
+	args = append(args, params[0])
 	// generate result file path
 	t.resultFilePath, e = generateTmpFile()
 	if e != nil {
 		return
 	}
-	// bind it to args
+	// Register result file
 	args = append(args, t.resultFilePath)
+	// Register digest file
+	if len(params) > 1 {
+		args = append(args, params[1])
+	}
+
 	// prepare command
 	cmd := exec.Command("tesseract", args...)
 	// execute

@@ -6,6 +6,8 @@ import "fmt"
 type Client struct {
 	tesseract tesseractCmd
 	source    path
+	digest    path
+	options   map[string]string
 }
 type path struct {
 	value string
@@ -50,6 +52,9 @@ func (c *Client) accept(params map[string]string) (e error) {
 		return fmt.Errorf("Missing parameter `src`.")
 	}
 	c.source = path{src}
+	if digest, ok := params["digest"]; ok {
+		c.digest = path{digest}
+	}
 	return
 }
 func (c *Client) ready() (e error) {
@@ -61,6 +66,9 @@ func (c *Client) ready() (e error) {
 func (c *Client) execute() (res string, e error) {
 	args := []string{
 		c.source.Get(),
+	}
+	if c.digest.Ready() {
+		args = append(args, c.digest.Get())
 	}
 	return c.tesseract.Execute(args)
 }

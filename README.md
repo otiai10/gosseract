@@ -12,14 +12,10 @@ import (
 )
 
 func main() {
-    // get client
-	client, _ := gosseract.NewClient()
-    // pass path to source image
-	text, _ := client.Target("your/image/file.png").Out()
-
-	fmt.Println(text)
+    // This is the simlest way :)
+    out := gosseract.Must("your/img/file.png")
+    fmt.Println(out)
 }
-
 ```
 
 # dependencies

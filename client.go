@@ -1,6 +1,9 @@
 package gosseract
 
 import "fmt"
+import "os/exec"
+import "bytes"
+import "regexp"
 
 // Client is an client to use gosseract functions
 type Client struct {
@@ -17,6 +20,8 @@ func (p *path) Ready() bool {
 
 // NewClient provide reference to new Client
 func NewClient() (*Client, error) {
+	v, e := Version()
+	fmt.Println(v, e)
 	return &Client{}, nil
 }
 func (c *Client) Source(srcPath string) *Client {
@@ -48,5 +53,28 @@ func (c *Client) ready() (e error) {
 	if !c.source.Ready() {
 		return fmt.Errorf("Source is not set")
 	}
+	return
+}
+func Version() (v string, e error) {
+	v, e = execTesseractCommandWithStderr("--version")
+	if e != nil {
+		return
+	}
+	exp := regexp.MustCompile("^tesseract ([0-9\\.]+)")
+	matches := exp.FindStringSubmatch(v)
+	if len(matches) < 2 {
+		e = fmt.Errorf("tesseract version not found: response is `%s`.", v)
+	}
+	v = matches[1]
+	return
+}
+func execTesseractCommandWithStderr(opt string) (res string, e error) {
+	cmd := exec.Command("tesseract", opt)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	if e = cmd.Run(); e != nil {
+		return
+	}
+	res = stderr.String()
 	return
 }

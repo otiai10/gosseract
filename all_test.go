@@ -9,7 +9,9 @@ func Test_Greet(t *testing.T) {
 }
 
 func Test_Must(t *testing.T) {
-	params := make(map[string]string)
+	params := map[string]string{
+		"src": "./samples/hoge.png",
+	}
 	Expect(t, gosseract.Must(params)).ToBe("gosseract")
 }
 

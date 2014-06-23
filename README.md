@@ -1,8 +1,6 @@
-# gosseract-ocr
+# Gosseract-OCR [![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=develop)](https://travis-ci.org/otiai10/gosseract)
 
 [Tesseract-OCR](https://code.google.com/p/tesseract-ocr/) command wrapper for Golang
-
-[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=develop)](https://travis-ci.org/otiai10/gosseract)
 
 # example
 ```go

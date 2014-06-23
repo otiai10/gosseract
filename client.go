@@ -6,7 +6,6 @@ import "fmt"
 type Client struct {
 	tesseract tesseractCmd
 	source    path
-	result    path
 }
 type path struct {
 	value string

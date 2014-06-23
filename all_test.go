@@ -9,7 +9,8 @@ func Test_Greet(t *testing.T) {
 }
 
 func Test_Must(t *testing.T) {
-    Expect(t, gosseract.Must(gosseract.Params{})).ToBe("gosseract")
+	params := make(map[string]string)
+	Expect(t, gosseract.Must(params)).ToBe("gosseract")
 }
 
 func Test_NewClient(t *testing.T) {

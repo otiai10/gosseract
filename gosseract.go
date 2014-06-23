@@ -5,7 +5,6 @@ func Greet() string {
 	return "Hello,Gosseract."
 }
 
-func Must(p Params) string {
-    return "gosseract"
+func Must(params map[string]string) string {
+	return "gosseract"
 }
-

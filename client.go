@@ -1,6 +1,9 @@
 package gosseract
 
 import "fmt"
+import "image"
+import "os"
+import "image/png"
 
 // Client is an client to use gosseract functions
 type Client struct {
@@ -8,6 +11,7 @@ type Client struct {
 	source    path
 	digest    path
 	options   map[string]string
+	Error     error
 }
 type path struct {
 	value string
@@ -29,13 +33,33 @@ func NewClient() (c *Client, e error) {
 	c = &Client{tesseract: tess}
 	return
 }
-func (c *Client) Source(srcPath string) *Client {
+func (c *Client) Src(srcPath string) *Client {
+	c.source = path{srcPath}
+	return c
+}
+func (c *Client) Image(img image.Image) *Client {
+	imageFilePath, e := generateTmpFile()
+	if e != nil {
+		c.Error = e
+		return c
+	}
+	f, e := os.Create(imageFilePath)
+	// TODO: DRY
+	if e != nil {
+		c.Error = e
+		return c
+	}
+	defer f.Close()
+	png.Encode(f, img)
+	// TODO: delete created file after
+	c.source = path{f.Name()}
 	return c
 }
 func (c *Client) Out() (out string, e error) {
 	if e = c.ready(); e != nil {
 		return
 	}
+	// TODO: validation to call execute
 	out, e = c.execute()
 	return
 }

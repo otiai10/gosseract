@@ -26,17 +26,21 @@ func (p *path) Get() string {
 
 // NewClient provide reference to new Client
 func NewClient() (c *Client, e error) {
-	tess, e := GetTesseractCmd()
+	tess, e := getTesseractCmd()
 	if e != nil {
 		return
 	}
 	c = &Client{tesseract: tess}
 	return
 }
+
+// Src accepts path to target source file
 func (c *Client) Src(srcPath string) *Client {
 	c.source = path{srcPath}
 	return c
 }
+
+// Image accepts image object of target
 func (c *Client) Image(img image.Image) *Client {
 	imageFilePath, e := generateTmpFile()
 	if e != nil {
@@ -55,6 +59,8 @@ func (c *Client) Image(img image.Image) *Client {
 	c.source = path{f.Name()}
 	return c
 }
+
+// Out executes tesseract and gives results
 func (c *Client) Out() (out string, e error) {
 	if e = c.ready(); e != nil {
 		return
@@ -63,6 +69,8 @@ func (c *Client) Out() (out string, e error) {
 	out, e = c.execute()
 	return
 }
+
+// Must executes tesseract directly by parameter map
 func (c *Client) Must(params map[string]string) (out string, e error) {
 	if e = c.accept(params); e != nil {
 		return

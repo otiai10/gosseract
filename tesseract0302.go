@@ -46,7 +46,7 @@ func (t tesseract0302) Execute(params []string) (res string, e error) {
 	return
 }
 func (t tesseract0302) readResult() (res string, e error) {
-	fpath := t.resultFilePath + OUT_FILE_EXT
+	fpath := t.resultFilePath + outFILEEXTENSION
 	file, e := os.OpenFile(fpath, 1, 1)
 	if e != nil {
 		return

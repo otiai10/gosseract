@@ -11,12 +11,10 @@ type tesseractCmd interface {
 	Execute(args []string) (string, error)
 }
 
-var (
-	TMP_FILE_PREF = "gosseract"
-	OUT_FILE_EXT  = ".txt"
-)
+const tmpFILEPREFIX = "gosseract"
+const outFILEEXTENSION = ".txt"
 
-func GetTesseractCmd() (tess tesseractCmd, e error) {
+func getTesseractCmd() (tess tesseractCmd, e error) {
 	v, e := version()
 	if e != nil {
 		return
@@ -29,7 +27,7 @@ func GetTesseractCmd() (tess tesseractCmd, e error) {
 		tess = tesseract0303{version: v}
 		return
 	}
-	e = fmt.Errorf("No tesseract version is found, supporting 3.02~ and 3.03~.")
+	e = fmt.Errorf("No tesseract version is found, supporting 3.02~ and 3.03~")
 	return
 }
 func version() (v string, e error) {
@@ -40,7 +38,7 @@ func version() (v string, e error) {
 	exp := regexp.MustCompile("^tesseract ([0-9\\.]+)")
 	matches := exp.FindStringSubmatch(v)
 	if len(matches) < 2 {
-		e = fmt.Errorf("tesseract version not found: response is `%s`.", v)
+		e = fmt.Errorf("tesseract version not found: response is `%s`", v)
 	}
 	v = matches[1]
 	return
@@ -57,7 +55,7 @@ func execTesseractCommandWithStderr(opt string) (res string, e error) {
 }
 func generateTmpFile() (fname string, e error) {
 	myTmpDir := "" // TODO: enable to choose optionally
-	f, e := ioutil.TempFile(myTmpDir, TMP_FILE_PREF)
+	f, e := ioutil.TempFile(myTmpDir, tmpFILEPREFIX)
 	if e != nil {
 		return
 	}

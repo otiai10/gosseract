@@ -1,8 +1,6 @@
-# gosseract-ocr
+# Gosseract-OCR [![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=develop)](https://travis-ci.org/otiai10/gosseract)
 
 [Tesseract-OCR](https://code.google.com/p/tesseract-ocr/) command wrapper for Golang
-
-[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=develop)](https://travis-ci.org/otiai10/gosseract)
 
 # example
 ```go
@@ -14,22 +12,21 @@ import (
 )
 
 func main() {
-	servant := gosseract.SummonServant()
+    // This is the simlest way :)
+    out := gosseract.Must(map[string]string{"src": "your/img/file.png"})
+    fmt.Println(out)
 
-	text, _ := servant.Target("your/image/file.png").Out()
-
-	fmt.Println(text)
+    // Using client
+    client, _ := gosseract.NewClient()
+    out, _ = client.Src("your/img/file.png").Out()
+    fmt.Println(out)
 }
-
 ```
 
-# setup
-```sh
-apt-get install tesseract-ocr # Basic OCR library by C++
-# or yum? brew? Choose the way whichever you can install `tesseract-ocr`
-# for Mac OS X 'brew install tesseract'
-go get github.com/otiai10/gosseract
-```
+# dependencies
+
+- [tesseract-ocr](https://code.google.com/p/tesseract-ocr/)#3.02~
+- [mint](https://github.com/otiai10/mint) to simplize tests
 
 # test
 ```sh

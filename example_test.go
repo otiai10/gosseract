@@ -5,6 +5,7 @@ import "testing"
 import "fmt"
 
 func ExampleMust(t *testing.T) {
-	out := gosseract.Must("./.samples/png/sample002.png")
+	// TODO: it panics! error handling in *Client.accept
+	out := gosseract.Must(map[string]string{"src": "./.samples/png/sample002.png"})
 	fmt.Println(out)
 }

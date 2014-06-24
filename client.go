@@ -10,7 +10,6 @@ type Client struct {
 	tesseract tesseractCmd
 	source    path
 	digest    path
-	options   map[string]string
 	Error     error
 }
 type path struct {

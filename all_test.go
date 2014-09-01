@@ -7,7 +7,11 @@ import "os"
 import "bytes"
 import "image"
 import "image/png"
+import "image/jpeg"
 import "io/ioutil"
+import "net/http"
+import "strings"
+import "fmt"
 
 func Test_Must(t *testing.T) {
 	params := map[string]string{
@@ -55,11 +59,38 @@ func TestClient_Image(t *testing.T) {
 	Expect(t, e).ToBe(nil)
 	Expect(t, out).ToBe("01:37:58\n\n")
 }
-func fixImage(fpath string) image.Image {
+func TestClient_Image_by_jpg(t *testing.T) {
+	client, _ := gosseract.NewClient()
+	img := fixImage("./.samples/jpg/sample001.jpeg", "jpeg")
+	out, e := client.Image(img).Out()
+	Expect(t, e).ToBe(nil)
+	Expect(t, strings.Trim(out, "\n")).ToBe("2748")
+}
+func TestClient_Image_by_jpg_from_http(t *testing.T) {
+	httpClient := &http.Client{}
+	imgURL := "http://images.forbes.com/media/lists/companies/google_200x200.jpg"
+	resp, err := httpClient.Get(imgURL)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Println(err)
+		t.Fail()
+		return
+	}
+	client, _ := gosseract.NewClient()
+	img, _ := jpeg.Decode(resp.Body)
+	out, _ := client.Image(img).Out()
+	Expect(t, strings.Trim(out, "\n")).ToBe("Google")
+}
+func fixImage(fpath string, ext ...string) (img image.Image) {
 	f, _ := os.Open(fpath)
 	buf, _ := ioutil.ReadFile(f.Name())
-	img, _ := png.Decode(bytes.NewReader(buf))
-	return img
+	// TODO: refactor
+	if len(ext) == 0 {
+		img, _ = png.Decode(bytes.NewReader(buf))
+	} else {
+		img, _ = jpeg.Decode(bytes.NewReader(buf))
+	}
+	return
 }
 
 func TestClient_Out(t *testing.T) {

@@ -11,24 +11,32 @@ type tesseractCmd interface {
 	Execute(args []string) (string, error)
 }
 
+const TESSERACT = "tesseract"
 const tmpFILEPREFIX = "gosseract"
 const outFILEEXTENSION = ".txt"
 
 func getTesseractCmd() (tess tesseractCmd, e error) {
+	commandPath, e := lookPath()
+	if e != nil {
+		return
+	}
 	v, e := version()
 	if e != nil {
 		return
 	}
 	if regexp.MustCompile("^3.02").Match([]byte(v)) {
-		tess = tesseract0302{version: v}
+		tess = tesseract0302{version: v, commandPath: commandPath}
 		return
 	}
 	if regexp.MustCompile("^3.03").Match([]byte(v)) {
-		tess = tesseract0303{version: v}
+		tess = tesseract0303{version: v, commandPath: commandPath}
 		return
 	}
 	e = fmt.Errorf("No tesseract version is found, supporting 3.02~ and 3.03~")
 	return
+}
+func lookPath() (commandPath string, e error) {
+	return exec.LookPath(TESSERACT)
 }
 func version() (v string, e error) {
 	v, e = execTesseractCommandWithStderr("--version")

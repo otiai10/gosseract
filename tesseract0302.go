@@ -9,6 +9,7 @@ import "io/ioutil"
 type tesseract0302 struct {
 	version        string
 	resultFilePath string
+	commandPath    string
 }
 
 func (t tesseract0302) Version() string {

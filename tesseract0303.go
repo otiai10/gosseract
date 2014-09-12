@@ -1,7 +1,8 @@
 package gosseract
 
 type tesseract0303 struct {
-	version string
+	version     string
+	commandPath string
 }
 
 func (t tesseract0303) Version() string {

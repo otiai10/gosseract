@@ -55,6 +55,19 @@ func TestClient_Image(t *testing.T) {
 	Expect(t, e).ToBe(nil)
 	Expect(t, out).ToBe("01:37:58\n\n")
 }
+
+func TestClient_Digest(t *testing.T) {
+	client, _ := gosseract.NewClient()
+	img := fixImage("./.samples/png/sample001.png")
+	out, e := client.Image(img).Out()
+	Expect(t, e).ToBe(nil)
+	Expect(t, out).ToBe("03:41:26\n\n")
+
+	out, e = client.Digest("./.samples/option/digest001.txt").Image(img).Out()
+	Expect(t, e).ToBe(nil)
+	Expect(t, out).ToBe("O   I  \n\n")
+}
+
 func fixImage(fpath string) image.Image {
 	f, _ := os.Open(fpath)
 	buf, _ := ioutil.ReadFile(f.Name())

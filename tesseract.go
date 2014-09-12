@@ -52,7 +52,7 @@ func version() (v string, e error) {
 	return
 }
 func execTesseractCommandWithStderr(opt string) (res string, e error) {
-	cmd := exec.Command("tesseract", opt)
+	cmd := exec.Command(TESSERACT, opt)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if e = cmd.Run(); e != nil {

@@ -34,7 +34,7 @@ func (t tesseract0302) Execute(params []string) (res string, e error) {
 	}
 
 	// prepare command
-	cmd := exec.Command("tesseract", args...)
+	cmd := exec.Command(TESSERACT, args...)
 	// execute
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr

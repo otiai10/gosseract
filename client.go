@@ -39,6 +39,12 @@ func (c *Client) Src(srcPath string) *Client {
 	return c
 }
 
+// Digest accepts path to target digest file
+func (c *Client) Digest(digestPath string) *Client {
+	c.digest = path{digestPath}
+	return c
+}
+
 // Image accepts image object of target
 func (c *Client) Image(img image.Image) *Client {
 	imageFilePath, e := generateTmpFile()

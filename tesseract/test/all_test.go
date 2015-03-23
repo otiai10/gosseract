@@ -1,13 +1,10 @@
 package tesseract_test
 
 import (
-	"testing"
-
-	"github.com/otiai10/gosseract/tesseract"
-	. "github.com/otiai10/mint"
+    "testing"
+    "github.com/otiai10/gosseract/tesseract"
 )
 
-func TestAAA(t *testing.T) {
-	Expect(t, true).ToBe(true)
-	tesseract.AAA()
+func TestHoge(t *testing.T) {
+    tesseract.Hoge()
 }

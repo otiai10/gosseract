@@ -3,6 +3,7 @@ extern "C" {
 #endif
 
 int hoge();
+char* fuga(char* filepath);
 
 #ifdef __cplusplus
 }

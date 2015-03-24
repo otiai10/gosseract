@@ -2,8 +2,7 @@
 #include <leptonica/allheaders.h>
 
 extern "C" {
-    int hoge()
-    {
+    int hoge() {
         char *outText;
 
         tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
@@ -28,4 +27,24 @@ extern "C" {
 
         return 0;
     }
+
+    char* fuga(char* filepath) {
+      char *out;
+      tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
+      // Initialize tesseract-ocr with English, without specifying tessdata path
+      if (api->Init(NULL, "eng")) {
+        fprintf(stderr, "Could not initialize tesseract.\n");
+        exit(1);
+      }
+
+      Pix *image = pixRead(filepath);
+      api->SetImage(image);
+
+      out = api->GetUTF8Text();
+      api->End();
+      pixDestroy(&image);
+
+      return out;
+    }
+
 }/* extern "C" */

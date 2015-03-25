@@ -3,13 +3,12 @@ language: go
 go:
     - 1.2
     - tip
-
 compiler:
     - g++
 before_install:
-    - sudo apt-get install g++
     - sudo apt-get install tesseract-ocr
+    - sudo apt-get install tesseract-ocr-dev
 before_script:
     - go get github.com/otiai10/mint
 script:
-    - env CC=g++ go test -v ./...
+    - go test -v ./...

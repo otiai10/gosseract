@@ -7,7 +7,7 @@ compiler:
     - g++
 before_install:
     - sudo apt-get install tesseract-ocr
-    - sudo apt-get install tesseract-ocr-dev
+    - sudo apt-get install libtesseract-dev
 before_script:
     - go get github.com/otiai10/mint
 script:

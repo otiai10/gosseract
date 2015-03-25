@@ -4,6 +4,8 @@ go:
     - 1.2
     - tip
 
+compiler:
+    - g++
 before_install:
     - sudo apt-get install g++
     - sudo apt-get install tesseract-ocr

@@ -2,6 +2,33 @@
 #include <leptonica/allheaders.h>
 
 extern "C" {
+    class TessClient
+    {
+      private:
+        tesseract::TessBaseAPI *api;
+        Pix *image;
+      public:
+        TessClient()
+        {
+          api = new tesseract::TessBaseAPI();
+        }
+        TessClient(char *imgPath)
+        {
+          image = pixRead(imgPath);
+        }
+        void setImage(char* imgPath)
+        {
+          image = pixRead(imgPath);
+        }
+        char* Exec()
+        {
+          api->SetImage(image);
+          char *outText = api->GetUTF8Text();
+          pixDestroy(&image);
+          api->End();
+          return outText;
+        }
+    };
     int hoge() {
         char *outText;
 

@@ -6,12 +6,9 @@ package tesseract
 */
 import "C"
 
-func Hoge() {
-	C.hoge()
-}
-
-func Do(imgPath string) string {
+// Simple executes tesseract only with source image file path.
+func Simple(imgPath string) string {
 	p := C.CString(imgPath)
-	s := C.fuga(p)
+	s := C.simple(p)
 	return C.GoString(s)
 }

@@ -2,7 +2,7 @@
 extern "C" {
 #endif
 
-char* simple(char* filepath);
+char* simple(char* filepath, char* whitelist);
 
 #ifdef __cplusplus
 }

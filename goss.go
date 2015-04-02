@@ -4,10 +4,11 @@ import "github.com/otiai10/gosseract/tesseract"
 
 // Params is parameters for gosseract.Must.
 type Params struct {
-	Src string
+	Src       string // source image file path
+	Whitelist string // tessedit_char_whitelist
 }
 
 // Must execute tesseract-OCR directly by parameter map
 func Must(params Params) (out string) {
-	return tesseract.Simple(params.Src)
+	return tesseract.Simple(params.Src, params.Whitelist)
 }

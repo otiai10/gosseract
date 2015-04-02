@@ -7,8 +7,9 @@ package tesseract
 import "C"
 
 // Simple executes tesseract only with source image file path.
-func Simple(imgPath string) string {
+func Simple(imgPath string, whitelist string) string {
 	p := C.CString(imgPath)
-	s := C.simple(p)
+	w := C.CString(whitelist)
+	s := C.simple(p, w)
 	return C.GoString(s)
 }

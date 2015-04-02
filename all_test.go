@@ -26,6 +26,7 @@ func Test_Must_WithDigest(t *testing.T) {
 
 	// add optional digest
 	// params["digest"] = "./.samples/option/digest001.txt"
+	params.Whitelist = "IO"
 	Expect(t, Must(params)).ToBe("O   I  \n\n")
 }
 

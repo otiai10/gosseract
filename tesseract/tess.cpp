@@ -29,7 +29,7 @@ extern "C" {
         }
     };
 
-    char* simple(char* filepath) {
+    char* simple(char* filepath, char* whitelist) {
       char *out;
       tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
       // Initialize tesseract-ocr with English, without specifying tessdata path
@@ -40,6 +40,10 @@ extern "C" {
 
       Pix *image = pixRead(filepath);
       api->SetImage(image);
+
+      if (strlen(whitelist) != 0) {
+        api->SetVariable("tessedit_char_whitelist", whitelist);
+      }
 
       out = api->GetUTF8Text();
       api->End();

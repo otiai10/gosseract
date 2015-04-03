@@ -13,7 +13,7 @@ import (
 
 func main() {
     // This is the simlest way :)
-    out := gosseract.Must(map[string]string{"src": "your/img/file.png"})
+    out := gosseract.Must(gosseract.Params{Src: "your/img/file.png"})
     fmt.Println(out)
 
     // Using client

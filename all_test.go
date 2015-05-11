@@ -6,6 +6,7 @@ import (
 	"image/png"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/otiai10/mint"
@@ -17,6 +18,10 @@ func Test_Must(t *testing.T) {
 	})).ToBe("01:37:58\n\n")
 }
 
+func removeWhitespace(s string) string {
+	return strings.TrimSpace(strings.Replace(s, " ", "", -1))
+}
+
 // tesseract ./.samples/png/sample000.png out -l eng ./.samples/option/digest001.txt
 func Test_Must_WithDigest(t *testing.T) {
 	params := Params{
@@ -26,8 +31,8 @@ func Test_Must_WithDigest(t *testing.T) {
 
 	// add optional digest
 	// params["digest"] = "./.samples/option/digest001.txt"
-	params.Whitelist = "IO"
-	Expect(t, Must(params)).ToBe("O   I  \n\n")
+	params.Whitelist = "24"
+	Expect(t, removeWhitespace(Must(params))).ToBe("42")
 }
 
 func Test_NewClient(t *testing.T) {
@@ -65,9 +70,10 @@ func TestClient_Digest(t *testing.T) {
 	Expect(t, e).ToBe(nil)
 	Expect(t, out).ToBe("03:41:26\n\n")
 
+	// ./.samples/option/digest001.txt: tessedit_char_whitelist 403
 	out, e = client.Digest("./.samples/option/digest001.txt").Image(img).Out()
 	Expect(t, e).ToBe(nil)
-	Expect(t, out).ToBe("O   I  \n\n")
+	Expect(t, removeWhitespace(out)).ToBe("034")
 }
 
 func fixImage(fpath string) image.Image {

@@ -1,1 +1,1 @@
-tessedit_char_whitelist OI
+tessedit_char_whitelist 403

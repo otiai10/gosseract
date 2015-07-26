@@ -32,7 +32,11 @@ func getTesseractCmd() (tess tesseractCmd, e error) {
 		tess = tesseract0303{version: v, commandPath: commandPath}
 		return
 	}
-	e = fmt.Errorf("No tesseract version is found, supporting 3.02~ and 3.03~")
+	if regexp.MustCompile("^3.04").Match([]byte(v)) {
+		tess = tesseract0304{version: v, commandPath: commandPath}
+		return
+	}
+	e = fmt.Errorf("No tesseract version is found, supporting 3.02~, 3.03~ and 3.04~")
 	return
 }
 func lookPath() (commandPath string, e error) {

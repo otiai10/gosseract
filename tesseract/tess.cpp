@@ -29,11 +29,11 @@ extern "C" {
         }
     };
 
-    char* simple(char* filepath, char* whitelist) {
+    char* simple(char* filepath, char* whitelist ,char* languages) {
       char *out;
       tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
       // Initialize tesseract-ocr with English, without specifying tessdata path
-      if (api->Init(NULL, "eng")) {
+      if (api->Init(NULL, languages)) {
         fprintf(stderr, "Could not initialize tesseract.\n");
         exit(1);
       }

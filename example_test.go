@@ -7,7 +7,7 @@ import "image"
 
 func ExampleMust(t *testing.T) {
 	// TODO: it panics! error handling in *Client.accept
-	out := gosseract.Must(gosseract.Params{Src: "./.samples/png/sample002.png"})
+	out := gosseract.Must(gosseract.Params{Src: "./.samples/png/sample002.png",Languages:"eng+heb"})
 	fmt.Println(out)
 }
 

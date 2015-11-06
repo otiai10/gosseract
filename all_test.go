@@ -14,7 +14,8 @@ import (
 
 func Test_Must(t *testing.T) {
 	Expect(t, Must(Params{
-		Src: "./.samples/png/sample000.png",
+		Src:       "./.samples/png/sample000.png",
+		Languages: "eng",
 	})).ToBe("01:37:58\n\n")
 }
 
@@ -25,7 +26,8 @@ func removeWhitespace(s string) string {
 // tesseract ./.samples/png/sample000.png out -l eng ./.samples/option/digest001.txt
 func Test_Must_WithDigest(t *testing.T) {
 	params := Params{
-		Src: "./.samples/png/sample001.png",
+		Src:       "./.samples/png/sample001.png",
+		Languages: "eng",
 	}
 	Expect(t, Must(params)).ToBe("03:41:26\n\n")
 

@@ -9,6 +9,8 @@ go:
 compiler:
     - g++
 before_install:
+    - apt-get update
+    - apt-cache search tesseract
     - sudo apt-get install tesseract-ocr
     - sudo apt-get install libtesseract-dev
     - sudo apt-get install libleptonica-dev

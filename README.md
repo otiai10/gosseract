@@ -2,7 +2,8 @@
 
 [Tesseract-OCR](https://code.google.com/p/tesseract-ocr/) command wrapper for Golang
 
-# example
+# code example
+
 ```go
 package main
 
@@ -13,7 +14,10 @@ import (
 
 func main() {
     // This is the simlest way :)
-    out := gosseract.Must(gosseract.Params{Src: "your/img/file.png",Languages:"eng+heb"})
+    out := gosseract.Must(gosseract.Params{
+			Src:       "your/img/file.png",
+			Languages: "eng+heb",
+    })
     fmt.Println(out)
 
     // Using client
@@ -22,6 +26,12 @@ func main() {
     fmt.Println(out)
 }
 ```
+
+# sample application
+
+[![ocrserver](https://github.com/otiai10/ocrserver/raw/master/assets/favicon.png)](https://github.com/otiai10/ocrserver)
+[ocrserver](https://github.com/otiai10/ocrserver): the minimum OCR server with using gosseract.
+
 
 # installation
 

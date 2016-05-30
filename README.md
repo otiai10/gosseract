@@ -1,6 +1,6 @@
 # Gosseract-OCR [![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=master)](https://travis-ci.org/otiai10/gosseract) [![GoDoc](https://godoc.org/github.com/otiai10/gosseract?status.png)](https://godoc.org/github.com/otiai10/gosseract)
 
-[Tesseract-OCR](https://code.google.com/p/tesseract-ocr/) command wrapper for Golang
+[Tesseract-OCR](https://github.com/tesseract-ocr/tesseract) command wrapper for Golang
 
 # code example
 
@@ -50,7 +50,7 @@ go test ./...
 
 # dependencies
 
-- [tesseract-ocr](https://code.google.com/p/tesseract-ocr/)#3.02~
+- [tesseract-ocr](https://github.com/tesseract-ocr/tesseract)#3.02~
 - [mint](https://github.com/otiai10/mint) to simplize tests
 
 # issues

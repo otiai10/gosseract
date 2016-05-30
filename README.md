@@ -35,7 +35,7 @@ func main() {
 
 # installation
 
-1. install [tesseract-ocr](https://code.google.com/p/tesseract-ocr/)
+1. install [tesseract-ocr](https://github.com/tesseract-ocr/tesseract)
 2. install [go](http://golang.org/doc/install)
 3. install [gosseract](https://godoc.org/github.com/otiai10/gosseract)
     - `go get github.com/otiai10/gosseract`

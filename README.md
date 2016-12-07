@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-    // This is the simlest way :)
+    // This is the simplest way :)
     out := gosseract.Must(gosseract.Params{
 			Src:       "your/img/file.png",
 			Languages: "eng+heb",

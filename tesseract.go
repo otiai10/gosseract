@@ -51,18 +51,21 @@ func version() (v string, e error) {
 	matches := exp.FindStringSubmatch(v)
 	if len(matches) < 2 {
 		e = fmt.Errorf("tesseract version not found: response is `%s`", v)
+		return
 	}
 	v = matches[1]
 	return
 }
 func execTesseractCommandWithStderr(opt string) (res string, e error) {
 	cmd := exec.Command(TESSERACT, opt)
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if e = cmd.Run(); e != nil {
 		return
 	}
-	res = stderr.String()
+	res = stdout.String() + stderr.String()
 	return
 }
 func generateTmpFile() (fname string, e error) {

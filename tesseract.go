@@ -36,7 +36,11 @@ func getTesseractCmd() (tess tesseractCmd, e error) {
 		tess = tesseract0304{version: v, commandPath: commandPath}
 		return
 	}
-	e = fmt.Errorf("No tesseract version is found, supporting 3.02~, 3.03~ and 3.04~")
+	if regexp.MustCompile("^3.05").Match([]byte(v)) {
+		tess = tesseract0305{version: v, commandPath: commandPath}
+		return
+	}
+	e = fmt.Errorf("No tesseract version is found, supporting 3.02~, 3.03~, 3.04~ and 3.05~")
 	return
 }
 func lookPath() (commandPath string, e error) {
@@ -51,18 +55,21 @@ func version() (v string, e error) {
 	matches := exp.FindStringSubmatch(v)
 	if len(matches) < 2 {
 		e = fmt.Errorf("tesseract version not found: response is `%s`", v)
+		return
 	}
 	v = matches[1]
 	return
 }
 func execTesseractCommandWithStderr(opt string) (res string, e error) {
 	cmd := exec.Command(TESSERACT, opt)
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if e = cmd.Run(); e != nil {
 		return
 	}
-	res = stderr.String()
+	res = stdout.String() + stderr.String()
 	return
 }
 func generateTmpFile() (fname string, e error) {

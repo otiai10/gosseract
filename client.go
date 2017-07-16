@@ -10,6 +10,7 @@ type Client struct {
 	tesseract tesseractCmd
 	source    path
 	digest    path
+	parameter []string
 	Error     error
 }
 type path struct {
@@ -31,6 +32,11 @@ func NewClient() (c *Client, e error) {
 	}
 	c = &Client{tesseract: tess}
 	return
+}
+
+func (c *Client) AddParameter(parameter string) *Client {
+	c.parameter = append(c.parameter, parameter)
+	return c
 }
 
 // Src accepts path to target source file
@@ -106,6 +112,11 @@ func (c *Client) execute() (res string, e error) {
 	}
 	if c.digest.Ready() {
 		args = append(args, c.digest.Get())
+	}
+	if len(c.parameter) > 0 {
+		for _, p := range c.parameter {
+			args = append(args, p)
+		}
 	}
 	return c.tesseract.Execute(args)
 }

@@ -55,8 +55,9 @@ func (t tesseract0305) Execute(params []string) (res string, e error) {
 	if hocr {
 		res, e = t.readResult(".hocr")
 	} else {
-		res, e = t.readResult(outFILEEXTENSION)
+    res, e = t.readResult(outFILEEXTENSION)
 	}
+ 	os.Remove(t.resultFilePath)
 	return
 }
 

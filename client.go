@@ -11,6 +11,8 @@ type Client struct {
 	source    path
 	digest    path
 	parameter []string
+	// If the generated PNG source file needs to be deleted
+	needsdelete bool
 	Error     error
 }
 type path struct {
@@ -66,7 +68,7 @@ func (c *Client) Image(img image.Image) *Client {
 	}
 	defer f.Close()
 	png.Encode(f, img)
-	// TODO: delete created file after
+	c.needsdelete = true
 	c.source = path{f.Name()}
 	return c
 }
@@ -78,6 +80,10 @@ func (c *Client) Out() (out string, e error) {
 	}
 	// TODO: validation to call execute
 	out, e = c.execute()
+	if c.needsdelete {
+		os.Remove(c.source.value)
+		c.needsdelete = false
+	}
 	return
 }
 

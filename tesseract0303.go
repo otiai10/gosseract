@@ -44,6 +44,7 @@ func (t tesseract0303) Execute(params []string) (res string, e error) {
 	}
 	// read result
 	res, e = t.readResult()
+	os.Remove(t.resultFilePath)
 	return
 }
 

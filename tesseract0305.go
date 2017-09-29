@@ -28,9 +28,11 @@ func (t tesseract0305) Execute(params []string) (res string, e error) {
 	}
 	// Register result file
 	args = append(args, t.resultFilePath)
-	// Register digest file
+
 	if len(params) > 1 {
-		args = append(args, params[1])
+		for i := 1; i < len(params); i++ {
+			args = append(args, params[i])
+		}
 	}
 
 	// prepare command
@@ -43,13 +45,24 @@ func (t tesseract0305) Execute(params []string) (res string, e error) {
 		return
 	}
 	// read result
-	res, e = t.readResult()
-	os.Remove(t.resultFilePath)
+	var hocr bool
+	for _, a := range args {
+		if a == "hocr" {
+			hocr = true
+		}
+	}
+
+	if hocr {
+		res, e = t.readResult(".hocr")
+	} else {
+    res, e = t.readResult(outFILEEXTENSION)
+	}
+ 	os.Remove(t.resultFilePath)
 	return
 }
 
-func (t tesseract0305) readResult() (res string, e error) {
-	fpath := t.resultFilePath + outFILEEXTENSION
+func (t tesseract0305) readResult(extenstion string) (res string, e error) {
+	fpath := t.resultFilePath + extenstion
 	file, e := os.OpenFile(fpath, 1, 1)
 	if e != nil {
 		return

@@ -3,7 +3,7 @@ package tesseract_test
 import (
 	"testing"
 
-	"github.com/otiai10/gosseract/tesseract"
+	"github.com/otiai10/gosseract/v1/gosseract/tesseract"
 	. "github.com/otiai10/mint"
 )
 

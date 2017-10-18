@@ -30,6 +30,8 @@ _testmain.go
 gosseract.sublime-project
 gosseract.sublime-workspace
 
+.DS_Store
+
 # project specific
 
 gosseract.iml

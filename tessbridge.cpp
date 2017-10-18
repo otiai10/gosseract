@@ -5,8 +5,6 @@
 TessBaseAPI Init()
 {
   tesseract::TessBaseAPI * api = new tesseract::TessBaseAPI();
-  char* lang;
-  api->Init(NULL, lang);
   return (void*)api;
 }
 

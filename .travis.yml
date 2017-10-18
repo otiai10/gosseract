@@ -9,7 +9,7 @@ compiler:
     - g++
 before_install:
     - sudo apt-get -qq update
-    - sudo apt-get install tesseract-ocr
+    - sudo apt-get install tesseract-ocr=3.05
     - sudo apt-get install libtesseract-dev
     - sudo apt-get install libleptonica-dev
 before_script:

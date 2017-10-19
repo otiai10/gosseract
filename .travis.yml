@@ -8,7 +8,7 @@ go:
 compiler:
     - g++
 before_install:
-    - TESSERACT=4.00.00dev LEPTONICA=1.74.2 sudo ./testscript/setup.sh
+    - TESSERACT=4.00.00dev LEPTONICA=1.74.2 sudo ./test/script/setup.sh
 env:
     - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
 before_script:

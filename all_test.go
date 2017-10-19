@@ -23,7 +23,7 @@ func TestClient_SetImage(t *testing.T) {
 	defer client.Close()
 
 	client.Trim = true
-	client.SetImage("./testdata/001-gosseract.png")
+	client.SetImage("./test/data/001-gosseract.png")
 
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)

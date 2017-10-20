@@ -1,4 +1,6 @@
-# gosseract
+> _:tada: v2 is released! It contains breaking change. If you still want to use v1, please replace `github.com/otiai10/gosseract` with `github.com/otiai10/gosseract/v1/gosseract` and it is exactly the same thing as v1 implementation_
+
+# Gosseract-OCR [![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=master)](https://travis-ci.org/otiai10/gosseract) [![GoDoc](https://godoc.org/github.com/otiai10/gosseract?status.svg)](https://godoc.org/github.com/otiai10/gosseract)
 
 Golang OCR package, wrapping Tesseract-OCR C++ library.
 

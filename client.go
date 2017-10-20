@@ -7,6 +7,7 @@ import "C"
 import (
 	"fmt"
 	"strings"
+	"unsafe"
 )
 
 // Version returns the version of Tesseract-OCR
@@ -24,13 +25,15 @@ type Client struct {
 	TessdataPrefix *string
 	Languages      []string
 	ImagePath      string
+	Variables      map[string]string
 	PageSegMode    *PageSegMode
 }
 
 // NewClient construct new Client. It's due to caller to Close this client.
 func NewClient() *Client {
 	client := &Client{
-		api: C.Create(),
+		api:       C.Create(),
+		Variables: map[string]string{},
 	}
 	return client
 }
@@ -49,6 +52,17 @@ func (c *Client) Close() (err error) {
 // SetImage sets image to execute OCR.
 func (c *Client) SetImage(imagepath string) *Client {
 	c.ImagePath = imagepath
+	return c
+}
+
+// SetWhitelist sets whitelist chars.
+func (c *Client) SetWhitelist(whitelist string) *Client {
+	return c.SetVariable("tessedit_char_whitelist", whitelist)
+}
+
+// SetVariable sets parameters.
+func (c *Client) SetVariable(key, value string) *Client {
+	c.Variables[key] = value
 	return c
 }
 
@@ -79,6 +93,13 @@ func (c *Client) Text() (string, error) {
 
 	// Set Image by giving path
 	C.SetImage(c.api, C.CString(c.ImagePath))
+
+	for key, value := range c.Variables {
+		k, v := C.CString(key), C.CString(value)
+		defer C.free(unsafe.Pointer(k))
+		defer C.free(unsafe.Pointer(v))
+		C.SetVariable(c.api, k, v)
+	}
 
 	if c.PageSegMode != nil {
 		mode := C.int(*c.PageSegMode)

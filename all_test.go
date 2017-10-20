@@ -32,7 +32,8 @@ func TestClient_SetImage(t *testing.T) {
 	Expect(t, text).ToBe("otiai10 / gosseract")
 
 	client.Languages = []string{"eng"}
+	client.SetWhitelist("aegitosr10/")
 	text, err = client.Text()
 	Expect(t, err).ToBe(nil)
-	Expect(t, text).ToBe("otiai10 / gosseract")
+	Expect(t, text).ToBe("otiai10 / gosseraet")
 }

@@ -18,6 +18,11 @@ void Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
   api->Init(tessdataprefix, languages);
 }
 
+void SetVariable(TessBaseAPI a, char* name, char* value) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  api->SetVariable(name, value);
+}
+
 void SetImage(TessBaseAPI a, char* imagepath) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   Pix *image = pixRead(imagepath);

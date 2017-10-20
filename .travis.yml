@@ -14,4 +14,4 @@ env:
 before_script:
     - go get github.com/otiai10/mint
 script:
-    - go test -v ./...
+    - go test -v

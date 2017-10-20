@@ -24,6 +24,7 @@ type Client struct {
 	TessdataPrefix *string
 	Languages      []string
 	ImagePath      string
+	PageSegMode    *PageSegMode
 }
 
 // NewClient construct new Client. It's due to caller to Close this client.
@@ -51,6 +52,12 @@ func (c *Client) SetImage(imagepath string) *Client {
 	return c
 }
 
+// SetPageSegMode sets PSM
+func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
+	c.PageSegMode = &mode
+	return c
+}
+
 // Text finally initalize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
 func (c *Client) Text() (string, error) {
 
@@ -72,6 +79,11 @@ func (c *Client) Text() (string, error) {
 
 	// Set Image by giving path
 	C.SetImage(c.api, C.CString(c.ImagePath))
+
+	if c.PageSegMode != nil {
+		mode := C.int(*c.PageSegMode)
+		C.SetPageSegMode(c.api, mode)
+	}
 
 	// Get text by execuitng
 	out := C.GoString(C.UTF8Text(c.api))

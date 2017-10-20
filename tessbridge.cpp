@@ -24,6 +24,17 @@ void SetImage(TessBaseAPI a, char* imagepath) {
   api->SetImage(image);
 }
 
+void SetPageSegMode(TessBaseAPI a, int m) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  tesseract::PageSegMode mode = (tesseract::PageSegMode)m;
+  api->SetPageSegMode(mode);
+}
+
+int GetPageSegMode(TessBaseAPI a) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  return api->GetPageSegMode();
+}
+
 char* UTF8Text(TessBaseAPI a) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   return api->GetUTF8Text();

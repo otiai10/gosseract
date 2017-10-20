@@ -25,6 +25,8 @@ func TestClient_SetImage(t *testing.T) {
 	client.Trim = true
 	client.SetImage("./test/data/001-gosseract.png")
 
+	client.SetPageSegMode(PSM_SINGLE_BLOCK)
+
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("otiai10 / gosseract")

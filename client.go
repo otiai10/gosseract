@@ -87,12 +87,15 @@ func (c *Client) Text() (string, error) {
 	if len(c.Languages) == 0 {
 		C.Init(c.api, nil, nil)
 	} else {
-		langs := strings.Join(c.Languages, "+")
-		C.Init(c.api, nil, C.CString(langs))
+		langs := C.CString(strings.Join(c.Languages, "+"))
+		defer C.free(unsafe.Pointer(langs))
+		C.Init(c.api, nil, langs)
 	}
 
 	// Set Image by giving path
-	C.SetImage(c.api, C.CString(c.ImagePath))
+	imagepath := C.CString(c.ImagePath)
+	defer C.free(unsafe.Pointer(imagepath))
+	C.SetImage(c.api, imagepath)
 
 	for key, value := range c.Variables {
 		k, v := C.CString(key), C.CString(value)

@@ -29,9 +29,7 @@ _testmain.go
 .idea/*
 gosseract.sublime-project
 gosseract.sublime-workspace
-
-.DS_Store
-
-# project specific
-
 gosseract.iml
+
+# runtime
+.vagrant

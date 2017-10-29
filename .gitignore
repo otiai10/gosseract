@@ -33,3 +33,4 @@ gosseract.iml
 
 # runtime
 .vagrant
+coverage.txt

@@ -3,7 +3,7 @@ package gosseract_test
 import (
 	"testing"
 
-	"github.com/otiai10/gosseract"
+	"github.com/otiai10/gosseract/v1/gosseract"
 )
 
 func BenchmarkMust(b *testing.B) {

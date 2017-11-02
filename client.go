@@ -1,117 +1,121 @@
 package gosseract
 
-import "fmt"
-import "image"
-import "os"
-import "image/png"
+// #cgo LDFLAGS: -llept -ltesseract
+// #include <stdlib.h>
+// #include "tessbridge.h"
+import "C"
+import (
+	"fmt"
+	"strings"
+	"unsafe"
+)
 
-// Client is an client to use gosseract functions
+// Version returns the version of Tesseract-OCR
+func Version() string {
+	api := C.Create()
+	defer C.Free(api)
+	version := C.Version(api)
+	return C.GoString(version)
+}
+
+// Client is argument builder for tesseract::TessBaseAPI.
 type Client struct {
-	tesseract tesseractCmd
-	source    path
-	digest    path
-	// If the generated PNG source file needs to be deleted
-	needsdelete bool
-	Error     error
-}
-type path struct {
-	value string
+	api            C.TessBaseAPI
+	Trim           bool
+	TessdataPrefix *string
+	Languages      []string
+	ImagePath      string
+	Variables      map[string]string
+	PageSegMode    *PageSegMode
 }
 
-func (p *path) Ready() bool {
-	return (p.value != "")
-}
-func (p *path) Get() string {
-	return p.value
-}
-
-// NewClient provide reference to new Client
-func NewClient() (c *Client, e error) {
-	tess, e := getTesseractCmd()
-	if e != nil {
-		return
+// NewClient construct new Client. It's due to caller to Close this client.
+func NewClient() *Client {
+	client := &Client{
+		api:       C.Create(),
+		Variables: map[string]string{},
 	}
-	c = &Client{tesseract: tess}
-	return
+	return client
 }
 
-// Src accepts path to target source file
-func (c *Client) Src(srcPath string) *Client {
-	c.source = path{srcPath}
+// Close frees allocated API.
+func (c *Client) Close() (err error) {
+	// defer func() {
+	// 	if e := recover(); e != nil {
+	// 		err = fmt.Errorf("%v", e)
+	// 	}
+	// }()
+	C.Free(c.api)
+	return err
+}
+
+// SetImage sets image to execute OCR.
+func (c *Client) SetImage(imagepath string) *Client {
+	c.ImagePath = imagepath
 	return c
 }
 
-// Digest accepts path to target digest file
-func (c *Client) Digest(digestPath string) *Client {
-	c.digest = path{digestPath}
+// SetWhitelist sets whitelist chars.
+func (c *Client) SetWhitelist(whitelist string) *Client {
+	return c.SetVariable("tessedit_char_whitelist", whitelist)
+}
+
+// SetVariable sets parameters.
+func (c *Client) SetVariable(key, value string) *Client {
+	c.Variables[key] = value
 	return c
 }
 
-// Image accepts image object of target
-func (c *Client) Image(img image.Image) *Client {
-	imageFilePath, e := generateTmpFile()
-	if e != nil {
-		c.Error = e
-		return c
-	}
-	f, e := os.Create(imageFilePath)
-	// TODO: DRY
-	if e != nil {
-		c.Error = e
-		return c
-	}
-	defer f.Close()
-	png.Encode(f, img)
-	c.needsdelete = true
-	c.source = path{f.Name()}
+// SetPageSegMode sets PSM
+func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
+	c.PageSegMode = &mode
 	return c
 }
 
-// Out executes tesseract and gives results
-func (c *Client) Out() (out string, e error) {
-	if e = c.ready(); e != nil {
-		return
-	}
-	// TODO: validation to call execute
-	out, e = c.execute()
-	if c.needsdelete {
-		os.Remove(c.source.value)
-		c.needsdelete = false
-	}
-	return
-}
+// Text finally initalize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
+func (c *Client) Text() (string, error) {
 
-// Must executes tesseract directly by parameter map
-func (c *Client) Must(params map[string]string) (out string, e error) {
-	if e = c.accept(params); e != nil {
-		return
+	// Defer recover and make error
+	var err error
+	defer func() {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("%v", e)
+		}
+	}()
+
+	// Initialize tesseract::TessBaseAPI
+	if len(c.Languages) == 0 {
+		C.Init(c.api, nil, nil)
+	} else {
+		langs := C.CString(strings.Join(c.Languages, "+"))
+		defer C.free(unsafe.Pointer(langs))
+		C.Init(c.api, nil, langs)
 	}
-	return c.Out()
-}
-func (c *Client) accept(params map[string]string) (e error) {
-	var ok bool
-	var src string
-	if src, ok = params["src"]; !ok {
-		return fmt.Errorf("Missing parameter `src`.")
+
+	// Set Image by giving path
+	imagepath := C.CString(c.ImagePath)
+	defer C.free(unsafe.Pointer(imagepath))
+	C.SetImage(c.api, imagepath)
+
+	for key, value := range c.Variables {
+		k, v := C.CString(key), C.CString(value)
+		defer C.free(unsafe.Pointer(k))
+		defer C.free(unsafe.Pointer(v))
+		C.SetVariable(c.api, k, v)
 	}
-	c.source = path{src}
-	if digest, ok := params["digest"]; ok {
-		c.digest = path{digest}
+
+	if c.PageSegMode != nil {
+		mode := C.int(*c.PageSegMode)
+		C.SetPageSegMode(c.api, mode)
 	}
-	return
-}
-func (c *Client) ready() (e error) {
-	if !c.source.Ready() {
-		return fmt.Errorf("Source is not set")
+
+	// Get text by execuitng
+	out := C.GoString(C.UTF8Text(c.api))
+
+	// Trim result if needed
+	if c.Trim {
+		out = strings.Trim(out, "\n")
 	}
-	return
-}
-func (c *Client) execute() (res string, e error) {
-	args := []string{
-		c.source.Get(),
-	}
-	if c.digest.Ready() {
-		args = append(args, c.digest.Get())
-	}
-	return c.tesseract.Execute(args)
+
+	return out, err
 }

@@ -1,6 +1,6 @@
 package gosseract
 
-import "github.com/otiai10/gosseract/tesseract"
+import "github.com/otiai10/gosseract/v1/gosseract/tesseract"
 
 // Params is parameters for gosseract.Must.
 type Params struct {

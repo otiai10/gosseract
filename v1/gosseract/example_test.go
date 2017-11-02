@@ -1,13 +1,13 @@
 package gosseract_test
 
-import "github.com/otiai10/gosseract"
+import "github.com/otiai10/gosseract/v1/gosseract"
 import "testing"
 import "fmt"
 import "image"
 
 func ExampleMust(t *testing.T) {
 	// TODO: it panics! error handling in *Client.accept
-	out := gosseract.Must(gosseract.Params{Src: "./.samples/png/sample002.png",Languages:"eng+heb"})
+	out := gosseract.Must(gosseract.Params{Src: "./.samples/png/sample002.png", Languages: "eng+heb"})
 	fmt.Println(out)
 }
 

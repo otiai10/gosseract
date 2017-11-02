@@ -29,7 +29,8 @@ _testmain.go
 .idea/*
 gosseract.sublime-project
 gosseract.sublime-workspace
-
-# project specific
-
 gosseract.iml
+
+# runtime
+.vagrant
+coverage.txt

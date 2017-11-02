@@ -1,16 +1,19 @@
-# Gosseract-OCR [![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=master)](https://travis-ci.org/otiai10/gosseract) [![GoDoc](https://godoc.org/github.com/otiai10/gosseract?status.png)](https://godoc.org/github.com/otiai10/gosseract)
+> _:tada: v2 is released! It contains breaking change. If you still want to use v1, please replace `github.com/otiai10/gosseract` with `github.com/otiai10/gosseract/v1/gosseract` and it is exactly the same thing as v1 implementation_
 
-[Tesseract-OCR](https://github.com/tesseract-ocr/tesseract) command for Golang
+# Gosseract-OCR
+[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=v2/develop)](https://travis-ci.org/otiai10/gosseract)
+[![codecov](https://codecov.io/gh/otiai10/gosseract/branch/v2/develop/graph/badge.svg)](https://codecov.io/gh/otiai10/gosseract)
+[![GoDoc](https://godoc.org/github.com/otiai10/gosseract?status.svg)](https://godoc.org/github.com/otiai10/gosseract)
 
-# Quick Start
+Golang OCR package, wrapping Tesseract-OCR C++ library.
 
-If you have `docker` on your machine, just hit this and try with GUI
+# OCR Server
 
-```sh
-docker run -it --rm -e PORT=8080 -p 8080:8080 otiai10/ocrserver
-```
+Do you just want OCR server, or see the working example of this package? Yes, there is already-made server application, which is seriously easy to deploy!
 
-# Code Example
+👉 https://github.com/otiai10/ocrserver
+
+# Example
 
 ```go
 package main
@@ -21,47 +24,31 @@ import (
 )
 
 func main() {
-    // This is the simplest way :)
-    out := gosseract.Must(gosseract.Params{
-			Src:       "your/img/file.png",
-			Languages: "eng+heb",
-    })
-    fmt.Println(out)
-
-    // Using client
-    client, _ := gosseract.NewClient()
-    out, _ = client.Src("your/img/file.png").Out()
-    fmt.Println(out)
+	client := gosseract.NewClient()
+	defer client.Close()
+	client.SetImage("path/to/image.png")
+	text, _ := client.Text()
+	fmt.Println(text)
+	// Hello, World!
 }
 ```
 
-# Server Application
+# Install
 
-Here it is a ready-made solution.
-
-[![ocrserver](https://github.com/otiai10/ocrserver/raw/master/app/assets/favicon.png)](https://github.com/otiai10/ocrserver)
-[ocrserver](https://github.com/otiai10/ocrserver): the minimum OCR server with using gosseract.
-
-# Installation
-
-1. install [tesseract-ocr](https://github.com/tesseract-ocr/tesseract)
-2. install [go](http://golang.org/doc/install)
-3. install [gosseract](https://godoc.org/github.com/otiai10/gosseract)
-    - `go get github.com/otiai10/gosseract`
-4. install [mint for testing](https://godoc.org/github.com/otiai10/mint)
-    - `go get github.com/otiai10/mint`
-5. run the tests first↓
+1. [tesseract](https://github.com/tesseract-ocr/tesseract/wiki), including library and headers
+2. `go get github.com/otiai10/gosseract`
 
 # Test
 
-```sh
-go test ./...
+For basic test, install [mint](https://github.com/otiai10/mint) by `go get github.com/otiai10/mint` then `go test`. It requires tesseract-ocr and its library and header files installed on local machine.
+
+```
+% go get -u github.com/otiai10/mint
+% go test`.
 ```
 
-# Dependencies
+If you don't want to install tesseract-ocr on your local machine, use `./test/script/runtime.sh` and use Docker runtime (and Vagrant coming soon) to test the source code.
 
-- [tesseract-ocr](https://github.com/tesseract-ocr/tesseract)#3.02~
-- [mint](https://github.com/otiai10/mint) to simplize tests
-
-# Known Issues
-- https://github.com/otiai10/gosseract/issues?state=open
+```
+% ./test/script/runtime.sh --driver docker
+```

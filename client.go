@@ -52,6 +52,7 @@ func NewClient() *Client {
 	client := &Client{
 		api:       C.Create(),
 		Variables: map[string]string{},
+		Trim:      true,
 	}
 	return client
 }

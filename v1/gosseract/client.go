@@ -12,7 +12,7 @@ type Client struct {
 	digest    path
 	// If the generated PNG source file needs to be deleted
 	needsdelete bool
-	Error     error
+	Error       error
 }
 type path struct {
 	value string

@@ -11,5 +11,5 @@ type Params struct {
 
 // Must execute tesseract-OCR directly by parameter map
 func Must(params Params) (out string) {
-	return tesseract.Simple(params.Src, params.Whitelist,params.Languages)
+	return tesseract.Simple(params.Src, params.Whitelist, params.Languages)
 }

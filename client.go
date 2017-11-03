@@ -94,7 +94,7 @@ func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
 	return c
 }
 
-// Text finally initalize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
+// Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
 func (c *Client) Text() (string, error) {
 
 	// Defer recover and make error

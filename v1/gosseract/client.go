@@ -92,7 +92,7 @@ func (c *Client) accept(params map[string]string) (e error) {
 	var ok bool
 	var src string
 	if src, ok = params["src"]; !ok {
-		return fmt.Errorf("Missing parameter `src`.")
+		return fmt.Errorf("missing parameter `src`")
 	}
 	c.source = path{src}
 	if digest, ok := params["digest"]; ok {

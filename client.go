@@ -1,6 +1,10 @@
 package gosseract
 
+// #if __FreeBSD__ >= 10
+// #cgo LDFLAGS: -L/usr/local/lib -llept -ltesseract
+// #else
 // #cgo LDFLAGS: -llept -ltesseract
+// #endif
 // #include <stdlib.h>
 // #include "tessbridge.h"
 import "C"

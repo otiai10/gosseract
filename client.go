@@ -20,13 +20,31 @@ func Version() string {
 
 // Client is argument builder for tesseract::TessBaseAPI.
 type Client struct {
-	api            C.TessBaseAPI
-	Trim           bool
+	api C.TessBaseAPI
+
+	// Trim specifies characters to trim, which would be trimed from result string.
+	// As results of OCR, text oftenly contains unnecessary characters, such as newlines, on the head/foot of string.
+	// If `Trim` is set, this client will remove specified characters from the result.
+	Trim bool
+
+	// TessdataPrefix can indicate directory path to `tessdata`.
+	// It is set `/usr/local/share/tessdata/` or something like that, as default.
+	// TODO: Implement and test
 	TessdataPrefix *string
-	Languages      []string
-	ImagePath      string
-	Variables      map[string]string
-	PageSegMode    *PageSegMode
+
+	// Languages are languages to be detected. If not specified, it's gonna be "eng".
+	Languages []string
+
+	// ImagePath is just path to image file to be processed OCR.
+	ImagePath string
+
+	// Variables is just a pool to evaluate "tesseract::TessBaseAPI->SetVariable" in delay.
+	// TODO: Think if it should be public, or private property.
+	Variables map[string]string
+
+	// PageSegMode is a mode for page layout analysis.
+	// See https://github.com/otiai10/gosseract/issues/52 for more information.
+	PageSegMode *PageSegMode
 }
 
 // NewClient construct new Client. It's due to caller to Close this client.
@@ -38,7 +56,7 @@ func NewClient() *Client {
 	return client
 }
 
-// Close frees allocated API.
+// Close frees allocated API. This MUST be called for ANY client constructed by "NewClient" function.
 func (c *Client) Close() (err error) {
 	// defer func() {
 	// 	if e := recover(); e != nil {
@@ -49,24 +67,27 @@ func (c *Client) Close() (err error) {
 	return err
 }
 
-// SetImage sets image to execute OCR.
+// SetImage sets path to image file to be processed OCR.
 func (c *Client) SetImage(imagepath string) *Client {
 	c.ImagePath = imagepath
 	return c
 }
 
 // SetWhitelist sets whitelist chars.
+// See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (c *Client) SetWhitelist(whitelist string) *Client {
 	return c.SetVariable("tessedit_char_whitelist", whitelist)
 }
 
-// SetVariable sets parameters.
+// SetVariable sets parameters, representing tesseract::TessBaseAPI->SetVariable.
+// See official documentation here https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
 func (c *Client) SetVariable(key, value string) *Client {
 	c.Variables[key] = value
 	return c
 }
 
-// SetPageSegMode sets PSM
+// SetPageSegMode sets "Page Segmentation Mode" (PSM) to detect layout of characters.
+// See official documentation for PSM here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method
 func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
 	c.PageSegMode = &mode
 	return c

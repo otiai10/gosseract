@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/otiai10/gosseract/branch/v2/develop/graph/badge.svg)](https://codecov.io/gh/otiai10/gosseract)
 [![GoDoc](https://godoc.org/github.com/otiai10/gosseract?status.svg)](https://godoc.org/github.com/otiai10/gosseract)
 
-Golang OCR package, wrapping Tesseract-OCR C++ library.
+Golang OCR package, by using Tesseract C++ library.
 
 # OCR Server
 

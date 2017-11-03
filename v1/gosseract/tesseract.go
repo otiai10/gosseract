@@ -11,6 +11,7 @@ type tesseractCmd interface {
 	Execute(args []string) (string, error)
 }
 
+// TESSERACT specifies bin name for tesseract.
 const TESSERACT = "tesseract"
 const tmpFILEPREFIX = "gosseract"
 const outFILEEXTENSION = ".txt"

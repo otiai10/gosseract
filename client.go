@@ -23,7 +23,7 @@ type Client struct {
 	api C.TessBaseAPI
 
 	// Trim specifies characters to trim, which would be trimed from result string.
-	// As results of OCR, text oftenly contains unnecessary characters, such as newlines, on the head/foot of string.
+	// As results of OCR, text often contains unnecessary characters, such as newlines, on the head/foot of string.
 	// If `Trim` is set, this client will remove specified characters from the result.
 	Trim bool
 

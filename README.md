@@ -39,6 +39,8 @@ func main() {
 1. [tesseract](https://github.com/tesseract-ocr/tesseract/wiki), including library and headers
 2. `go get github.com/otiai10/gosseract`
 
+Check [Dockerfile](https://github.com/otiai10/gosseract/blob/master/Dockerfile) for more detail of installation, or you can just try by `docker run -it --rm otiai10/gosseract`.
+
 # Test
 
 For basic test, install [mint](https://github.com/otiai10/mint) by `go get github.com/otiai10/mint` then `go test`. It requires tesseract-ocr and its library and header files installed on local machine.
@@ -53,3 +55,7 @@ If you don't want to install tesseract-ocr on your local machine, use `./test/sc
 ```
 % ./test/script/runtime.sh --driver docker
 ```
+
+# Issues
+
+- [https://github.com/otiai10/gosseract/issues](https://github.com/otiai10/gosseract/issues?utf8=%E2%9C%93&q=is%3Aissue)

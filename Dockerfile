@@ -1,29 +1,31 @@
 #####
-# This is an example runtime to use "gosseract" package.
-# You can just try how it works by using docker command.
-# Hit `docker run -it --rm otiai10/gosseract` to check it out.
+# This is a working example of setting up tesseract/gosseract,
+# and also works as an example runtime to use gosseract package.
+# You can just hit `docker run -it --rm otiai10/gosseract`
+# to try and check it out!
 #####
-FROM debian:latest
-
+FROM golang:latest
 LABEL maintainer="otiai10<otiai10@gmail.com>"
 
 RUN apt-get update -qq
+
+# You need librariy files and headers of tesseract and leptonica.
+# When you miss these or LD_LIBRARY_PATH is not set to them,
+# you would face an error: "tesseract/baseapi.h: No such file or directory"
 RUN apt-get install -y libtesseract-dev libleptonica-dev
 
-RUN apt-get install -y git wget golang
-
-ENV GOPATH=/go
+# In case you face TESSDATA_PREFIX error, you minght need to set env vars
+# to specify the directory where "tessdata" is located.
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr
 
 RUN go get github.com/otiai10/gosseract
 
-# For testing
-RUN go get github.com/otiai10/mint
-
 # Load languages
 ARG LANGS="eng,deu,jpn"
-RUN IFS="," &&\
-for lang in ${LANGS}; do\
-  wget -q https://github.com/tesseract-ocr/tessdata/raw/master/${lang}.traineddata -P /usr/local/share/tessdata;\
-done
+RUN IFS="," && for lang in ${LANGS}; do apt-get install tesseract-ocr-${lang}; done
 # If you want to add languages, use --build-arg like this
 # > docker build . --build-arg LANGS="eng,fra,spa"
+
+# "mint" is just for minimum testing
+RUN go get github.com/otiai10/mint
+RUN cd ${GOPATH}/src/github.com/otiai10/gosseract && go test

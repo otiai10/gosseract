@@ -37,3 +37,9 @@ func TestClient_SetImage(t *testing.T) {
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("otiai10 / gosseraet")
 }
+
+func TestClient_SetLanguage(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+	client.SetLanguage("eng", "deu")
+}

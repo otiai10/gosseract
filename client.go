@@ -78,6 +78,12 @@ func (c *Client) SetImage(imagepath string) *Client {
 	return c
 }
 
+// SetLanguage sets languages to use. English as default.
+func (c *Client) SetLanguage(langs ...string) *Client {
+	c.Languages = langs
+	return c
+}
+
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (c *Client) SetWhitelist(whitelist string) *Client {
@@ -98,6 +104,18 @@ func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
 	return c
 }
 
+// Initialize tesseract::TessBaseAPI
+// TODO: add tessdata prefix
+func (c *Client) init() {
+	if len(c.Languages) == 0 {
+		C.Init(c.api, nil, nil)
+	} else {
+		langs := C.CString(strings.Join(c.Languages, "+"))
+		defer C.free(unsafe.Pointer(langs))
+		C.Init(c.api, nil, langs)
+	}
+}
+
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
 func (c *Client) Text() (string, error) {
 
@@ -109,14 +127,7 @@ func (c *Client) Text() (string, error) {
 		}
 	}()
 
-	// Initialize tesseract::TessBaseAPI
-	if len(c.Languages) == 0 {
-		C.Init(c.api, nil, nil)
-	} else {
-		langs := C.CString(strings.Join(c.Languages, "+"))
-		defer C.free(unsafe.Pointer(langs))
-		C.Init(c.api, nil, langs)
-	}
+	c.init()
 
 	// Set Image by giving path
 	imagepath := C.CString(c.ImagePath)

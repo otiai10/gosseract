@@ -78,6 +78,12 @@ func (c *Client) SetImage(imagepath string) *Client {
 	return c
 }
 
+// SetLanguage sets languages to use. English as default.
+func (c *Client) SetLanguage(langs ...string) *Client {
+	c.Languages = langs
+	return c
+}
+
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (c *Client) SetWhitelist(whitelist string) *Client {

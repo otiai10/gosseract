@@ -20,4 +20,4 @@
 
 - `uname -a`
 - `go version`
-- `tesseract version`
+- `tesseract --version`

@@ -1,10 +1,11 @@
 language: go
-
 go:
     - 1.7
     - 1.8
     - 1.9
     - tip
+services:
+    - docker
 compiler:
     - g++
 before_install:
@@ -16,5 +17,6 @@ before_script:
 script:
     - go test -v
     - go test -race -coverprofile=coverage.txt -covermode=atomic
+    - ./test/script/runtime.sh --driver docker
 after_success:
     - bash <(curl -s https://codecov.io/bash)

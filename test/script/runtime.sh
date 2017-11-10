@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script is a driver for "runtime tests".
 # The "runtime test" is to test gosseract package in specific environments,

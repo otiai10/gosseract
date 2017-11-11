@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script is a driver for "runtime tests".
 # The "runtime test" is to test gosseract package in specific environments,
@@ -6,6 +6,7 @@
 
 DRIVER=docker
 REMOVE=
+QUIET="--quiet"
 while [[ $# -gt 0 ]]; do
 case "${1}" in
     --driver|-d)
@@ -16,6 +17,10 @@ case "${1}" in
     REMOVE=YES
     shift
     ;;
+    --verbose)
+    QUIET=
+    shift
+    ;;
 esac
 done
 
@@ -24,7 +29,7 @@ function test_docker_runtimes() {
     testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
     echo "┌─────── ${testcase}"
     echo "│ [Docker] Building image..."
-    docker build . -f ${runtime} -t gosseract/test:${testcase} 1>/dev/null
+    docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET}
     echo "│ [Docker] Running tests..."
     SUCCEEDED=
     if docker run -i -t --rm gosseract/test:${testcase} 1>/dev/null ; then

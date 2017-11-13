@@ -29,7 +29,7 @@ function test_docker_runtimes() {
     testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
     echo "┌─────── ${testcase}"
     echo "│ [Docker] Building image..."
-    docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET}
+    docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
     echo "│ [Docker] Running tests..."
     SUCCEEDED=
     if docker run -i -t --rm gosseract/test:${testcase} 1>/dev/null ; then

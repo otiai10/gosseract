@@ -3,7 +3,7 @@ FROM otiai10/tesseract:4.00.00dev
 RUN apt-get update && apt-get install -y git
 
 # Install Go1.9.1
-RUN wget https://storage.googleapis.com/golang/go1.9.1.linux-amd64.tar.gz \
+RUN wget -nv https://storage.googleapis.com/golang/go1.9.1.linux-amd64.tar.gz \
   && tar -xzvf go1.9.1.linux-amd64.tar.gz
 RUN mv /go /.go
 ENV GOROOT=/.go

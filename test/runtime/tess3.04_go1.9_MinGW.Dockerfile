@@ -11,7 +11,7 @@ RUN apt-get install -y \
 
 # Golang itself
 RUN wget -nv https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz \
- && tar -xzvf go1.9.2.linux-amd64.tar.gz && mv ./go /.go
+ && tar -xzf go1.9.2.linux-amd64.tar.gz && mv ./go /.go
 ENV GOROOT=/.go
 RUN mkdir /go
 ENV GOPATH=/go

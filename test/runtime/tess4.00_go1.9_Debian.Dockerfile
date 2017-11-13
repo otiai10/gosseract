@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y git
 
 # Install Go1.9.1
 RUN wget -nv https://storage.googleapis.com/golang/go1.9.1.linux-amd64.tar.gz \
-  && tar -xzvf go1.9.1.linux-amd64.tar.gz
+  && tar -xzf go1.9.1.linux-amd64.tar.gz
 RUN mv /go /.go
 ENV GOROOT=/.go
 

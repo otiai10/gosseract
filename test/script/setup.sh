@@ -23,25 +23,25 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
 cd /
 mkdir -p /tmp/leptonica \
   && wget -nv https://github.com/DanBloomberg/leptonica/archive/${LEPTONICA}.tar.gz \
-  && tar -xzvf ${LEPTONICA}.tar.gz -C /tmp/leptonica \
+  && tar -xzf ${LEPTONICA}.tar.gz -C /tmp/leptonica \
   && mv /tmp/leptonica/* /leptonica
 cd /leptonica
 autoreconf -i \
   && ./autobuild \
   && ./configure \
-  && make \
+  && make --quiet \
   && make install
 
 # Compile Tesseract
 cd /
 mkdir -p /tmp/tesseract \
   && wget -nv https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT}.tar.gz \
-  && tar -xzvf ${TESSERACT}.tar.gz -C /tmp/tesseract \
+  && tar -xzf ${TESSERACT}.tar.gz -C /tmp/tesseract \
   && mv /tmp/tesseract/* /tesseract
 cd /tesseract
 ./autogen.sh \
   && ./configure \
-  && make \
+  && make --quiet \
   && make install
 
 # Recover location

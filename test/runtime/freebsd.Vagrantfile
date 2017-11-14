@@ -24,5 +24,14 @@ Vagrant.configure("2") do |config|
     vb.name = ENV["VIRTUALBOX_NAME"]
 
   end
-  config.vm.provision :shell, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+  config.vm.provision :shell, :privileged => false, :inline => "echo 'TODO: pkg install tesseract/tesseract-dev'"
+
 end

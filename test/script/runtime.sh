@@ -27,12 +27,12 @@ done
 function test_docker_runtimes() {
   for runtime in `ls ./test/runtime/*.Dockerfile`; do
     testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
-    echo "┌─────── ${testcase}"
+    echo "┌──────────── ${testcase}"
     echo "│ [Docker] Building image..."
     docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
     echo "│ [Docker] Running tests..."
     SUCCEEDED=
-    if docker run -i -t --rm gosseract/test:${testcase} 1>/dev/null ; then
+    if docker run -i -t --rm gosseract/test:${testcase} | sed "s/^/│ /" ; then
       SUCCEEDED=YES
     fi
     if [ -n "${REMOVE}" ]; then
@@ -40,7 +40,7 @@ function test_docker_runtimes() {
       docker rmi gosseract/test:${testcase} 1>/dev/null
     fi
     if [ -n "${SUCCEEDED}" ]; then
-      echo "└─────── ${testcase} [OK]"
+      echo "└───────────── ${testcase} [OK]"
     else
       echo ">>>>> ${testcase} [NG!] <<<<<"
       exit 1
@@ -51,19 +51,19 @@ function test_docker_runtimes() {
 function test_vagrant_runtimes() {
   for runtime in `ls ./test/runtime/*.Vagrantfile`; do
     testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
-    echo "┌─────── ${testcase}"
+    echo "┌───────────── ${testcase}"
     echo "│ [Vagrant] Making VM up..."
     vboxname=gosseract-test-${testcase}
     SUCCEEDED=
-    if VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up --provision 1>/dev/null ; then
+    if VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up --provision 2>&1 | sed "s/^/│ /" ; then
       SUCCEEDED=YES
     fi
     if [ -n "${REMOVE}" ]; then
       echo "│ [Vagrant] Removing VM..."
-      VAGRANT_VAGRANTFILE=${runtime} vagrant destroy -f 1>/dev/null
+      VAGRANT_VAGRANTFILE=${runtime} vagrant destroy -f | sed "s/^/│ /"
     fi
     if [ -n "${SUCCEEDED}" ]; then
-      echo "└─────── ${testcase} [OK]"
+      echo "└───────────── ${testcase} [OK]"
     else
       echo ">>>>> ${testcase} [NG!] <<<<<"
       exit 1

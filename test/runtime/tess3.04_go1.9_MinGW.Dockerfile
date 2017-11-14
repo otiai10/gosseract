@@ -10,8 +10,8 @@ RUN apt-get install -y \
   tesseract-ocr-eng
 
 # Golang itself
-RUN wget https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz \
- && tar -xzvf go1.9.2.linux-amd64.tar.gz && mv ./go /.go
+RUN wget -nv https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz \
+ && tar -xzf go1.9.2.linux-amd64.tar.gz && mv ./go /.go
 ENV GOROOT=/.go
 RUN mkdir /go
 ENV GOPATH=/go

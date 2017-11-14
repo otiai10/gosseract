@@ -26,28 +26,28 @@ ENV TESSDATA_PREFIX=/usr/local/share
 WORKDIR /
 RUN mkdir -p /tmp/leptonica \
   && wget -nv https://github.com/DanBloomberg/leptonica/archive/${LEPTO}.tar.gz \
-  && tar -xzvf ${LEPTO}.tar.gz -C /tmp/leptonica \
+  && tar -xzf ${LEPTO}.tar.gz -C /tmp/leptonica \
   && mv /tmp/leptonica/* /leptonica
 WORKDIR /leptonica
 
-RUN autoreconf -i \
-  && ./autobuild \
-  && ./configure \
-  && make \
-  && make install
+RUN autoreconf -i 2>/dev/null \
+  && ./autobuild --silent \
+  && ./configure --enable-silent-rules \
+  && make 1>/dev/null \
+  && make install --silent
 
 # Compile Tesseract
 WORKDIR /
 RUN mkdir -p /tmp/tesseract \
   && wget -nv https://github.com/tesseract-ocr/tesseract/archive/${TESS}.tar.gz \
-  && tar -xzvf ${TESS}.tar.gz -C /tmp/tesseract \
+  && tar -xzf ${TESS}.tar.gz -C /tmp/tesseract \
   && mv /tmp/tesseract/* /tesseract
 WORKDIR /tesseract
 
 RUN ./autogen.sh \
-  && ./configure \
-  && make \
-  && make install
+  && ./configure --enable-silent-rules \
+  && make 1>/dev/null \
+  && make install --silent
 
 # Load languages
 RUN wget -nv https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata -P /usr/local/share/tessdata
@@ -57,7 +57,7 @@ WORKDIR /
 
 # Install Go
 RUN wget -nv https://storage.googleapis.com/golang/go${GO}.linux-amd64.tar.gz \
-  && tar -xzvf go${GO}.linux-amd64.tar.gz
+  && tar -xzf go${GO}.linux-amd64.tar.gz
 RUN mv /go /.go
 ENV GOROOT=/.go
 

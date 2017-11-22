@@ -54,6 +54,7 @@ If you don't want to install tesseract-ocr on your local machine, use `./test/sc
 
 ```
 % ./test/script/runtime.sh --driver docker
+% ./test/script/runtime.sh --driver vagrant
 ```
 
 # Issues

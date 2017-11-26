@@ -15,7 +15,7 @@ env:
 before_script:
     - go get github.com/otiai10/mint
 script:
-    - go test -v
+    - go test -v -bench .
     - go test -race -coverprofile=coverage.txt -covermode=atomic
     - ./test/script/runtime.sh --driver docker --verbose
 after_success:

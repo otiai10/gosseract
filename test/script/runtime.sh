@@ -1,8 +1,24 @@
 #!/bin/bash
 
-# This script is a driver for "runtime tests".
-# The "runtime test" is to test gosseract package in specific environments,
-# such as OS, Go version and Tesseract version.
+function help_message() {
+  cat << EOF
+This script is a driver for "runtime tests".
+The "runtime test" is to test gosseract package in specific environments,
+such as OS, Go version and Tesseract version.
+
+Options:
+  --driver|-d {name}  Specify VM driver software, either of [docker, vagrant].
+  --verbose|-v        Show verbose logs of setting VMs up.
+  --run|-R {case}     Run only specified cases which includes given pattern in the case name.
+  --rm                Remove VMs which are created by this runtime test.
+  --help|-h           Show this message ;)
+
+Examples:
+
+  ./test/script/runtime.sh -d docker -v -R CentOS --rm
+
+EOF
+}
 
 DRIVER=
 REMOVE=
@@ -18,13 +34,20 @@ case "${1}" in
     REMOVE=YES
     shift
     ;;
-    --verbose)
+    --verbose|-v)
     QUIET=
     shift
     ;;
-    --run)
+    --run|-R)
     MATCH="${2}"
     shift && shift
+    ;;
+    --help|-h)
+    help_message
+    exit 0
+    ;;
+    *)
+    shift
     ;;
 esac
 done

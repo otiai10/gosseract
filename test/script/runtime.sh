@@ -7,6 +7,7 @@
 DRIVER=
 REMOVE=
 QUIET="--quiet"
+MATCH=
 while [[ $# -gt 0 ]]; do
 case "${1}" in
     --driver|-d)
@@ -21,12 +22,21 @@ case "${1}" in
     QUIET=
     shift
     ;;
+    --run)
+    MATCH="${2}"
+    shift && shift
+    ;;
 esac
 done
 
 function test_docker_runtimes() {
   for runtime in `ls ./test/runtime/*.Dockerfile`; do
     testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
+    if [ -n "${MATCH}" ]; then
+      if [[ "${testcase}" != *${MATCH}* ]]; then
+        continue
+      fi
+    fi
     echo "┌──────────── ${testcase}"
     echo "│ [Docker] Building image..."
     docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
@@ -51,6 +61,11 @@ function test_docker_runtimes() {
 function test_vagrant_runtimes() {
   for runtime in `ls ./test/runtime/*.Vagrantfile`; do
     testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
+    if [ -n "${MATCH}" ]; then
+      if [[ "${testcase}" != *${MATCH}* ]]; then
+        continue
+      fi
+    fi
     echo "┌───────────── ${testcase}"
     echo "│ [Vagrant] Making VM up..."
     vboxname=gosseract-test-${testcase}

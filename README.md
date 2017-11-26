@@ -47,13 +47,14 @@ For basic test, install [mint](https://github.com/otiai10/mint) by `go get githu
 
 ```
 % go get -u github.com/otiai10/mint
-% go test`.
+% go test .
 ```
 
 If you don't want to install tesseract-ocr on your local machine, use `./test/script/runtime.sh` and use Docker runtime (and Vagrant coming soon) to test the source code.
 
 ```
 % ./test/script/runtime.sh --driver docker
+% ./test/script/runtime.sh --driver vagrant
 ```
 
 # Issues

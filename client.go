@@ -9,7 +9,6 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
-	"fmt"
 	"strings"
 	"unsafe"
 )
@@ -121,11 +120,12 @@ func (c *Client) Text() (string, error) {
 
 	// Defer recover and make error
 	var err error
-	defer func() {
-		if e := recover(); e != nil {
-			err = fmt.Errorf("%v", e)
-		}
-	}()
+	// TODO: Handle and recover errors by Cgo.
+	// defer func() {
+	// 	if e := recover(); e != nil {
+	// 		err = fmt.Errorf("%v", e)
+	// 	}
+	// }()
 
 	c.init()
 

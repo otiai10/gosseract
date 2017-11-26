@@ -96,8 +96,7 @@ function __main__() {
     ;;
     *)
     test_docker_runtimes
-    # FIXME: Set up vagrant test, especially for FreeBSD. See ./test/runtime/FreeBSD.Vagrantfile for more detail.
-    # test_vagrant_runtimes
+    test_vagrant_runtimes
     ;;
   esac
 }

@@ -1,8 +1,8 @@
-> _:tada: v2 is released! It contains breaking change. If you still want to use v1, please replace `github.com/otiai10/gosseract` with `github.com/otiai10/gosseract/v1/gosseract` and it is exactly the same thing as v1 implementation_
+> :tada: v2 is released! It contains breaking change. If you still want to use v1, please replace `github.com/otiai10/gosseract` with `github.com/otiai10/gosseract/v1/gosseract` and it is exactly the same thing as v1 implementation_
 
 # Gosseract-OCR
-[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=v2/develop)](https://travis-ci.org/otiai10/gosseract)
-[![codecov](https://codecov.io/gh/otiai10/gosseract/branch/v2/develop/graph/badge.svg)](https://codecov.io/gh/otiai10/gosseract)
+[![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=master)](https://travis-ci.org/otiai10/gosseract)
+[![codecov](https://codecov.io/gh/otiai10/gosseract/branch/master/graph/badge.svg)](https://codecov.io/gh/otiai10/gosseract)
 [![Go Report Card](https://goreportcard.com/badge/github.com/otiai10/gosseract)](https://goreportcard.com/report/github.com/otiai10/gosseract)
 [![GoDoc](https://godoc.org/github.com/otiai10/gosseract?status.svg)](https://godoc.org/github.com/otiai10/gosseract)
 
@@ -36,26 +36,27 @@ func main() {
 
 # Install
 
-1. [tesseract](https://github.com/tesseract-ocr/tesseract/wiki), including library and headers
-2. `go get github.com/otiai10/gosseract`
+1. [tesseract-ocr](https://github.com/tesseract-ocr/tesseract/wiki), including library and headers
+2. `go get -t github.com/otiai10/gosseract`
 
 Check [Dockerfile](https://github.com/otiai10/gosseract/blob/master/Dockerfile) for more detail of installation, or you can just try by `docker run -it --rm otiai10/gosseract`.
 
 # Test
 
-For basic test, install [mint](https://github.com/otiai10/mint) by `go get github.com/otiai10/mint` then `go test`. It requires tesseract-ocr and its library and header files installed on local machine.
+In case you have [tesseract-ocr](https://github.com/tesseract-ocr/tesseract/wiki) on your local, you can just hit
 
 ```
-% go get -u github.com/otiai10/mint
 % go test .
 ```
 
-If you don't want to install tesseract-ocr on your local machine, use `./test/script/runtime.sh` and use Docker runtime (and Vagrant coming soon) to test the source code.
+Otherwise, if you **DON'T** want to install tesseract-ocr on your local, kick `./test/runtime` which is using Docker and Vagrant to test the source code on some runtimes.
 
 ```
-% ./test/script/runtime.sh --driver docker
-% ./test/script/runtime.sh --driver vagrant
+% ./test/runtime --driver docker
+% ./test/runtime --driver vagrant
 ```
+
+Check [./test/runtimes](https://github.com/otiai10/gosseract/tree/master/test/runtimes) for more information about runtime tests.
 
 # Issues
 

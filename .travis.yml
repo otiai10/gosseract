@@ -10,7 +10,7 @@ compiler:
     - g++
 before_install:
     # - TESSERACT=4.00.00dev LEPTONICA=1.74.2 sudo ./test/script/setup.sh
-    - suod apt-get update -qq
+    - sudo apt-get update -qq
     - sudo apt-get install -y -qq libtesseract-dev libleptonica-dev tesseract-ocr-eng
 env:
     - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib

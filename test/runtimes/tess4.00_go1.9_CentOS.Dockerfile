@@ -16,6 +16,9 @@ RUN yum install -y -q \
   libjpeg-devel \
   libpng-devel \
   libtiff-devel \
+  libicu-devel \
+  libpango1.0-dev \
+  libcairo-dev \
   zlib-devel
 
 
@@ -58,12 +61,11 @@ WORKDIR /
 # Install Go
 RUN wget -nv https://storage.googleapis.com/golang/go${GO}.linux-amd64.tar.gz \
   && tar -xzf go${GO}.linux-amd64.tar.gz
-RUN mv /go /.go
-ENV GOROOT=/.go
+ENV GOROOT=/go
 
 # Prepare GOPATH
-RUN mkdir /go
-ENV GOPATH=/go
+RUN mkdir /gopath
+ENV GOPATH=/gopath
 ENV PATH=${PATH}:${GOROOT}/bin:${GOPATH}/bin
 
 # Dependencies for tests
@@ -71,6 +73,5 @@ RUN go get github.com/otiai10/mint
 
 # Mount source code of gosseract project
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
-WORKDIR ${GOPATH}/src/github.com/otiai10/gosseract
 
-CMD go test
+ENTRYPOINT go test github.com/otiai10/gosseract

@@ -1,6 +1,6 @@
 language: go
 go:
-    - 1.7
+    # - 1.7
     - 1.8
     - 1.9
     - tip
@@ -9,7 +9,9 @@ services:
 compiler:
     - g++
 before_install:
-    - TESSERACT=4.00.00dev LEPTONICA=1.74.2 sudo ./test/script/setup.sh
+    # - TESSERACT=4.00.00dev LEPTONICA=1.74.2 sudo ./test/script/setup.sh
+    - suod apt-get update -qq
+    - sudo apt-get install -y -qq libtesseract-dev libleptonica-dev tesseract-ocr-eng
 env:
     - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
 before_script:
@@ -17,6 +19,6 @@ before_script:
 script:
     - go test -v -bench .
     - go test -race -coverprofile=coverage.txt -covermode=atomic
-    - ./test/script/runtime.sh --driver docker --verbose
+    - ./test/runtime --driver docker --verbose
 after_success:
     - bash <(curl -s https://codecov.io/bash)

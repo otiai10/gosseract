@@ -8,7 +8,7 @@ import (
 
 func TestVersion(t *testing.T) {
 	version := Version()
-	Expect(t, version).Match("[0-9]{1}.[0-9]{2}(.[0-9a-z]*)")
+	Expect(t, version).Match("[0-9]{1}.[0-9]{2}(.[0-9a-z]*)?")
 }
 
 func TestNewClient(t *testing.T) {

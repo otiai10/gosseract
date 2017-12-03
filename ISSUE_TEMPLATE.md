@@ -8,9 +8,17 @@
 
 ## Reproducility Frequency
 
-- __%
+- XX%
 
-## How to Reproduce
+## Reproducible Dockerfile
+
+```dockerfile
+FROM your-os:your-version
+# Describe how to reproduce your problem
+# on your environment
+```
+
+Otherwise, describe how to reproduce
 
 1. `foo bar`
 2. `spam ham`
@@ -18,6 +26,18 @@
 
 # Environment
 
-- `uname -a`
-- `go version`
-- `tesseract --version`
+```
+uname -a
+```
+
+```
+go env
+```
+
+```
+go version
+```
+
+```
+tesseract --version
+```

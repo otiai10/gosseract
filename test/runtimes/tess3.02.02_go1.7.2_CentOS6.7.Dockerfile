@@ -24,7 +24,7 @@ RUN yum install -y \
 
 
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
-ENV TESSDATA_PREFIX=/usr/local/share
+ENV TESSDATA_PREFIX=/usr/local/share/tesseract-ocr
 
 # Compile Leptonica
 WORKDIR /
@@ -57,7 +57,17 @@ RUN ./autogen.sh \
   && make install --silent
 
 # Load languages
-RUN wget -nv https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata -P /usr/local/share/tessdata
+# {{{ Tesseract3.02 doesn't work with the latest ttraineddata.
+# Use https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-302 for older tesseract version.
+RUN wget -nv https://downloads.sourceforge.net/project/tesseract-ocr-alt/tesseract-ocr-3.02.eng.tar.gz \
+  && tar -xzvf ./tesseract-ocr-3.02.eng.tar.gz  \
+  && mv tesseract-ocr ${TESSDATA_PREFIX}/
+# Instead of
+#
+#   RUN wget -nv https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata -P /usr/local/share/tessdata
+#
+# Related issue link: https://github.com/otiai10/gosseract/issues/97
+# }}}
 
 # Recover location
 WORKDIR /

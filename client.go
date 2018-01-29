@@ -1,6 +1,5 @@
 package gosseract
 
-// #cgo CXXFLAGS: -std=c++11
 // #if __FreeBSD__ >= 10
 // #cgo LDFLAGS: -L/usr/local/lib -llept -ltesseract
 // #else

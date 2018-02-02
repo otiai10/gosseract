@@ -14,6 +14,8 @@ such as OS, Go version and Tesseract version.
 
 Options:
   --driver|-d {name}  Specify VM driver software, either of [docker, vagrant].
+  --build|-b          Build testable images if provided, otherwise pull images.
+  --push|-p           Push local images to dockerhub (for development purpose).
   --verbose|-v        Show verbose logs of setting VMs up.
   --run|-R {case}     Run only specified cases which includes given pattern in the case name.
   --rm                Remove VMs which are created by this runtime test.
@@ -31,6 +33,8 @@ EOF
 function parse_options() {
   DRIVER=
   REMOVE=
+  BUILD=
+  PUSH=
   QUIET="--quiet"
   MATCH=
   while [[ $# -gt 0 ]]; do
@@ -41,6 +45,14 @@ function parse_options() {
       ;;
       --rm)
       REMOVE=YES
+      shift
+      ;;
+      --build|-b)
+      BUILD=YES
+      shift
+      ;;
+      --push|-p)
+      PUSH=YES
       shift
       ;;
       --verbose|-v)
@@ -72,10 +84,19 @@ function test_docker_runtimes() {
       fi
     fi
     echo "┌───────────── ${testcase}"
-    echo "│ [Docker] Building image..."
-    docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
+    if [ -n "${BUILD}" ]; then
+      echo "│ [Docker] Building image..."
+      docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
+    else
+      echo "│ [Docker] Pulling image..."
+      docker pull gosseract/test:${testcase} | sed "s/^/│ /"
+    fi
     echo "│ [Docker] Running tests..."
     docker run -i -t --rm gosseract/test:${testcase} | sed "s/^/│ [${testcase}] /"
+    if [ -n "${PUSH}" ]; then
+      echo "│ [Docker] Pushing the image..."
+      docker push gosseract/test:${testcase} | sed "s/^/│ /"
+    fi
     if [ -n "${REMOVE}" ]; then
       echo "│ [Docker] Removing image..."
       docker rmi gosseract/test:${testcase} 1>/dev/null

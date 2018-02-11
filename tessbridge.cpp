@@ -24,6 +24,13 @@ void Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
   api->Init(tessdataprefix, languages);
 }
 
+void InitConfig(TessBaseAPI a, char* tessdataprefix, char* languages, char* config) {
+  char *configs[]={config};
+  int configs_size = 1;
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
+}
+
 void SetVariable(TessBaseAPI a, char* name, char* value) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   api->SetVariable(name, value);
@@ -49,6 +56,11 @@ int GetPageSegMode(TessBaseAPI a) {
 char* UTF8Text(TessBaseAPI a) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   return api->GetUTF8Text();
+}
+
+char* HOCRText(TessBaseAPI a) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  return api->GetHOCRText(0);
 }
 
 const char* Version(TessBaseAPI a) {

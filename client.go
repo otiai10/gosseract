@@ -48,6 +48,9 @@ type Client struct {
 	// PageSegMode is a mode for page layout analysis.
 	// See https://github.com/otiai10/gosseract/issues/52 for more information.
 	PageSegMode *PageSegMode
+
+	//Config is the configuration file for Tesseract
+	Config string
 }
 
 // NewClient construct new Client. It's due to caller to Close this client.
@@ -103,15 +106,30 @@ func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
 	return c
 }
 
+// SetConfig sets config file.
+func (c *Client) SetConfig(config string) *Client {
+	c.Config = config
+	return c
+}
+
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
 func (c *Client) init() {
 	if len(c.Languages) == 0 {
-		C.Init(c.api, nil, nil)
+		if (len(c.Config) > 0) {
+			C.InitConfig(c.api, nil, nil, C.CString(c.Config))
+		} else {
+			C.Init(c.api, nil, nil)
+		}
 	} else {
 		langs := C.CString(strings.Join(c.Languages, "+"))
 		defer C.free(unsafe.Pointer(langs))
-		C.Init(c.api, nil, langs)
+
+		if (len(c.Config) > 0) {
+			C.InitConfig(c.api, nil, langs, C.CString(c.Config))
+		} else {
+			C.Init(c.api, nil, langs)
+		}
 	}
 }
 
@@ -153,6 +171,43 @@ func (c *Client) Text() (string, error) {
 	if c.Trim {
 		out = strings.Trim(out, "\n")
 	}
+
+	return out, err
+}
+
+// HOCR finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as HOCR format. 
+func (c *Client) HOCR() (string, error) {
+
+	// Defer recover and make error
+	var err error
+	// TODO: Handle and recover errors by Cgo.
+	// defer func() {
+	// 	if e := recover(); e != nil {
+	// 		err = fmt.Errorf("%v", e)
+	// 	}
+	// }()
+
+	c.init()
+
+	// Set Image by giving path
+	imagepath := C.CString(c.ImagePath)
+	defer C.free(unsafe.Pointer(imagepath))
+	C.SetImage(c.api, imagepath)
+
+	for key, value := range c.Variables {
+		k, v := C.CString(key), C.CString(value)
+		defer C.free(unsafe.Pointer(k))
+		defer C.free(unsafe.Pointer(v))
+		C.SetVariable(c.api, k, v)
+	}
+
+	if c.PageSegMode != nil {
+		mode := C.int(*c.PageSegMode)
+		C.SetPageSegMode(c.api, mode)
+	}
+
+	// Get text by execuitng
+	out := C.GoString(C.HOCRText(c.api))
 
 	return out, err
 }

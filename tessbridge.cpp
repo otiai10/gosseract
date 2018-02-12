@@ -62,6 +62,11 @@ char* UTF8Text(TessBaseAPI a) {
   return api->GetUTF8Text();
 }
 
+char* HOCRText(TessBaseAPI a) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  return api->GetHOCRText(0);
+}
+
 const char* Version(TessBaseAPI a) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   const char* v = api->Version();

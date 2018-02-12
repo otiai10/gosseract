@@ -204,3 +204,13 @@ func (c *Client) Text() (string, error) {
 
 	return out, err
 }
+
+// HTML finally initialize tesseract::TessBaseAPI, execute OCR and returns hOCR text.
+// See https://en.wikipedia.org/wiki/HOCR for more information of hOCR.
+func (c *Client) HTML() (string, error) {
+	var err error
+	c.init()
+	c.prepare()
+	out := C.GoString(C.HOCRText(c.api))
+	return out, err
+}

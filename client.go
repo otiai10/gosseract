@@ -9,6 +9,8 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
+	"fmt"
+	"os"
 	"strings"
 	"unsafe"
 )
@@ -49,8 +51,10 @@ type Client struct {
 	// See https://github.com/otiai10/gosseract/issues/52 for more information.
 	PageSegMode *PageSegMode
 
-	//Config is the configuration file for Tesseract
-	Config string
+	// Config is a file path to the configuration for Tesseract
+	// See http://www.sk-spell.sk.cx/tesseract-ocr-parameters-in-302-version
+	// TODO: Fix link to official page
+	ConfigFilePath string
 }
 
 // NewClient construct new Client. It's due to caller to Close this client.
@@ -106,31 +110,45 @@ func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
 	return c
 }
 
-// SetConfig sets config file.
-func (c *Client) SetConfig(config string) *Client {
-	c.Config = config
-	return c
+// SetConfigFile sets the file path to config file.
+func (c *Client) SetConfigFile(fpath string) error {
+	info, err := os.Stat(fpath)
+	if err != nil {
+		return err
+	}
+	if info.IsDir() {
+		return fmt.Errorf("the specified config file path seems to be a directory")
+	}
+	c.ConfigFilePath = fpath
+	return nil
+}
+
+// It's due to the caller to free this char pointer.
+func (c *Client) charLangs() *C.char {
+	var langs *C.char
+	if len(c.Languages) != 0 {
+		langs = C.CString(strings.Join(c.Languages, "+"))
+	}
+	return langs
+}
+
+// It's due to the caller to free this char pointer.
+func (c *Client) charConfig() *C.char {
+	var config *C.char
+	if _, err := os.Stat(c.ConfigFilePath); err == nil {
+		config = C.CString(c.ConfigFilePath)
+	}
+	return config
 }
 
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
 func (c *Client) init() {
-	if len(c.Languages) == 0 {
-		if (len(c.Config) > 0) {
-			C.InitConfig(c.api, nil, nil, C.CString(c.Config))
-		} else {
-			C.Init(c.api, nil, nil)
-		}
-	} else {
-		langs := C.CString(strings.Join(c.Languages, "+"))
-		defer C.free(unsafe.Pointer(langs))
-
-		if (len(c.Config) > 0) {
-			C.InitConfig(c.api, nil, langs, C.CString(c.Config))
-		} else {
-			C.Init(c.api, nil, langs)
-		}
-	}
+	langs := c.charLangs()
+	defer C.free(unsafe.Pointer(langs))
+	config := c.charConfig()
+	defer C.free(unsafe.Pointer(config))
+	C.Init(c.api, nil, langs, config)
 }
 
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.

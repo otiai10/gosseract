@@ -43,3 +43,22 @@ func TestClient_SetLanguage(t *testing.T) {
 	defer client.Close()
 	client.SetLanguage("eng", "deu")
 }
+
+func TestClient_ConfigFilePath(t *testing.T) {
+
+	client := NewClient()
+	defer client.Close()
+
+	err := client.SetConfigFile("./test/config/01.config")
+	Expect(t, err).ToBe(nil)
+	client.SetImage("./test/data/001-gosseract.png")
+	text, err := client.Text()
+	Expect(t, err).ToBe(nil)
+	Expect(t, text).ToBe("otiai10 l gosseract")
+
+	When(t, "the config file is not found", func(t *testing.T) {
+		err := client.SetConfigFile("./test/config/not-existing")
+		Expect(t, err).Not().ToBe(nil)
+	})
+
+}

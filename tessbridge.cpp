@@ -24,11 +24,15 @@ void Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
   api->Init(tessdataprefix, languages);
 }
 
-void InitConfig(TessBaseAPI a, char* tessdataprefix, char* languages, char* config) {
-  char *configs[]={config};
-  int configs_size = 1;
+void Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilepath) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
-  api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
+  if (configfilepath != NULL) {
+    char *configs[]={configfilepath};
+    int configs_size = 1;
+    api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
+  } else {
+    api->Init(tessdataprefix, languages);
+  }
 }
 
 void SetVariable(TessBaseAPI a, char* name, char* value) {

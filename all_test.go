@@ -61,4 +61,9 @@ func TestClient_ConfigFilePath(t *testing.T) {
 		Expect(t, err).Not().ToBe(nil)
 	})
 
+	When(t, "the config file path is a directory", func(t *testing.T) {
+		err := client.SetConfigFile("./test/config/02.config")
+		Expect(t, err).Not().ToBe(nil)
+	})
+
 }

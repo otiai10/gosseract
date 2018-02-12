@@ -151,6 +151,33 @@ func (c *Client) init() {
 	C.Init(c.api, nil, langs, config)
 }
 
+// Prepare tesseract::TessBaseAPI options,
+// must be called after `init`.
+func (c *Client) prepare() {
+	// Set Image by giving path
+	imagepath := C.CString(c.ImagePath)
+	defer C.free(unsafe.Pointer(imagepath))
+	C.SetImage(c.api, imagepath)
+
+	for key, value := range c.Variables {
+		c.bind(key, value)
+	}
+
+	if c.PageSegMode != nil {
+		mode := C.int(*c.PageSegMode)
+		C.SetPageSegMode(c.api, mode)
+	}
+}
+
+// Binds variable to API object.
+// Must be called from inside `prepare`.
+func (c *Client) bind(key, value string) {
+	k, v := C.CString(key), C.CString(value)
+	defer C.free(unsafe.Pointer(k))
+	defer C.free(unsafe.Pointer(v))
+	C.SetVariable(c.api, k, v)
+}
+
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
 func (c *Client) Text() (string, error) {
 
@@ -165,22 +192,7 @@ func (c *Client) Text() (string, error) {
 
 	c.init()
 
-	// Set Image by giving path
-	imagepath := C.CString(c.ImagePath)
-	defer C.free(unsafe.Pointer(imagepath))
-	C.SetImage(c.api, imagepath)
-
-	for key, value := range c.Variables {
-		k, v := C.CString(key), C.CString(value)
-		defer C.free(unsafe.Pointer(k))
-		defer C.free(unsafe.Pointer(v))
-		C.SetVariable(c.api, k, v)
-	}
-
-	if c.PageSegMode != nil {
-		mode := C.int(*c.PageSegMode)
-		C.SetPageSegMode(c.api, mode)
-	}
+	c.prepare()
 
 	// Get text by execuitng
 	out := C.GoString(C.UTF8Text(c.api))

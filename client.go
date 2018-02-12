@@ -9,6 +9,8 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
+	"fmt"
+	"os"
 	"strings"
 	"unsafe"
 )
@@ -48,6 +50,11 @@ type Client struct {
 	// PageSegMode is a mode for page layout analysis.
 	// See https://github.com/otiai10/gosseract/issues/52 for more information.
 	PageSegMode *PageSegMode
+
+	// Config is a file path to the configuration for Tesseract
+	// See http://www.sk-spell.sk.cx/tesseract-ocr-parameters-in-302-version
+	// TODO: Fix link to official page
+	ConfigFilePath string
 }
 
 // NewClient construct new Client. It's due to caller to Close this client.
@@ -103,16 +110,72 @@ func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
 	return c
 }
 
+// SetConfigFile sets the file path to config file.
+func (c *Client) SetConfigFile(fpath string) error {
+	info, err := os.Stat(fpath)
+	if err != nil {
+		return err
+	}
+	if info.IsDir() {
+		return fmt.Errorf("the specified config file path seems to be a directory")
+	}
+	c.ConfigFilePath = fpath
+	return nil
+}
+
+// It's due to the caller to free this char pointer.
+func (c *Client) charLangs() *C.char {
+	var langs *C.char
+	if len(c.Languages) != 0 {
+		langs = C.CString(strings.Join(c.Languages, "+"))
+	}
+	return langs
+}
+
+// It's due to the caller to free this char pointer.
+func (c *Client) charConfig() *C.char {
+	var config *C.char
+	if _, err := os.Stat(c.ConfigFilePath); err == nil {
+		config = C.CString(c.ConfigFilePath)
+	}
+	return config
+}
+
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
 func (c *Client) init() {
-	if len(c.Languages) == 0 {
-		C.Init(c.api, nil, nil)
-	} else {
-		langs := C.CString(strings.Join(c.Languages, "+"))
-		defer C.free(unsafe.Pointer(langs))
-		C.Init(c.api, nil, langs)
+	langs := c.charLangs()
+	defer C.free(unsafe.Pointer(langs))
+	config := c.charConfig()
+	defer C.free(unsafe.Pointer(config))
+	C.Init(c.api, nil, langs, config)
+}
+
+// Prepare tesseract::TessBaseAPI options,
+// must be called after `init`.
+func (c *Client) prepare() {
+	// Set Image by giving path
+	imagepath := C.CString(c.ImagePath)
+	defer C.free(unsafe.Pointer(imagepath))
+	C.SetImage(c.api, imagepath)
+
+	for key, value := range c.Variables {
+		c.bind(key, value)
 	}
+
+	if c.PageSegMode != nil {
+		mode := C.int(*c.PageSegMode)
+		C.SetPageSegMode(c.api, mode)
+	}
+}
+
+// Binds variable to API object.
+// Must be called from inside `prepare`.
+func (c *Client) bind(key, value string) {
+	k, v := C.CString(key), C.CString(value)
+	defer C.free(unsafe.Pointer(k))
+	defer C.free(unsafe.Pointer(v))
+	C.SetVariable(c.api, k, v)
 }
 
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
@@ -129,22 +192,7 @@ func (c *Client) Text() (string, error) {
 
 	c.init()
 
-	// Set Image by giving path
-	imagepath := C.CString(c.ImagePath)
-	defer C.free(unsafe.Pointer(imagepath))
-	C.SetImage(c.api, imagepath)
-
-	for key, value := range c.Variables {
-		k, v := C.CString(key), C.CString(value)
-		defer C.free(unsafe.Pointer(k))
-		defer C.free(unsafe.Pointer(v))
-		C.SetVariable(c.api, k, v)
-	}
-
-	if c.PageSegMode != nil {
-		mode := C.int(*c.PageSegMode)
-		C.SetPageSegMode(c.api, mode)
-	}
+	c.prepare()
 
 	// Get text by execuitng
 	out := C.GoString(C.UTF8Text(c.api))
@@ -154,5 +202,15 @@ func (c *Client) Text() (string, error) {
 		out = strings.Trim(out, "\n")
 	}
 
+	return out, err
+}
+
+// HTML finally initialize tesseract::TessBaseAPI, execute OCR and returns hOCR text.
+// See https://en.wikipedia.org/wiki/HOCR for more information of hOCR.
+func (c *Client) HTML() (string, error) {
+	var err error
+	c.init()
+	c.prepare()
+	out := C.GoString(C.HOCRText(c.api))
 	return out, err
 }

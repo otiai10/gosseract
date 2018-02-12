@@ -20,6 +20,7 @@ ENV PATH=${PATH}:${GOROOT}/bin:${GOPATH}/bin
 
 # Dependencies for tests
 RUN go get github.com/otiai10/mint
+RUN go get golang.org/x/net/html
 
 # Mount source code of gosseract project
 # instead of `go get github.com/otiai10/gosseract`

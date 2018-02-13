@@ -203,7 +203,7 @@ func (client *Client) Text() (out string, err error) {
 	return out, err
 }
 
-// HTML finally initialize tesseract::TessBaseAPI, execute OCR and returns hOCR text.
+// HOCRText finally initialize tesseract::TessBaseAPI, execute OCR and returns hOCR text.
 // See https://en.wikipedia.org/wiki/HOCR for more information of hOCR.
 func (client *Client) HOCRText() (out string, err error) {
 	if err = client.init(); err != nil {

@@ -69,50 +69,50 @@ func NewClient() *Client {
 }
 
 // Close frees allocated API. This MUST be called for ANY client constructed by "NewClient" function.
-func (c *Client) Close() (err error) {
+func (client *Client) Close() (err error) {
 	// defer func() {
 	// 	if e := recover(); e != nil {
 	// 		err = fmt.Errorf("%v", e)
 	// 	}
 	// }()
-	C.Free(c.api)
+	C.Free(client.api)
 	return err
 }
 
 // SetImage sets path to image file to be processed OCR.
-func (c *Client) SetImage(imagepath string) *Client {
-	c.ImagePath = imagepath
-	return c
+func (client *Client) SetImage(imagepath string) *Client {
+	client.ImagePath = imagepath
+	return client
 }
 
 // SetLanguage sets languages to use. English as default.
-func (c *Client) SetLanguage(langs ...string) *Client {
-	c.Languages = langs
-	return c
+func (client *Client) SetLanguage(langs ...string) *Client {
+	client.Languages = langs
+	return client
 }
 
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
-func (c *Client) SetWhitelist(whitelist string) *Client {
-	return c.SetVariable("tessedit_char_whitelist", whitelist)
+func (client *Client) SetWhitelist(whitelist string) *Client {
+	return client.SetVariable("tessedit_char_whitelist", whitelist)
 }
 
 // SetVariable sets parameters, representing tesseract::TessBaseAPI->SetVariable.
 // See official documentation here https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
-func (c *Client) SetVariable(key, value string) *Client {
-	c.Variables[key] = value
-	return c
+func (client *Client) SetVariable(key, value string) *Client {
+	client.Variables[key] = value
+	return client
 }
 
 // SetPageSegMode sets "Page Segmentation Mode" (PSM) to detect layout of characters.
 // See official documentation for PSM here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method
-func (c *Client) SetPageSegMode(mode PageSegMode) *Client {
-	c.PageSegMode = &mode
-	return c
+func (client *Client) SetPageSegMode(mode PageSegMode) *Client {
+	client.PageSegMode = &mode
+	return client
 }
 
 // SetConfigFile sets the file path to config file.
-func (c *Client) SetConfigFile(fpath string) error {
+func (client *Client) SetConfigFile(fpath string) error {
 	info, err := os.Stat(fpath)
 	if err != nil {
 		return err
@@ -120,36 +120,36 @@ func (c *Client) SetConfigFile(fpath string) error {
 	if info.IsDir() {
 		return fmt.Errorf("the specified config file path seems to be a directory")
 	}
-	c.ConfigFilePath = fpath
+	client.ConfigFilePath = fpath
 	return nil
 }
 
 // It's due to the caller to free this char pointer.
-func (c *Client) charLangs() *C.char {
+func (client *Client) charLangs() *C.char {
 	var langs *C.char
-	if len(c.Languages) != 0 {
-		langs = C.CString(strings.Join(c.Languages, "+"))
+	if len(client.Languages) != 0 {
+		langs = C.CString(strings.Join(client.Languages, "+"))
 	}
 	return langs
 }
 
 // It's due to the caller to free this char pointer.
-func (c *Client) charConfig() *C.char {
+func (client *Client) charConfig() *C.char {
 	var config *C.char
-	if _, err := os.Stat(c.ConfigFilePath); err == nil {
-		config = C.CString(c.ConfigFilePath)
+	if _, err := os.Stat(client.ConfigFilePath); err == nil {
+		config = C.CString(client.ConfigFilePath)
 	}
 	return config
 }
 
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
-func (c *Client) init() error {
-	langs := c.charLangs()
+func (client *Client) init() error {
+	langs := client.charLangs()
 	defer C.free(unsafe.Pointer(langs))
-	config := c.charConfig()
+	config := client.charConfig()
 	defer C.free(unsafe.Pointer(config))
-	res := C.Init(c.api, nil, langs, config)
+	res := C.Init(client.api, nil, langs, config)
 	if res != 0 {
 		// TODO: capture and vacuum stderr from Cgo
 		return fmt.Errorf("failed to initialize TessBaseAPI with code %d", res)
@@ -159,45 +159,45 @@ func (c *Client) init() error {
 
 // Prepare tesseract::TessBaseAPI options,
 // must be called after `init`.
-func (c *Client) prepare() error {
+func (client *Client) prepare() error {
 	// Set Image by giving path
-	imagepath := C.CString(c.ImagePath)
+	imagepath := C.CString(client.ImagePath)
 	defer C.free(unsafe.Pointer(imagepath))
-	C.SetImage(c.api, imagepath)
+	C.SetImage(client.api, imagepath)
 
-	for key, value := range c.Variables {
-		if ok := c.bind(key, value); !ok {
+	for key, value := range client.Variables {
+		if ok := client.bind(key, value); !ok {
 			return fmt.Errorf("failed to set variable with key(%s):value(%s)", key, value)
 		}
 	}
 
-	if c.PageSegMode != nil {
-		mode := C.int(*c.PageSegMode)
-		C.SetPageSegMode(c.api, mode)
+	if client.PageSegMode != nil {
+		mode := C.int(*client.PageSegMode)
+		C.SetPageSegMode(client.api, mode)
 	}
 	return nil
 }
 
 // Binds variable to API object.
 // Must be called from inside `prepare`.
-func (c *Client) bind(key, value string) bool {
+func (client *Client) bind(key, value string) bool {
 	k, v := C.CString(key), C.CString(value)
 	defer C.free(unsafe.Pointer(k))
 	defer C.free(unsafe.Pointer(v))
-	res := C.SetVariable(c.api, k, v)
+	res := C.SetVariable(client.api, k, v)
 	return bool(res)
 }
 
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
-func (c *Client) Text() (out string, err error) {
-	if err = c.init(); err != nil {
+func (client *Client) Text() (out string, err error) {
+	if err = client.init(); err != nil {
 		return
 	}
-	if err = c.prepare(); err != nil {
+	if err = client.prepare(); err != nil {
 		return
 	}
-	out = C.GoString(C.UTF8Text(c.api))
-	if c.Trim {
+	out = C.GoString(C.UTF8Text(client.api))
+	if client.Trim {
 		out = strings.Trim(out, "\n")
 	}
 	return out, err
@@ -205,13 +205,13 @@ func (c *Client) Text() (out string, err error) {
 
 // HTML finally initialize tesseract::TessBaseAPI, execute OCR and returns hOCR text.
 // See https://en.wikipedia.org/wiki/HOCR for more information of hOCR.
-func (c *Client) HTML() (out string, err error) {
-	if err = c.init(); err != nil {
+func (client *Client) HTML() (out string, err error) {
+	if err = client.init(); err != nil {
 		return
 	}
-	if err = c.prepare(); err != nil {
+	if err = client.prepare(); err != nil {
 		return
 	}
-	out = C.GoString(C.HOCRText(c.api))
+	out = C.GoString(C.HOCRText(client.api))
 	return
 }

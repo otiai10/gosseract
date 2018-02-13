@@ -94,12 +94,18 @@ func TestClient_HTML(t *testing.T) {
 	Expect(t, texts).ToBe([]string{"otiai10", "/", "gosseract"})
 
 	When(t, "only invalid languages are given", func(t *testing.T) {
+		client := NewClient()
+		defer client.Close()
 		client.SetLanguage("foo")
+		client.SetImage("./test/data/001-gosseract.png")
 		_, err := client.HTML()
 		Expect(t, err).Not().ToBe(nil)
 	})
 	When(t, "undefined key-value is tried to be set", func(t *testing.T) {
+		client := NewClient()
+		defer client.Close()
 		client.SetVariable("foobar", "hoge")
+		client.SetImage("./test/data/001-gosseract.png")
 		_, err := client.HTML()
 		Expect(t, err).Not().ToBe(nil)
 	})

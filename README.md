@@ -1,6 +1,4 @@
-> :tada: v2 is released! It contains breaking change. If you still want to use v1, please replace `github.com/otiai10/gosseract` with `github.com/otiai10/gosseract/v1/gosseract` and it is exactly the same thing as v1 implementation_
-
-# Gosseract-OCR
+# gosseract OCR
 [![Build Status](https://travis-ci.org/otiai10/gosseract.svg?branch=master)](https://travis-ci.org/otiai10/gosseract)
 [![codecov](https://codecov.io/gh/otiai10/gosseract/branch/master/graph/badge.svg)](https://codecov.io/gh/otiai10/gosseract)
 [![Go Report Card](https://goreportcard.com/badge/github.com/otiai10/gosseract)](https://goreportcard.com/report/github.com/otiai10/gosseract)

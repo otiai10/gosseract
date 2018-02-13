@@ -79,7 +79,7 @@ func TestClient_HTML(t *testing.T) {
 	defer client.Close()
 	client.SetImage("./test/data/001-gosseract.png")
 	client.SetWhitelist("otiai10/gosseract")
-	out, err := client.HTML()
+	out, err := client.HOCRText()
 	Expect(t, err).ToBe(nil)
 
 	tokenizer := html.NewTokenizer(strings.NewReader(out))
@@ -94,13 +94,19 @@ func TestClient_HTML(t *testing.T) {
 	Expect(t, texts).ToBe([]string{"otiai10", "/", "gosseract"})
 
 	When(t, "only invalid languages are given", func(t *testing.T) {
+		client := NewClient()
+		defer client.Close()
 		client.SetLanguage("foo")
-		_, err := client.HTML()
+		client.SetImage("./test/data/001-gosseract.png")
+		_, err := client.HOCRText()
 		Expect(t, err).Not().ToBe(nil)
 	})
 	When(t, "undefined key-value is tried to be set", func(t *testing.T) {
+		client := NewClient()
+		defer client.Close()
 		client.SetVariable("foobar", "hoge")
-		_, err := client.HTML()
+		client.SetImage("./test/data/001-gosseract.png")
+		_, err := client.HOCRText()
 		Expect(t, err).Not().ToBe(nil)
 	})
 }

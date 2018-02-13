@@ -151,6 +151,7 @@ func (c *Client) init() error {
 	defer C.free(unsafe.Pointer(config))
 	res := C.Init(c.api, nil, langs, config)
 	if res != 0 {
+		// TODO: capture and vacuum stderr from Cgo
 		return fmt.Errorf("failed to initialize TessBaseAPI with code %d", res)
 	}
 	return nil

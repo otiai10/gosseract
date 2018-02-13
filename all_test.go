@@ -44,7 +44,10 @@ func TestClient_SetImage(t *testing.T) {
 func TestClient_SetLanguage(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
-	client.SetLanguage("eng", "deu")
+	client.SetLanguage("deu")
+	client.SetImage("./test/data/001-gosseract.png")
+	_, err := client.Text()
+	Expect(t, err).Not().ToBe(nil)
 }
 
 func TestClient_ConfigFilePath(t *testing.T) {
@@ -89,4 +92,15 @@ func TestClient_HTML(t *testing.T) {
 		}
 	}
 	Expect(t, texts).ToBe([]string{"otiai10", "/", "gosseract"})
+
+	When(t, "only invalid languages are given", func(t *testing.T) {
+		client.SetLanguage("foo")
+		_, err := client.HTML()
+		Expect(t, err).Not().ToBe(nil)
+	})
+	When(t, "undefined key-value is tried to be set", func(t *testing.T) {
+		client.SetVariable("foobar", "hoge")
+		_, err := client.HTML()
+		Expect(t, err).Not().ToBe(nil)
+	})
 }

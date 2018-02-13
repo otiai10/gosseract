@@ -79,7 +79,7 @@ func TestClient_HTML(t *testing.T) {
 	defer client.Close()
 	client.SetImage("./test/data/001-gosseract.png")
 	client.SetWhitelist("otiai10/gosseract")
-	out, err := client.HTML()
+	out, err := client.HOCRText()
 	Expect(t, err).ToBe(nil)
 
 	tokenizer := html.NewTokenizer(strings.NewReader(out))
@@ -98,7 +98,7 @@ func TestClient_HTML(t *testing.T) {
 		defer client.Close()
 		client.SetLanguage("foo")
 		client.SetImage("./test/data/001-gosseract.png")
-		_, err := client.HTML()
+		_, err := client.HOCRText()
 		Expect(t, err).Not().ToBe(nil)
 	})
 	When(t, "undefined key-value is tried to be set", func(t *testing.T) {
@@ -106,7 +106,7 @@ func TestClient_HTML(t *testing.T) {
 		defer client.Close()
 		client.SetVariable("foobar", "hoge")
 		client.SetImage("./test/data/001-gosseract.png")
-		_, err := client.HTML()
+		_, err := client.HOCRText()
 		Expect(t, err).Not().ToBe(nil)
 	})
 }

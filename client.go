@@ -6,6 +6,7 @@ package gosseract
 // #cgo LDFLAGS: -llept -ltesseract
 // #endif
 // #include <stdlib.h>
+// #include <stdbool.h>
 // #include "tessbridge.h"
 import "C"
 import (
@@ -143,74 +144,74 @@ func (c *Client) charConfig() *C.char {
 
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
-func (c *Client) init() {
+func (c *Client) init() error {
 	langs := c.charLangs()
 	defer C.free(unsafe.Pointer(langs))
 	config := c.charConfig()
 	defer C.free(unsafe.Pointer(config))
-	C.Init(c.api, nil, langs, config)
+	res := C.Init(c.api, nil, langs, config)
+	if res != 0 {
+		// TODO: capture and vacuum stderr from Cgo
+		return fmt.Errorf("failed to initialize TessBaseAPI with code %d", res)
+	}
+	return nil
 }
 
 // Prepare tesseract::TessBaseAPI options,
 // must be called after `init`.
-func (c *Client) prepare() {
+func (c *Client) prepare() error {
 	// Set Image by giving path
 	imagepath := C.CString(c.ImagePath)
 	defer C.free(unsafe.Pointer(imagepath))
 	C.SetImage(c.api, imagepath)
 
 	for key, value := range c.Variables {
-		c.bind(key, value)
+		if ok := c.bind(key, value); !ok {
+			return fmt.Errorf("failed to set variable with key(%s):value(%s)", key, value)
+		}
 	}
 
 	if c.PageSegMode != nil {
 		mode := C.int(*c.PageSegMode)
 		C.SetPageSegMode(c.api, mode)
 	}
+	return nil
 }
 
 // Binds variable to API object.
 // Must be called from inside `prepare`.
-func (c *Client) bind(key, value string) {
+func (c *Client) bind(key, value string) bool {
 	k, v := C.CString(key), C.CString(value)
 	defer C.free(unsafe.Pointer(k))
 	defer C.free(unsafe.Pointer(v))
-	C.SetVariable(c.api, k, v)
+	res := C.SetVariable(c.api, k, v)
+	return bool(res)
 }
 
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
-func (c *Client) Text() (string, error) {
-
-	// Defer recover and make error
-	var err error
-	// TODO: Handle and recover errors by Cgo.
-	// defer func() {
-	// 	if e := recover(); e != nil {
-	// 		err = fmt.Errorf("%v", e)
-	// 	}
-	// }()
-
-	c.init()
-
-	c.prepare()
-
-	// Get text by execuitng
-	out := C.GoString(C.UTF8Text(c.api))
-
-	// Trim result if needed
+func (c *Client) Text() (out string, err error) {
+	if err = c.init(); err != nil {
+		return
+	}
+	if err = c.prepare(); err != nil {
+		return
+	}
+	out = C.GoString(C.UTF8Text(c.api))
 	if c.Trim {
 		out = strings.Trim(out, "\n")
 	}
-
 	return out, err
 }
 
 // HTML finally initialize tesseract::TessBaseAPI, execute OCR and returns hOCR text.
 // See https://en.wikipedia.org/wiki/HOCR for more information of hOCR.
-func (c *Client) HTML() (string, error) {
-	var err error
-	c.init()
-	c.prepare()
-	out := C.GoString(C.HOCRText(c.api))
-	return out, err
+func (c *Client) HTML() (out string, err error) {
+	if err = c.init(); err != nil {
+		return
+	}
+	if err = c.prepare(); err != nil {
+		return
+	}
+	out = C.GoString(C.HOCRText(c.api))
+	return
 }

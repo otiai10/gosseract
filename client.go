@@ -3,6 +3,7 @@ package gosseract
 // #if __FreeBSD__ >= 10
 // #cgo LDFLAGS: -L/usr/local/lib -llept -ltesseract
 // #else
+// #cgo CXXFLAGS: -std=c++0x
 // #cgo LDFLAGS: -llept -ltesseract
 // #endif
 // #include <stdlib.h>

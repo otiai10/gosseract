@@ -1,6 +1,7 @@
 package gosseract
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -34,9 +35,22 @@ func TestClient_SetImage(t *testing.T) {
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("otiai10 / gosseract")
 
+}
+
+func TestClient_SetWhitelist(t *testing.T) {
+
+	if os.Getenv("TESS_LSTM") == "1" {
+		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
+	}
+
+	client := NewClient()
+	defer client.Close()
+
+	client.Trim = true
+	client.SetImage("./test/data/001-gosseract.png")
 	client.Languages = []string{"eng"}
 	client.SetWhitelist("aegitosr10/")
-	text, err = client.Text()
+	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("otiai10 / gosseraet")
 }
@@ -51,6 +65,10 @@ func TestClient_SetLanguage(t *testing.T) {
 }
 
 func TestClient_ConfigFilePath(t *testing.T) {
+
+	if os.Getenv("TESS_LSTM") == "1" {
+		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
+	}
 
 	client := NewClient()
 	defer client.Close()

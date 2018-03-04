@@ -1,6 +1,7 @@
 package gosseract
 
 import (
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -35,6 +36,25 @@ func TestClient_SetImage(t *testing.T) {
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("otiai10 / gosseract")
 
+}
+
+func TestClient_SetImageFromBytes(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+
+	content, err := ioutil.ReadFile("./test/data/001-gosseract.png")
+	if err != nil {
+		t.Fatalf("could not read test file")
+	}
+
+	client.Trim = true
+	client.SetImageFromBytes(content)
+
+	client.SetPageSegMode(PSM_SINGLE_BLOCK)
+
+	text, err := client.Text()
+	Expect(t, err).ToBe(nil)
+	Expect(t, text).ToBe("otiai10 / gosseract")
 }
 
 func TestClient_SetWhitelist(t *testing.T) {

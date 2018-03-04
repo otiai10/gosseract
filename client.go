@@ -45,6 +45,9 @@ type Client struct {
 	// ImagePath is just path to image file to be processed OCR.
 	ImagePath string
 
+	// ImageData is the in-memory image to be processed OCR.
+	ImageData []byte
+
 	// Variables is just a pool to evaluate "tesseract::TessBaseAPI->SetVariable" in delay.
 	// TODO: Think if it should be public, or private property.
 	Variables map[string]string
@@ -83,6 +86,12 @@ func (client *Client) Close() (err error) {
 // SetImage sets path to image file to be processed OCR.
 func (client *Client) SetImage(imagepath string) *Client {
 	client.ImagePath = imagepath
+	return client
+}
+
+// SetImageFromBytes sets the image data to be processed OCR.
+func (client *Client) SetImageFromBytes(data []byte) *Client {
+	client.ImageData = data
 	return client
 }
 
@@ -161,10 +170,18 @@ func (client *Client) init() error {
 // Prepare tesseract::TessBaseAPI options,
 // must be called after `init`.
 func (client *Client) prepare() error {
-	// Set Image by giving path
-	imagepath := C.CString(client.ImagePath)
-	defer C.free(unsafe.Pointer(imagepath))
-	C.SetImage(client.api, imagepath)
+	if len(client.ImageData) > 0 {
+		C.SetImageFromBuffer(
+			client.api,
+			(*C.uchar)(unsafe.Pointer(&client.ImageData[0])),
+			C.int(len(client.ImageData)),
+		)
+	} else {
+		// Set Image by giving path
+		imagepath := C.CString(client.ImagePath)
+		defer C.free(unsafe.Pointer(imagepath))
+		C.SetImage(client.api, imagepath)
+	}
 
 	for key, value := range client.Variables {
 		if ok := client.bind(key, value); !ok {

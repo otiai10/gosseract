@@ -28,13 +28,13 @@ func TestClient_SetImage(t *testing.T) {
 	defer client.Close()
 
 	client.Trim = true
-	client.SetImage("./test/data/001-gosseract.png")
+	client.SetImage("./test/data/001-helloworld.png")
 
 	client.SetPageSegMode(PSM_SINGLE_BLOCK)
 
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
-	Expect(t, text).ToBe("otiai10 / gosseract")
+	Expect(t, text).ToBe("Hello, World!")
 
 }
 
@@ -42,7 +42,7 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
 
-	content, err := ioutil.ReadFile("./test/data/001-gosseract.png")
+	content, err := ioutil.ReadFile("./test/data/001-helloworld.png")
 	if err != nil {
 		t.Fatalf("could not read test file")
 	}
@@ -54,7 +54,7 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
-	Expect(t, text).ToBe("otiai10 / gosseract")
+	Expect(t, text).ToBe("Hello, World!")
 }
 
 func TestClient_SetWhitelist(t *testing.T) {
@@ -67,19 +67,19 @@ func TestClient_SetWhitelist(t *testing.T) {
 	defer client.Close()
 
 	client.Trim = true
-	client.SetImage("./test/data/001-gosseract.png")
+	client.SetImage("./test/data/001-helloworld.png")
 	client.Languages = []string{"eng"}
-	client.SetWhitelist("aegitosr10/")
+	client.SetWhitelist("HeloWrd,")
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
-	Expect(t, text).ToBe("otiai10 / gosseraet")
+	Expect(t, text).ToBe("Hello, Worldl")
 }
 
 func TestClient_SetLanguage(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
 	client.SetLanguage("deu")
-	client.SetImage("./test/data/001-gosseract.png")
+	client.SetImage("./test/data/001-helloworld.png")
 	_, err := client.Text()
 	Expect(t, err).Not().ToBe(nil)
 }
@@ -95,10 +95,11 @@ func TestClient_ConfigFilePath(t *testing.T) {
 
 	err := client.SetConfigFile("./test/config/01.config")
 	Expect(t, err).ToBe(nil)
-	client.SetImage("./test/data/001-gosseract.png")
+	client.SetImage("./test/data/001-helloworld.png")
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
-	Expect(t, text).ToBe("otiai10 l gosseract")
+
+	Expect(t, text).ToBe("H    W   ")
 
 	When(t, "the config file is not found", func(t *testing.T) {
 		err := client.SetConfigFile("./test/config/not-existing")
@@ -115,8 +116,8 @@ func TestClient_ConfigFilePath(t *testing.T) {
 func TestClient_HTML(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
-	client.SetImage("./test/data/001-gosseract.png")
-	client.SetWhitelist("otiai10/gosseract")
+	client.SetImage("./test/data/001-helloworld.png")
+	client.SetWhitelist("Hello,World!")
 	out, err := client.HOCRText()
 	Expect(t, err).ToBe(nil)
 
@@ -129,13 +130,13 @@ func TestClient_HTML(t *testing.T) {
 			texts = append(texts, strings.Trim(token.Data, "\n"))
 		}
 	}
-	Expect(t, texts).ToBe([]string{"otiai10", "/", "gosseract"})
+	Expect(t, texts).ToBe([]string{"Hello,", "World!"})
 
 	When(t, "only invalid languages are given", func(t *testing.T) {
 		client := NewClient()
 		defer client.Close()
 		client.SetLanguage("foo")
-		client.SetImage("./test/data/001-gosseract.png")
+		client.SetImage("./test/data/001-helloworld.png")
 		_, err := client.HOCRText()
 		Expect(t, err).Not().ToBe(nil)
 	})
@@ -143,7 +144,7 @@ func TestClient_HTML(t *testing.T) {
 		client := NewClient()
 		defer client.Close()
 		client.SetVariable("foobar", "hoge")
-		client.SetImage("./test/data/001-gosseract.png")
+		client.SetImage("./test/data/001-helloworld.png")
 		_, err := client.HOCRText()
 		Expect(t, err).Not().ToBe(nil)
 	})

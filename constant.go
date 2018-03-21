@@ -38,3 +38,21 @@ const (
 	// PSM_COUNT - Just a number of enum entries. This is NOT a member of PSM ;)
 	PSM_COUNT
 )
+
+// SettableVariable represents available strings for TessBaseAPI::SetVariable.
+// See https://groups.google.com/forum/#!topic/tesseract-ocr/eHTBzrBiwvQ
+// and https://github.com/tesseract-ocr/tesseract/blob/master/ccmain/tesseractclass.h
+type SettableVariable string
+
+// Followings are variables which can be used for TessBaseAPI::SetVariable.
+// If anything missing (I know there are many), please add one below.
+const (
+	// TESSEDIT_CHAR_WHITELIST - Whitelist of chars to recognize
+	// There is a known issue in 4.00 with LSTM
+	// https://github.com/tesseract-ocr/tesseract/issues/751
+	TESSEDIT_CHAR_WHITELIST SettableVariable = "tessedit_char_whitelist"
+	// TESSEDIT_CHAR_BLACKLIST - Blacklist of chars not to recognize
+	// There is a known issue in 4.00 with LSTM
+	// https://github.com/tesseract-ocr/tesseract/issues/751
+	TESSEDIT_CHAR_BLACKLIST SettableVariable = "tessedit_char_blacklist"
+)

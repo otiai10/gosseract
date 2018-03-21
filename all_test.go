@@ -75,6 +75,24 @@ func TestClient_SetWhitelist(t *testing.T) {
 	Expect(t, text).ToBe("Hello, Worldl")
 }
 
+func TestClient_SetBlacklist(t *testing.T) {
+
+	if os.Getenv("TESS_LSTM") == "1" {
+		t.Skip("Blacklist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
+	}
+
+	client := NewClient()
+	defer client.Close()
+
+	client.Trim = true
+	client.SetImage("./test/data/001-helloworld.png")
+	client.Languages = []string{"eng"}
+	client.SetBlacklist("l")
+	text, err := client.Text()
+	Expect(t, err).ToBe(nil)
+	Expect(t, text).ToBe("He110, WorId!")
+}
+
 func TestClient_SetLanguage(t *testing.T) {
 	client := NewClient()
 	defer client.Close()

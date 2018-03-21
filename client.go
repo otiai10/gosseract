@@ -107,6 +107,12 @@ func (client *Client) SetWhitelist(whitelist string) *Client {
 	return client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
 }
 
+// SetBlacklist sets whitelist chars.
+// See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
+func (client *Client) SetBlacklist(whitelist string) *Client {
+	return client.SetVariable(TESSEDIT_CHAR_BLACKLIST, whitelist)
+}
+
 // SetVariable sets parameters, representing tesseract::TessBaseAPI->SetVariable.
 // See official documentation here https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
 func (client *Client) SetVariable(key SettableVariable, value string) *Client {

@@ -50,7 +50,7 @@ type Client struct {
 
 	// Variables is just a pool to evaluate "tesseract::TessBaseAPI->SetVariable" in delay.
 	// TODO: Think if it should be public, or private property.
-	Variables map[string]string
+	Variables map[SettableVariable]string
 
 	// PageSegMode is a mode for page layout analysis.
 	// See https://github.com/otiai10/gosseract/issues/52 for more information.
@@ -66,7 +66,7 @@ type Client struct {
 func NewClient() *Client {
 	client := &Client{
 		api:       C.Create(),
-		Variables: map[string]string{},
+		Variables: map[SettableVariable]string{},
 		Trim:      true,
 	}
 	return client
@@ -104,12 +104,12 @@ func (client *Client) SetLanguage(langs ...string) *Client {
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) *Client {
-	return client.SetVariable("tessedit_char_whitelist", whitelist)
+	return client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
 }
 
 // SetVariable sets parameters, representing tesseract::TessBaseAPI->SetVariable.
 // See official documentation here https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
-func (client *Client) SetVariable(key, value string) *Client {
+func (client *Client) SetVariable(key SettableVariable, value string) *Client {
 	client.Variables[key] = value
 	return client
 }
@@ -184,7 +184,7 @@ func (client *Client) prepare() error {
 	}
 
 	for key, value := range client.Variables {
-		if ok := client.bind(key, value); !ok {
+		if ok := client.bind(string(key), value); !ok {
 			return fmt.Errorf("failed to set variable with key(%s):value(%s)", key, value)
 		}
 	}

@@ -54,6 +54,8 @@ PixImage SetImage(TessBaseAPI a, char* imagepath) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   Pix *image = pixRead(imagepath);
   api->SetImage(image);
+  if(api->GetSourceYResolution() < 70)
+    api->SetSourceResolution(70);
   return (void*)image;
 }
 
@@ -61,6 +63,8 @@ PixImage SetImageFromBuffer(TessBaseAPI a, unsigned char* data, int size) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   Pix *image = pixReadMem(data, (size_t)size);
   api->SetImage(image);
+  if(api->GetSourceYResolution() < 70)
+    api->SetSourceResolution(70);
   return (void*)image;
 }
 

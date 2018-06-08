@@ -16,6 +16,13 @@ func TestVersion(t *testing.T) {
 	Expect(t, version).Match("[0-9]{1}.[0-9]{2}(.[0-9a-z]*)?")
 }
 
+func TestClearPersistentCache(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+	client.init()
+	ClearPersistentCache()
+}
+
 func TestNewClient(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
@@ -33,8 +40,20 @@ func TestClient_SetImage(t *testing.T) {
 	client.SetPageSegMode(PSM_SINGLE_BLOCK)
 
 	text, err := client.Text()
+	if client.pixImage == nil {
+		t.Errorf("could not set image")
+	}
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("Hello, World!")
+
+	client.SetImage("./test/data/001-helloworld.png")
+	if client.pixImage != nil {
+		t.Errorf("could not destory pix image")
+	}
+
+	client.SetImage("somewhere/fake/fakeimage.png")
+	_, err = client.Text()
+	Expect(t, err).Not().ToBe(nil)
 
 }
 
@@ -53,8 +72,15 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 	client.SetPageSegMode(PSM_SINGLE_BLOCK)
 
 	text, err := client.Text()
+	if client.pixImage == nil {
+		t.Errorf("could not set image")
+	}
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("Hello, World!")
+	client.SetImageFromBytes(content)
+	if client.pixImage != nil {
+		t.Errorf("could not destory pix image")
+	}
 }
 
 func TestClient_SetWhitelist(t *testing.T) {

@@ -25,9 +25,23 @@ func Version() string {
 	return C.GoString(version)
 }
 
+// ClearPersistentCache clears any library-level memory caches. There are a variety of expensive-to-load constant data structures (mostly language dictionaries) that are cached globally – surviving the Init() and End() of individual TessBaseAPI's. This function allows the clearing of these caches.
+func ClearPersistentCache() {
+	api := C.Create()
+	defer C.Free(api)
+	C.ClearPersistentCache(api)
+}
+
 // Client is argument builder for tesseract::TessBaseAPI.
 type Client struct {
 	api C.TessBaseAPI
+
+	// Holds a reference to the pix image to be able to destroy on client close
+	// or when a new image is set
+	pixImage C.PixImage
+
+	// Initialized allows the client to know if it needs to initialize itself
+	Initialized bool
 
 	// Trim specifies characters to trim, which would be trimed from result string.
 	// As results of OCR, text often contains unnecessary characters, such as newlines, on the head/foot of string.
@@ -79,24 +93,34 @@ func (client *Client) Close() (err error) {
 	// 		err = fmt.Errorf("%v", e)
 	// 	}
 	// }()
+	C.Clear(client.api)
 	C.Free(client.api)
 	return err
 }
 
 // SetImage sets path to image file to be processed OCR.
 func (client *Client) SetImage(imagepath string) *Client {
+	if client.pixImage != nil {
+		C.DestroyPixImage(client.pixImage)
+		client.pixImage = nil
+	}
 	client.ImagePath = imagepath
 	return client
 }
 
 // SetImageFromBytes sets the image data to be processed OCR.
 func (client *Client) SetImageFromBytes(data []byte) *Client {
+	if client.pixImage != nil {
+		C.DestroyPixImage(client.pixImage)
+		client.pixImage = nil
+	}
 	client.ImageData = data
 	return client
 }
 
 // SetLanguage sets languages to use. English as default.
 func (client *Client) SetLanguage(langs ...string) *Client {
+	client.Initialized = false
 	client.Languages = langs
 	return client
 }
@@ -136,6 +160,7 @@ func (client *Client) SetConfigFile(fpath string) error {
 	if info.IsDir() {
 		return fmt.Errorf("the specified config file path seems to be a directory")
 	}
+	client.Initialized = false
 	client.ConfigFilePath = fpath
 	return nil
 }
@@ -161,6 +186,9 @@ func (client *Client) charConfig() *C.char {
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
 func (client *Client) init() error {
+	if client.Initialized {
+		return nil
+	}
 	langs := client.charLangs()
 	defer C.free(unsafe.Pointer(langs))
 	config := client.charConfig()
@@ -170,23 +198,35 @@ func (client *Client) init() error {
 		// TODO: capture and vacuum stderr from Cgo
 		return fmt.Errorf("failed to initialize TessBaseAPI with code %d", res)
 	}
+	client.Initialized = true
 	return nil
 }
 
 // Prepare tesseract::TessBaseAPI options,
 // must be called after `init`.
 func (client *Client) prepare() error {
-	if len(client.ImageData) > 0 {
-		C.SetImageFromBuffer(
-			client.api,
-			(*C.uchar)(unsafe.Pointer(&client.ImageData[0])),
-			C.int(len(client.ImageData)),
-		)
-	} else {
-		// Set Image by giving path
-		imagepath := C.CString(client.ImagePath)
-		defer C.free(unsafe.Pointer(imagepath))
-		C.SetImage(client.api, imagepath)
+	// Will only set an image if pixImage is null, meaning a new image has been set
+	if client.pixImage == nil {
+		if len(client.ImageData) > 0 {
+			img := C.SetImageFromBuffer(
+				client.api,
+				(*C.uchar)(unsafe.Pointer(&client.ImageData[0])),
+				C.int(len(client.ImageData)),
+			)
+			client.pixImage = img
+		} else {
+			// Set Image by giving path
+			if client.ImagePath == "" {
+				return fmt.Errorf("invalid path will be set")
+			}
+			if _, err := os.Stat(client.ImagePath); os.IsNotExist(err) {
+				return fmt.Errorf("file does not exist")
+			}
+			imagepath := C.CString(client.ImagePath)
+			defer C.free(unsafe.Pointer(imagepath))
+			img := C.SetImage(client.api, imagepath)
+			client.pixImage = img
+		}
 	}
 
 	for key, value := range client.Variables {

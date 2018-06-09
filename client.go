@@ -95,6 +95,10 @@ func (client *Client) Close() (err error) {
 	// }()
 	C.Clear(client.api)
 	C.Free(client.api)
+	if client.pixImage != nil {
+		C.DestroyPixImage(client.pixImage)
+		client.pixImage = nil
+	}
 	return err
 }
 

@@ -13,6 +13,7 @@ int Init(TessBaseAPI, char*, char*, char*);
 bool SetVariable(TessBaseAPI, char*, char*);
 PixImage SetImage(TessBaseAPI, char*);
 PixImage SetImageFromBuffer(TessBaseAPI, unsigned char*, int);
+void SetPixImage(TessBaseAPI a, PixImage pix);
 void SetPageSegMode(TessBaseAPI, int);
 int GetPageSegMode(TessBaseAPI);
 char* UTF8Text(TessBaseAPI);

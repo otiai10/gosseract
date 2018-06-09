@@ -68,6 +68,12 @@ PixImage SetImageFromBuffer(TessBaseAPI a, unsigned char* data, int size) {
   return (void*)image;
 }
 
+void SetPixImage(TessBaseAPI a, PixImage pix) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  Pix *image = (Pix*) pix;
+  api->SetImage(image);
+}
+
 void SetPageSegMode(TessBaseAPI a, int m) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   tesseract::PageSegMode mode = (tesseract::PageSegMode)m;

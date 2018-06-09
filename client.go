@@ -227,6 +227,8 @@ func (client *Client) prepare() error {
 			img := C.SetImage(client.api, imagepath)
 			client.pixImage = img
 		}
+	} else {
+		C.SetPixImage(client.api, client.pixImage)
 	}
 
 	for key, value := range client.Variables {

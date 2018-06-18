@@ -49,12 +49,20 @@ func TestClient_SetImage(t *testing.T) {
 	err = client.SetImage("./test/data/001-helloworld.png")
 	Expect(t, err).ToBe(nil)
 
+	err = client.SetImage("")
+	Expect(t, err).Not().ToBe(nil)
+
 	err = client.SetImage("somewhere/fake/fakeimage.png")
 	Expect(t, err).Not().ToBe(nil)
 
 	_, err = client.Text()
 	Expect(t, err).ToBe(nil)
 
+	Because(t, "api must be initialized beforehand", func(t *testing.T) {
+		client := &Client{}
+		err := client.SetImage("./test/data/001-helloworld.png")
+		Expect(t, err).Not().ToBe(nil)
+	})
 }
 
 func TestClient_SetImageFromBytes(t *testing.T) {
@@ -79,6 +87,15 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 	Expect(t, text).ToBe("Hello, World!")
 	err = client.SetImageFromBytes(content)
 	Expect(t, err).ToBe(nil)
+
+	err = client.SetImageFromBytes(nil)
+	Expect(t, err).Not().ToBe(nil)
+
+	Because(t, "api must be initialized beforehand", func(t *testing.T) {
+		client := &Client{}
+		err := client.SetImageFromBytes(content)
+		Expect(t, err).Not().ToBe(nil)
+	})
 }
 
 func TestClient_SetWhitelist(t *testing.T) {
@@ -122,9 +139,12 @@ func TestClient_SetBlacklist(t *testing.T) {
 func TestClient_SetLanguage(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
-	client.SetLanguage("deu")
+	err := client.SetLanguage("deu")
+	Expect(t, err).ToBe(nil)
+	err = client.SetLanguage()
+	Expect(t, err).Not().ToBe(nil)
 	client.SetImage("./test/data/001-helloworld.png")
-	_, err := client.Text()
+	_, err = client.Text()
 	Expect(t, err).Not().ToBe(nil)
 }
 

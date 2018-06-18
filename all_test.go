@@ -46,15 +46,23 @@ func TestClient_SetImage(t *testing.T) {
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("Hello, World!")
 
-	client.SetImage("./test/data/001-helloworld.png")
-	if client.pixImage != nil {
-		t.Errorf("could not destory pix image")
-	}
+	err = client.SetImage("./test/data/001-helloworld.png")
+	Expect(t, err).ToBe(nil)
 
-	client.SetImage("somewhere/fake/fakeimage.png")
-	_, err = client.Text()
+	err = client.SetImage("")
 	Expect(t, err).Not().ToBe(nil)
 
+	err = client.SetImage("somewhere/fake/fakeimage.png")
+	Expect(t, err).Not().ToBe(nil)
+
+	_, err = client.Text()
+	Expect(t, err).ToBe(nil)
+
+	Because(t, "api must be initialized beforehand", func(t *testing.T) {
+		client := &Client{}
+		err := client.SetImage("./test/data/001-helloworld.png")
+		Expect(t, err).Not().ToBe(nil)
+	})
 }
 
 func TestClient_SetImageFromBytes(t *testing.T) {
@@ -77,10 +85,17 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 	}
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("Hello, World!")
-	client.SetImageFromBytes(content)
-	if client.pixImage != nil {
-		t.Errorf("could not destory pix image")
-	}
+	err = client.SetImageFromBytes(content)
+	Expect(t, err).ToBe(nil)
+
+	err = client.SetImageFromBytes(nil)
+	Expect(t, err).Not().ToBe(nil)
+
+	Because(t, "api must be initialized beforehand", func(t *testing.T) {
+		client := &Client{}
+		err := client.SetImageFromBytes(content)
+		Expect(t, err).Not().ToBe(nil)
+	})
 }
 
 func TestClient_SetWhitelist(t *testing.T) {
@@ -111,9 +126,11 @@ func TestClient_SetBlacklist(t *testing.T) {
 	defer client.Close()
 
 	client.Trim = true
-	client.SetImage("./test/data/001-helloworld.png")
+	err := client.SetImage("./test/data/001-helloworld.png")
+	Expect(t, err).ToBe(nil)
 	client.Languages = []string{"eng"}
-	client.SetBlacklist("l")
+	err = client.SetBlacklist("l")
+	Expect(t, err).ToBe(nil)
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
 	Expect(t, text).ToBe("He110, WorId!")
@@ -122,9 +139,12 @@ func TestClient_SetBlacklist(t *testing.T) {
 func TestClient_SetLanguage(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
-	client.SetLanguage("deu")
+	err := client.SetLanguage("deu")
+	Expect(t, err).ToBe(nil)
+	err = client.SetLanguage()
+	Expect(t, err).Not().ToBe(nil)
 	client.SetImage("./test/data/001-helloworld.png")
-	_, err := client.Text()
+	_, err = client.Text()
 	Expect(t, err).Not().ToBe(nil)
 }
 
@@ -184,12 +204,13 @@ func TestClient_HTML(t *testing.T) {
 		_, err := client.HOCRText()
 		Expect(t, err).Not().ToBe(nil)
 	})
-	When(t, "undefined key-value is tried to be set", func(t *testing.T) {
+	Because(t, "unknown key is validated when `init` is called", func(t *testing.T) {
 		client := NewClient()
 		defer client.Close()
-		client.SetVariable("foobar", "hoge")
+		err := client.SetVariable("foobar", "hoge")
+		Expect(t, err).ToBe(nil)
 		client.SetImage("./test/data/001-helloworld.png")
-		_, err := client.HOCRText()
+		_, err = client.Text()
 		Expect(t, err).Not().ToBe(nil)
 	})
 }

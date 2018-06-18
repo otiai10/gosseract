@@ -50,28 +50,13 @@ bool SetVariable(TessBaseAPI a, char* name, char* value) {
   return api->SetVariable(name, value);
 }
 
-PixImage SetImage(TessBaseAPI a, char* imagepath) {
-  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
-  Pix *image = pixRead(imagepath);
-  api->SetImage(image);
-  if(api->GetSourceYResolution() < 70)
-    api->SetSourceResolution(70);
-  return (void*)image;
-}
-
-PixImage SetImageFromBuffer(TessBaseAPI a, unsigned char* data, int size) {
-  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
-  Pix *image = pixReadMem(data, (size_t)size);
-  api->SetImage(image);
-  if(api->GetSourceYResolution() < 70)
-    api->SetSourceResolution(70);
-  return (void*)image;
-}
-
 void SetPixImage(TessBaseAPI a, PixImage pix) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   Pix *image = (Pix*) pix;
   api->SetImage(image);
+  if (api->GetSourceYResolution() < 70) {
+    api->SetSourceResolution(70);
+  }
 }
 
 void SetPageSegMode(TessBaseAPI a, int m) {
@@ -100,6 +85,17 @@ const char* Version(TessBaseAPI a) {
   const char* v = api->Version();
   return v;
 }
+
+PixImage CreatePixImageByFilePath(char* imagepath) {
+  Pix *image = pixRead(imagepath);
+  return (void*)image;
+}
+
+PixImage CreatePixImageFromBytes(unsigned char* data, int size) {
+  Pix *image = pixReadMem(data, (size_t)size);
+  return (void*)image;
+}
+
 
 void DestroyPixImage(PixImage pix){
   Pix *img = (Pix*) pix;

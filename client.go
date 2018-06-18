@@ -40,9 +40,6 @@ type Client struct {
 	// or when a new image is set
 	pixImage C.PixImage
 
-	// Initialized allows the client to know if it needs to initialize itself
-	Initialized bool
-
 	// Trim specifies characters to trim, which would be trimed from result string.
 	// As results of OCR, text often contains unnecessary characters, such as newlines, on the head/foot of string.
 	// If `Trim` is set, this client will remove specified characters from the result.
@@ -56,19 +53,9 @@ type Client struct {
 	// Languages are languages to be detected. If not specified, it's gonna be "eng".
 	Languages []string
 
-	// ImagePath is just path to image file to be processed OCR.
-	ImagePath string
-
-	// ImageData is the in-memory image to be processed OCR.
-	ImageData []byte
-
 	// Variables is just a pool to evaluate "tesseract::TessBaseAPI->SetVariable" in delay.
 	// TODO: Think if it should be public, or private property.
 	Variables map[SettableVariable]string
-
-	// PageSegMode is a mode for page layout analysis.
-	// See https://github.com/otiai10/gosseract/issues/52 for more information.
-	PageSegMode *PageSegMode
 
 	// Config is a file path to the configuration for Tesseract
 	// See http://www.sk-spell.sk.cx/tesseract-ocr-parameters-in-302-version
@@ -103,56 +90,89 @@ func (client *Client) Close() (err error) {
 }
 
 // SetImage sets path to image file to be processed OCR.
-func (client *Client) SetImage(imagepath string) *Client {
+func (client *Client) SetImage(imagepath string) error {
+
+	if client.api == nil {
+		return fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+	}
+	if imagepath == "" {
+		return fmt.Errorf("image path cannot be empty")
+	}
+	if _, err := os.Stat(imagepath); err != nil {
+		return fmt.Errorf("cannot detect the stat of specified file: %v", err)
+	}
+
 	if client.pixImage != nil {
 		C.DestroyPixImage(client.pixImage)
 		client.pixImage = nil
 	}
-	client.ImagePath = imagepath
-	return client
+
+	p := C.CString(imagepath)
+	defer C.free(unsafe.Pointer(p))
+
+	img := C.CreatePixImageByFilePath(p)
+	client.pixImage = img
+
+	return nil
 }
 
 // SetImageFromBytes sets the image data to be processed OCR.
-func (client *Client) SetImageFromBytes(data []byte) *Client {
+func (client *Client) SetImageFromBytes(data []byte) error {
+
+	if client.api == nil {
+		return fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+	}
+	if len(data) == 0 {
+		return fmt.Errorf("image data cannot be empty")
+	}
+
 	if client.pixImage != nil {
 		C.DestroyPixImage(client.pixImage)
 		client.pixImage = nil
 	}
-	client.ImageData = data
-	return client
+
+	img := C.CreatePixImageFromBytes((*C.uchar)(unsafe.Pointer(&data[0])), C.int(len(data)))
+	client.pixImage = img
+
+	return nil
 }
 
 // SetLanguage sets languages to use. English as default.
-func (client *Client) SetLanguage(langs ...string) *Client {
-	client.Initialized = false
+func (client *Client) SetLanguage(langs ...string) error {
+	if len(langs) == 0 {
+		return fmt.Errorf("languages cannot be empty")
+	}
 	client.Languages = langs
-	return client
+	return nil
 }
 
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
-func (client *Client) SetWhitelist(whitelist string) *Client {
+func (client *Client) SetWhitelist(whitelist string) error {
 	return client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
 }
 
 // SetBlacklist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
-func (client *Client) SetBlacklist(whitelist string) *Client {
+func (client *Client) SetBlacklist(whitelist string) error {
 	return client.SetVariable(TESSEDIT_CHAR_BLACKLIST, whitelist)
 }
 
 // SetVariable sets parameters, representing tesseract::TessBaseAPI->SetVariable.
 // See official documentation here https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
-func (client *Client) SetVariable(key SettableVariable, value string) *Client {
+// Because `api->SetVariable` must be called after `api->Init`, this method cannot detect unexpected key for variables.
+// Check `client.setVariablesToInitializedAPI` for more information.
+func (client *Client) SetVariable(key SettableVariable, value string) error {
 	client.Variables[key] = value
-	return client
+	return nil
 }
 
 // SetPageSegMode sets "Page Segmentation Mode" (PSM) to detect layout of characters.
 // See official documentation for PSM here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method
-func (client *Client) SetPageSegMode(mode PageSegMode) *Client {
-	client.PageSegMode = &mode
-	return client
+// See https://github.com/otiai10/gosseract/issues/52 for more information.
+func (client *Client) SetPageSegMode(mode PageSegMode) error {
+	C.SetPageSegMode(client.api, C.int(mode))
+	return nil
 }
 
 // SetConfigFile sets the file path to config file.
@@ -164,106 +184,64 @@ func (client *Client) SetConfigFile(fpath string) error {
 	if info.IsDir() {
 		return fmt.Errorf("the specified config file path seems to be a directory")
 	}
-	client.Initialized = false
 	client.ConfigFilePath = fpath
 	return nil
-}
-
-// It's due to the caller to free this char pointer.
-func (client *Client) charLangs() *C.char {
-	var langs *C.char
-	if len(client.Languages) != 0 {
-		langs = C.CString(strings.Join(client.Languages, "+"))
-	}
-	return langs
-}
-
-// It's due to the caller to free this char pointer.
-func (client *Client) charConfig() *C.char {
-	var config *C.char
-	if _, err := os.Stat(client.ConfigFilePath); err == nil {
-		config = C.CString(client.ConfigFilePath)
-	}
-	return config
 }
 
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
 func (client *Client) init() error {
-	if client.Initialized {
-		return nil
+
+	var languages *C.char
+	if len(client.Languages) != 0 {
+		languages = C.CString(strings.Join(client.Languages, "+"))
 	}
-	langs := client.charLangs()
-	defer C.free(unsafe.Pointer(langs))
-	config := client.charConfig()
-	defer C.free(unsafe.Pointer(config))
-	res := C.Init(client.api, nil, langs, config)
+	defer C.free(unsafe.Pointer(languages))
+
+	var configfile *C.char
+	if _, err := os.Stat(client.ConfigFilePath); err == nil {
+		configfile = C.CString(client.ConfigFilePath)
+	}
+	defer C.free(unsafe.Pointer(configfile))
+
+	res := C.Init(client.api, nil, languages, configfile)
 	if res != 0 {
 		// TODO: capture and vacuum stderr from Cgo
 		return fmt.Errorf("failed to initialize TessBaseAPI with code %d", res)
 	}
-	client.Initialized = true
-	return nil
-}
 
-// Prepare tesseract::TessBaseAPI options,
-// must be called after `init`.
-func (client *Client) prepare() error {
-	// Will only set an image if pixImage is null, meaning a new image has been set
+	if err := client.setVariablesToInitializedAPI(); err != nil {
+		return err
+	}
+
 	if client.pixImage == nil {
-		if len(client.ImageData) > 0 {
-			img := C.SetImageFromBuffer(
-				client.api,
-				(*C.uchar)(unsafe.Pointer(&client.ImageData[0])),
-				C.int(len(client.ImageData)),
-			)
-			client.pixImage = img
-		} else {
-			// Set Image by giving path
-			if client.ImagePath == "" {
-				return fmt.Errorf("invalid path will be set")
-			}
-			if _, err := os.Stat(client.ImagePath); os.IsNotExist(err) {
-				return fmt.Errorf("file does not exist")
-			}
-			imagepath := C.CString(client.ImagePath)
-			defer C.free(unsafe.Pointer(imagepath))
-			img := C.SetImage(client.api, imagepath)
-			client.pixImage = img
-		}
-	} else {
-		C.SetPixImage(client.api, client.pixImage)
+		return fmt.Errorf("PixImage is not set, use SetImage or SetImageFromBytes before Text or HOCRText")
 	}
+	C.SetPixImage(client.api, client.pixImage)
 
-	for key, value := range client.Variables {
-		if ok := client.bind(string(key), value); !ok {
-			return fmt.Errorf("failed to set variable with key(%s):value(%s)", key, value)
-		}
-	}
-
-	if client.PageSegMode != nil {
-		mode := C.int(*client.PageSegMode)
-		C.SetPageSegMode(client.api, mode)
-	}
 	return nil
 }
 
-// Binds variable to API object.
-// Must be called from inside `prepare`.
-func (client *Client) bind(key, value string) bool {
-	k, v := C.CString(key), C.CString(value)
-	defer C.free(unsafe.Pointer(k))
-	defer C.free(unsafe.Pointer(v))
-	res := C.SetVariable(client.api, k, v)
-	return bool(res)
+// This method sets all the sspecified variables to TessBaseAPI structure.
+// Because `api->SetVariable` must be called after `api->Init()`,
+// gosseract.Client.SetVariable cannot call `api->SetVariable` directly.
+// See https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
+func (client *Client) setVariablesToInitializedAPI() error {
+	for key, value := range client.Variables {
+		k, v := C.CString(string(key)), C.CString(value)
+		defer C.free(unsafe.Pointer(k))
+		defer C.free(unsafe.Pointer(v))
+		res := C.SetVariable(client.api, k, v)
+		if bool(res) == false {
+			return fmt.Errorf("failed to set variable with key(%v) and value(%v)", key, value)
+		}
+	}
+	return nil
 }
 
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
 func (client *Client) Text() (out string, err error) {
 	if err = client.init(); err != nil {
-		return
-	}
-	if err = client.prepare(); err != nil {
 		return
 	}
 	out = C.GoString(C.UTF8Text(client.api))
@@ -277,9 +255,6 @@ func (client *Client) Text() (out string, err error) {
 // See https://en.wikipedia.org/wiki/HOCR for more information of hOCR.
 func (client *Client) HOCRText() (out string, err error) {
 	if err = client.init(); err != nil {
-		return
-	}
-	if err = client.prepare(); err != nil {
 		return
 	}
 	out = C.GoString(C.HOCRText(client.api))

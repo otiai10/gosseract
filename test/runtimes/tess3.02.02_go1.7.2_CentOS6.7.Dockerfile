@@ -89,4 +89,6 @@ RUN go get golang.org/x/net/html
 # Mount source code of gosseract project
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
-ENTRYPOINT go test github.com/otiai10/gosseract
+# ENTRYPOINT go test github.com/otiai10/gosseract
+ENTRYPOINT [ "echo", "[SKIP] UNSUPPORTED Tesseract version <= 3.02" ]
+# See also https://github.com/otiai10/gosseract/issues/130

@@ -11,11 +11,21 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"unsafe"
 )
+
+// Coordinate x/y box
+type Coordinate struct {
+	X1 int
+	Y1 int
+	X2 int
+	Y2 int
+}
 
 // Version returns the version of Tesseract-OCR
 func Version() string {
@@ -258,5 +268,24 @@ func (client *Client) HOCRText() (out string, err error) {
 		return
 	}
 	out = C.GoString(C.HOCRText(client.api))
+	return
+}
+
+// GetResults returns a slice of coords
+func (client *Client) GetResults() (out []Coordinate, err error) {
+	if err = client.init(); err != nil {
+		return
+	}
+	result := C.GoString(C.GetResults(client.api))
+	sc := bufio.NewScanner(strings.NewReader(result))
+	for sc.Scan() {
+		coords := strings.Split(sc.Text(), ",")
+		x1, _ := strconv.Atoi(coords[0])
+		y1, _ := strconv.Atoi(coords[1])
+		x2, _ := strconv.Atoi(coords[2])
+		y2, _ := strconv.Atoi(coords[3])
+		out = append(out, Coordinate{x1, y1, x2, y2})
+	}
+
 	return
 }

@@ -11,6 +11,7 @@ void Free(TessBaseAPI);
 void Clear(TessBaseAPI);
 void ClearPersistentCache(TessBaseAPI);
 int Init(TessBaseAPI, char*, char*, char*);
+const char* GetResults(TessBaseAPI);
 bool SetVariable(TessBaseAPI, char*, char*);
 void SetPixImage(TessBaseAPI a, PixImage pix);
 void SetPageSegMode(TessBaseAPI, int);

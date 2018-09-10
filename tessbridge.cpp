@@ -3,6 +3,7 @@
 #include "/usr/local/include/leptonica/allheaders.h"
 #else
 #include <tesseract/baseapi.h>
+#include <string>
 #include <leptonica/allheaders.h>
 #endif
 
@@ -78,6 +79,34 @@ char* UTF8Text(TessBaseAPI a) {
 char* HOCRText(TessBaseAPI a) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   return api->GetHOCRText(0);
+}
+
+const char* GetResults(TessBaseAPI a) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+
+//  api->SetVariable("save_blob_choices", "T");
+  api->Recognize(NULL);
+
+  tesseract::ResultIterator* ri = api->GetIterator();
+  tesseract::PageIteratorLevel level = tesseract::RIL_WORD;
+
+  // won't care about heap memory
+  std::string *str = new std::string;
+
+   if (ri != 0) {
+    do {
+      const char* word = ri->GetUTF8Text(level);
+      float conf = ri->Confidence(level);
+      int x1, y1, x2, y2;
+      ri->BoundingBox(level, &x1, &y1, &x2, &y2);
+      char line[80];
+      sprintf(line, "%d,%d,%d,%d\n", x1, y1, x2, y2);
+      str->append(line);
+
+      delete[] word;
+    } while (ri->Next(level));
+  }
+  return str->c_str();
 }
 
 const char* Version(TessBaseAPI a) {

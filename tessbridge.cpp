@@ -81,7 +81,7 @@ char* HOCRText(TessBaseAPI a) {
   return api->GetHOCRText(0);
 }
 
-bounding_boxes* GetBoundingBoxes(TessBaseAPI a) {
+bounding_boxes* GetBoundingBoxes(TessBaseAPI a, int pageIteratorLevel) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   struct bounding_boxes* box_array;
   box_array = (bounding_boxes*)malloc(sizeof(bounding_boxes));
@@ -93,7 +93,7 @@ bounding_boxes* GetBoundingBoxes(TessBaseAPI a) {
   box_array->length = 0;
   api->Recognize(NULL);
   tesseract::ResultIterator* ri = api->GetIterator();
-  tesseract::PageIteratorLevel level = tesseract::RIL_WORD;
+  tesseract::PageIteratorLevel level = (tesseract::PageIteratorLevel)pageIteratorLevel;
 
   if (ri != 0) {
     do {

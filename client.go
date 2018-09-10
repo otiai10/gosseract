@@ -270,11 +270,11 @@ type BoundingBox struct {
 }
 
 // GetBoundingBoxes returns bounding boxes for each matched word
-func (client *Client) GetBoundingBoxes() (out []BoundingBox, err error) {
+func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingBox, err error) {
 	if err = client.init(); err != nil {
 		return
 	}
-	boxArray := C.GetBoundingBoxes(client.api)
+	boxArray := C.GetBoundingBoxes(client.api, C.int(level))
 	length := int(boxArray.length)
 	defer C.free(unsafe.Pointer(boxArray.boxes))
 	defer C.free(unsafe.Pointer(boxArray))

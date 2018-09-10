@@ -11,21 +11,12 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
-	"bufio"
 	"fmt"
+	"image"
 	"os"
-	"strconv"
 	"strings"
 	"unsafe"
 )
-
-// Coordinate x/y box
-type Coordinate struct {
-	X1 int
-	Y1 int
-	X2 int
-	Y2 int
-}
 
 // Version returns the version of Tesseract-OCR
 func Version() string {
@@ -271,20 +262,31 @@ func (client *Client) HOCRText() (out string, err error) {
 	return
 }
 
-// GetResults returns a slice of coords
-func (client *Client) GetResults() (out []Coordinate, err error) {
+// BoundingBox contains the position, confidence and UTF8 text of the recognized word
+type BoundingBox struct {
+	Box        image.Rectangle
+	Word       string
+	Confidence float64
+}
+
+// GetBoundingBoxes returns bounding boxes for each matched word
+func (client *Client) GetBoundingBoxes() (out []BoundingBox, err error) {
 	if err = client.init(); err != nil {
 		return
 	}
-	result := C.GoString(C.GetResults(client.api))
-	sc := bufio.NewScanner(strings.NewReader(result))
-	for sc.Scan() {
-		coords := strings.Split(sc.Text(), ",")
-		x1, _ := strconv.Atoi(coords[0])
-		y1, _ := strconv.Atoi(coords[1])
-		x2, _ := strconv.Atoi(coords[2])
-		y2, _ := strconv.Atoi(coords[3])
-		out = append(out, Coordinate{x1, y1, x2, y2})
+	boxArray := C.GetBoundingBoxes(client.api)
+	length := int(boxArray.length)
+	defer C.free(unsafe.Pointer(boxArray.boxes))
+	defer C.free(unsafe.Pointer(boxArray))
+
+	for i := 0; i < length; i++ {
+		// cast to bounding_box: boxes + i*sizeof(box)
+		box := (*C.struct_bounding_box)(unsafe.Pointer(uintptr(unsafe.Pointer(boxArray.boxes)) + uintptr(i)*unsafe.Sizeof(C.struct_bounding_box{})))
+		out = append(out, BoundingBox{
+			Box:        image.Rect(int(box.x1), int(box.y1), int(box.x2), int(box.y2)),
+			Word:       C.GoString(box.word),
+			Confidence: float64(box.confidence),
+		})
 	}
 
 	return

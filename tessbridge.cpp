@@ -81,32 +81,35 @@ char* HOCRText(TessBaseAPI a) {
   return api->GetHOCRText(0);
 }
 
-const char* GetResults(TessBaseAPI a) {
+bounding_boxes* GetBoundingBoxes(TessBaseAPI a) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
-
-//  api->SetVariable("save_blob_choices", "T");
+  struct bounding_boxes* box_array;
+  box_array = (bounding_boxes*)malloc(sizeof(bounding_boxes));
+  // linearly resize boxes array
+  int realloc_threshold = 900;
+  int realloc_raise = 1000;
+  int capacity = 1000;
+  box_array->boxes = (bounding_box*)malloc(capacity * sizeof(bounding_box));
+  box_array->length = 0;
   api->Recognize(NULL);
-
   tesseract::ResultIterator* ri = api->GetIterator();
   tesseract::PageIteratorLevel level = tesseract::RIL_WORD;
 
-  // won't care about heap memory
-  std::string *str = new std::string;
-
-   if (ri != 0) {
+  if (ri != 0) {
     do {
-      const char* word = ri->GetUTF8Text(level);
-      float conf = ri->Confidence(level);
-      int x1, y1, x2, y2;
-      ri->BoundingBox(level, &x1, &y1, &x2, &y2);
-      char line[80];
-      sprintf(line, "%d,%d,%d,%d\n", x1, y1, x2, y2);
-      str->append(line);
-
-      delete[] word;
+      if ( box_array->length >= realloc_threshold ) {
+        capacity += realloc_raise;
+        box_array->boxes = (bounding_box*)realloc(box_array->boxes, capacity * sizeof(bounding_box));
+        realloc_threshold += realloc_raise;
+      }
+      box_array->boxes[box_array->length].word = ri->GetUTF8Text(level);
+      box_array->boxes[box_array->length].confidence = ri->Confidence(level);
+      ri->BoundingBox(level, &box_array->boxes[box_array->length].x1, &box_array->boxes[box_array->length].y1, &box_array->boxes[box_array->length].x2, &box_array->boxes[box_array->length].y2);
+      box_array->length++;
     } while (ri->Next(level));
   }
-  return str->c_str();
+
+  return box_array;
 }
 
 const char* Version(TessBaseAPI a) {

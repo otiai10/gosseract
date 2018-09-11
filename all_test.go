@@ -185,6 +185,13 @@ func TestClientBoundingBox(t *testing.T) {
 	client.SetWhitelist("Hello,World!")
 	boxes, err := client.GetBoundingBoxes(RIL_WORD)
 	Expect(t, err).ToBe(nil)
+
+	Because(t, "api must be initialized beforehand", func(t *testing.T) {
+		client := &Client{}
+		_, err := client.GetBoundingBoxes(RIL_WORD)
+		Expect(t, err).Not().ToBe(nil)
+	})
+
 	words := []string{"Hello,", "World!"}
 	coords := []image.Rectangle{
 		image.Rect(74, 64, 524, 190),

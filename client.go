@@ -271,6 +271,9 @@ type BoundingBox struct {
 
 // GetBoundingBoxes returns bounding boxes for each matched word
 func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingBox, err error) {
+	if client.api == nil {
+		return out, fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+	}
 	if err = client.init(); err != nil {
 		return
 	}

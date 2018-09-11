@@ -183,7 +183,7 @@ func TestClientBoundingBox(t *testing.T) {
 	defer client.Close()
 	client.SetImage("./test/data/001-helloworld.png")
 	client.SetWhitelist("Hello,World!")
-	boxes, err := client.GetBoundingBoxes()
+	boxes, err := client.GetBoundingBoxes(RIL_WORD)
 	Expect(t, err).ToBe(nil)
 	words := []string{"Hello,", "World!"}
 	coords := []image.Rectangle{

@@ -3,7 +3,6 @@
 #include "/usr/local/include/leptonica/allheaders.h"
 #else
 #include <tesseract/baseapi.h>
-#include <string>
 #include <leptonica/allheaders.h>
 #endif
 

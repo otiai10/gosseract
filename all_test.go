@@ -1,6 +1,7 @@
 package gosseract
 
 import (
+	"image"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -175,6 +176,32 @@ func TestClient_ConfigFilePath(t *testing.T) {
 		Expect(t, err).Not().ToBe(nil)
 	})
 
+}
+
+func TestClientBoundingBox(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+	client.SetImage("./test/data/001-helloworld.png")
+	client.SetWhitelist("Hello,World!")
+	boxes, err := client.GetBoundingBoxes(RIL_WORD)
+	Expect(t, err).ToBe(nil)
+
+	Because(t, "api must be initialized beforehand", func(t *testing.T) {
+		client := &Client{}
+		_, err := client.GetBoundingBoxes(RIL_WORD)
+		Expect(t, err).Not().ToBe(nil)
+	})
+
+	words := []string{"Hello,", "World!"}
+	coords := []image.Rectangle{
+		image.Rect(74, 64, 524, 190),
+		image.Rect(638, 64, 1099, 170),
+	}
+
+	for i, box := range boxes {
+		Expect(t, box.Word).ToBe(words[i])
+		Expect(t, box.Box).ToBe(coords[i])
+	}
 }
 
 func TestClient_HTML(t *testing.T) {

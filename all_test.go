@@ -14,7 +14,7 @@ import (
 
 func TestVersion(t *testing.T) {
 	version := Version()
-	Expect(t, version).Match("[0-9]{1}.[0-9]{2}(.[0-9a-z]*)?")
+	Expect(t, version).Match("[0-9]{1}.[0-9]{1,2}(.[0-9a-z_-]*)?")
 }
 
 func TestClearPersistentCache(t *testing.T) {
@@ -101,7 +101,7 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 
 func TestClient_SetWhitelist(t *testing.T) {
 
-	if os.Getenv("TESS_LSTM") == "1" {
+	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
 		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
 
@@ -119,7 +119,7 @@ func TestClient_SetWhitelist(t *testing.T) {
 
 func TestClient_SetBlacklist(t *testing.T) {
 
-	if os.Getenv("TESS_LSTM") == "1" {
+	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
 		t.Skip("Blacklist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
 
@@ -151,7 +151,7 @@ func TestClient_SetLanguage(t *testing.T) {
 
 func TestClient_ConfigFilePath(t *testing.T) {
 
-	if os.Getenv("TESS_LSTM") == "1" {
+	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
 		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
 

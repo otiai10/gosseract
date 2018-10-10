@@ -1,6 +1,9 @@
 package gosseract
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func ExampleNewClient() {
 	client := NewClient()
@@ -31,6 +34,10 @@ func ExampleClient_Text() {
 }
 
 func ExampleClient_SetWhitelist() {
+
+	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
+		os.Exit(0)
+	}
 
 	client := NewClient()
 	defer client.Close()

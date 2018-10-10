@@ -1,29 +1,28 @@
-FROM centos:latest
+FROM ubuntu:16.04
 
-ARG TESS="4.00.00dev"
-ARG LEPTO="1.74.2"
-ARG GO="1.9.1"
+ARG TESS="3.02.02"
+ARG LEPTO="v1.72"
+ARG GO="1.6.2"
 
-RUN yum update -y -q
-RUN yum install -y -q \
-  gcc-c++ \
+RUN apt-get update -qq
+RUN apt-get install -yq \
   git \
   wget \
   make \
   autoconf \
   automake \
   libtool \
-  libjpeg-devel \
-  libpng-devel \
-  libtiff-devel \
-  libicu-devel \
+  autoconf-archive \
+  pkg-config \
+  libpng-dev \
+  libjpeg-dev \
+  libtiff-dev \
+  zlib1g-dev \
+  libicu-dev \
   libpango1.0-dev \
-  libcairo-dev \
-  zlib-devel
-
+  libcairo2-dev
 
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
-ENV TESSDATA_PREFIX=/usr/local/share
 
 # Compile Leptonica
 WORKDIR /
@@ -32,12 +31,12 @@ RUN mkdir -p /tmp/leptonica \
   && tar -xzf ${LEPTO}.tar.gz -C /tmp/leptonica \
   && mv /tmp/leptonica/* /leptonica
 WORKDIR /leptonica
-
-RUN autoreconf -i 2>/dev/null \
-  && ./autobuild --silent \
-  && ./configure --enable-silent-rules \
-  && make 1>/dev/null \
-  && make install --silent
+RUN chmod a+x ./autobuild ./configure
+RUN autoreconf -i \
+  && ./autobuild \
+  && ./configure \
+  && make --quiet \
+  && make install
 
 # Compile Tesseract
 WORKDIR /
@@ -46,19 +45,19 @@ RUN mkdir -p /tmp/tesseract \
   && tar -xzf ${TESS}.tar.gz -C /tmp/tesseract \
   && mv /tmp/tesseract/* /tesseract
 WORKDIR /tesseract
-
 RUN ./autogen.sh \
-  && ./configure --enable-silent-rules \
-  && make 1>/dev/null \
-  && make install --silent
-
-# Load languages
-RUN wget -nv https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata -P /usr/local/share/tessdata
+  && ./configure \
+  && make --quiet \
+  && make install
 
 # Recover location
 WORKDIR /
 
-# Install Go
+# Load languages
+RUN wget -nv https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata -P /usr/local/share/tessdata
+RUN wget -nv https://github.com/tesseract-ocr/tessdata/raw/master/jpn.traineddata -P /usr/local/share/tessdata
+
+# Install Go1.9.1
 RUN wget -nv https://storage.googleapis.com/golang/go${GO}.linux-amd64.tar.gz \
   && tar -xzf go${GO}.linux-amd64.tar.gz
 ENV GOROOT=/go
@@ -75,4 +74,6 @@ RUN go get golang.org/x/net/html
 # Mount source code of gosseract project
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
-ENTRYPOINT go test github.com/otiai10/gosseract
+# ENTRYPOINT go test github.com/otiai10/gosseract
+ENTRYPOINT [ "echo", "[SKIP] UNSUPPORTED Tesseract version <= 3.02" ]
+# See also https://github.com/otiai10/gosseract/issues/130

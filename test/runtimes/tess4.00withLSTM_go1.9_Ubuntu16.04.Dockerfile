@@ -26,4 +26,4 @@ RUN go get golang.org/x/net/html
 # Mount source code of gosseract project
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
-ENTRYPOINT TESS_LSTM=1 go test -run Test github.com/otiai10/gosseract
+ENTRYPOINT TESS_LSTM_DISABLED=1 go test -run Test github.com/otiai10/gosseract

@@ -1,34 +1,32 @@
 FROM ubuntu:16.04
 
-ARG TESS="4.00.00dev"
-ARG LEPTO="1.74.2"
-ARG GO="1.9.1"
-
 RUN apt-get update -qq
 RUN apt-get install -yq \
-  git \
-  wget \
-  make \
+  g++ \
   autoconf \
+  autoconf-archive \
   automake \
   libtool \
-  autoconf-archive \
   pkg-config \
   libpng-dev \
-  libjpeg-dev \
-  libtiff-dev \
-  zlib1g-dev \
+  libjpeg8-dev \
+  libtiff5-dev \
+  zlib1g-dev
+RUN apt-get install -yq \
   libicu-dev \
   libpango1.0-dev \
   libcairo2-dev
+RUN apt-get install -yq \
+  wget \
+  git
 
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib 
 
 # Compile Leptonica
 WORKDIR /
 RUN mkdir -p /tmp/leptonica \
-  && wget -nv https://github.com/DanBloomberg/leptonica/archive/${LEPTO}.tar.gz \
-  && tar -xzf ${LEPTO}.tar.gz -C /tmp/leptonica \
+  && wget -nv https://github.com/DanBloomberg/leptonica/releases/download/1.76.0/leptonica-1.76.0.tar.gz \
+  && tar -xzf leptonica-1.76.0.tar.gz -C /tmp/leptonica \
   && mv /tmp/leptonica/* /leptonica
 WORKDIR /leptonica
 RUN autoreconf -i \
@@ -40,14 +38,15 @@ RUN autoreconf -i \
 # Compile Tesseract
 WORKDIR /
 RUN mkdir -p /tmp/tesseract \
-  && wget -nv https://github.com/tesseract-ocr/tesseract/archive/${TESS}.tar.gz \
-  && tar -xzf ${TESS}.tar.gz -C /tmp/tesseract \
+  && wget -nv https://github.com/tesseract-ocr/tesseract/archive/4.0.0-beta.3.tar.gz \
+  && tar -xzf 4.0.0-beta.3.tar.gz -C /tmp/tesseract \
   && mv /tmp/tesseract/* /tesseract
 WORKDIR /tesseract
 RUN ./autogen.sh \
   && ./configure \
   && make --quiet \
   && make install
+
 
 # Recover location
 WORKDIR /
@@ -65,12 +64,12 @@ ENV GOROOT=/go
 RUN mkdir /gopath
 ENV GOPATH=/gopath
 ENV PATH=${PATH}:${GOROOT}/bin:${GOPATH}/bin
-
+ 
 # Dependencies for tests
 RUN go get github.com/otiai10/mint
 RUN go get golang.org/x/net/html
-
+ 
 # Mount source code of gosseract project
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
-ENTRYPOINT go test github.com/otiai10/gosseract
+ENTRYPOINT TESS_LSTM_DISABLED=1 go test github.com/otiai10/gosseract

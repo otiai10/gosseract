@@ -11,6 +11,7 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
+	"errors"
 	"fmt"
 	"image"
 	"os"
@@ -259,6 +260,54 @@ func (client *Client) HOCRText() (out string, err error) {
 		return
 	}
 	out = C.GoString(C.HOCRText(client.api))
+	return
+}
+
+// OSDResult is returned by DetectOrientationScript.
+type OSDResult struct {
+	// OrientationDegree is the detected clockwise rotation of the input
+	// image in degrees (0, 90, 180, 270).
+	OrientationDegree int
+	// OrientationConfidence is a confidence indicator for the orientation
+	// for which "15.0 is reasonably confident".
+	OrientationConfidence float64
+	ScriptName            *string
+	ScriptConfidence      float64
+}
+
+func (osd OSDResult) String() string {
+	if osd.ScriptName == nil {
+		return fmt.Sprintf("orientation: %d (%.2f)", osd.OrientationDegree, osd.OrientationConfidence)
+	}
+	return fmt.Sprintf("orientation: %d (%.2f), script: %s (%.2f)",
+		osd.OrientationDegree, osd.OrientationConfidence, *osd.ScriptName, osd.ScriptConfidence)
+}
+
+// DetectOrientationScript detects the orientation and script of the text.
+func (client *Client) DetectOrientationScript() (out *OSDResult, err error) {
+	if client.api == nil {
+		return out, fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+	}
+	if err = client.init(); err != nil {
+		return
+	}
+	osdResult := C.DetectOrientationScript(client.api)
+	defer C.free(unsafe.Pointer(osdResult))
+	osd := (*C.struct_osd_result)(unsafe.Pointer(osdResult))
+	var scriptName *string
+	if osd.script_name != nil {
+		s := C.GoString(osd.script_name)
+		scriptName = &s
+	}
+	if !bool(osd.success) {
+		return nil, errors.New("orienation and script detection failed")
+	}
+	out = &OSDResult{
+		OrientationDegree:     int(osd.orient_deg),
+		OrientationConfidence: float64(osd.orient_conf),
+		ScriptName:            scriptName,
+		ScriptConfidence:      float64(osd.script_conf),
+	}
 	return
 }
 

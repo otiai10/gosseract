@@ -147,6 +147,10 @@ func (client *Client) SetLanguage(langs ...string) error {
 	return nil
 }
 
+func (client *Client) DisableOutput() error {
+	return client.SetVariable(DEBUG_FILE, os.DevNull)
+}
+
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) error {

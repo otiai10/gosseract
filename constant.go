@@ -65,6 +65,8 @@ type SettableVariable string
 // Followings are variables which can be used for TessBaseAPI::SetVariable.
 // If anything missing (I know there are many), please add one below.
 const (
+	// DEBUG_FILE - File to send output to.
+	DEBUG_FILE SettableVariable = "debug_file"
 	// TESSEDIT_CHAR_WHITELIST - Whitelist of chars to recognize
 	// There is a known issue in 4.00 with LSTM
 	// https://github.com/tesseract-ocr/tesseract/issues/751

@@ -1,15 +1,16 @@
-FROM alpine:latest
+FROM fedora
 
-RUN apk update
-RUN apk add \
-  g++ \
-  git \
-  musl-dev \
+RUN yum update -y -q
+
+RUN yum install -y -q \
   go \
-  tesseract-ocr-dev
+  gcc-c++ \
+  tesseract-devel
 
 ENV GOPATH=/root/go
+
 RUN go get -u github.com/otiai10/mint golang.org/x/net/html
+
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
 CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]

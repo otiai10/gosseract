@@ -20,7 +20,7 @@ ENV LIBLEPT_HEADERSDIR=/usr/local/include
 
 # Leptonica
 RUN mkdir -p /tmp/leptonica && cd /tmp/leptonica \
-  && wget https://github.com/DanBloomberg/leptonica/archive/1.76.0.tar.gz \
+  && wget -nv https://github.com/DanBloomberg/leptonica/archive/1.76.0.tar.gz \
   && tar -xzf 1.76.0.tar.gz -C /tmp/leptonica \
   && cd /tmp/leptonica/leptonica-1.76.0 && mkdir m4 \
   && autoreconf -i \
@@ -31,7 +31,7 @@ RUN mkdir -p /tmp/leptonica && cd /tmp/leptonica \
 
 # Tesseract
 RUN mkdir -p /tmp/tesseract && cd /tmp/tesseract \
-  && wget https://github.com/tesseract-ocr/tesseract/archive/3.05.02.tar.gz \
+  && wget -nv https://github.com/tesseract-ocr/tesseract/archive/3.05.02.tar.gz \
   && tar -xzf 3.05.02.tar.gz -C /tmp/tesseract \
   && cd /tmp/tesseract/tesseract-3.05.02 \
   && ./autogen.sh \
@@ -40,7 +40,7 @@ RUN mkdir -p /tmp/tesseract && cd /tmp/tesseract \
   && make install
 
 # Languages
-RUN wget https://github.com/tesseract-ocr/tessdata/blob/master/eng.traineddata?raw=true -O /usr/local/share/tessdata/eng.traineddata
+RUN wget -nv https://github.com/tesseract-ocr/tessdata/blob/master/eng.traineddata?raw=true -O /usr/local/share/tessdata/eng.traineddata
 
 ENV TESSDATA_PREFIX=/usr/local/share/tessdata
 # RUN tesseract --version && tesseract --list-langs

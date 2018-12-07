@@ -1,6 +1,6 @@
 FROM base/archlinux:latest
 
-RUN pacman -Sy --noconfirm \
+RUN pacman -Sy -q --noconfirm \
   gcc \
   git \
   tesseract \

@@ -1,15 +1,16 @@
-FROM alpine:latest
+FROM debian:latest
 
-RUN apk update
-RUN apk add \
-  g++ \
+RUN apt-get update -qq
+RUN apt-get install -y \
   git \
-  musl-dev \
-  go \
-  tesseract-ocr-dev
+  golang \
+  libtesseract-dev \
+  libleptonica-dev \
+  tesseract-ocr-eng
 
 ENV GOPATH=/root/go
 RUN go get -u github.com/otiai10/mint golang.org/x/net/html
+
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
 CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]

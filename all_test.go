@@ -3,7 +3,9 @@ package gosseract
 import (
 	"image"
 	"io/ioutil"
+	"log"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -11,6 +13,24 @@ import (
 
 	. "github.com/otiai10/mint"
 )
+
+func TestMain(m *testing.M) {
+	compromiseWhitelistAndBlacklistIfNotSupported()
+	code := m.Run()
+	os.Exit(code)
+}
+
+// @See https://github.com/otiai10/gosseract/issues/145
+func compromiseWhitelistAndBlacklistIfNotSupported() {
+	v := Version()
+	v4, err := regexp.MatchString("4.0", v)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if v4 {
+		os.Setenv("TESS_LSTM_DISABLED", "1")
+	}
+}
 
 func TestVersion(t *testing.T) {
 	version := Version()

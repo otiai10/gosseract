@@ -31,10 +31,10 @@ void ClearPersistentCache(TessBaseAPI a) {
   api->ClearPersistentCache();
 }
 
-// int Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
-//   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
-//   return api->Init(tessdataprefix, languages);
-// }
+int Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  return api->Init(tessdataprefix, languages);
+}
 
 int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilepath, char* errbuf) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;

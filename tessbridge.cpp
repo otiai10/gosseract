@@ -30,26 +30,24 @@ void ClearPersistentCache(TessBaseAPI a) {
   api->ClearPersistentCache();
 }
 
-int Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
-  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
-  return api->Init(tessdataprefix, languages);
-}
+// int Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
+//   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+//   return api->Init(tessdataprefix, languages);
+// }
 
 int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilepath, char* err) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
-  // {{{
-  // char buf[512];
   setbuf(stderr, err);
-  // }}}
+  int ret;
   if (configfilepath != NULL) {
     char *configs[]={configfilepath};
     int configs_size = 1;
-    int ret = api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
-    return ret;
+    ret = api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
   } else {
-    int ret = api->Init(tessdataprefix, languages);
-    return ret;
+    ret = api->Init(tessdataprefix, languages);
   }
+  fflush(stderr);
+  return ret;
 }
 
 bool SetVariable(TessBaseAPI a, char* name, char* value) {

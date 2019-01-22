@@ -7,6 +7,7 @@
 #endif
 
 #include "tessbridge.h"
+#include <stdio.h>
 
 TessBaseAPI Create() {
   tesseract::TessBaseAPI * api = new tesseract::TessBaseAPI();
@@ -34,14 +35,20 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
   return api->Init(tessdataprefix, languages);
 }
 
-int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilepath) {
+int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilepath, char* err) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  // {{{
+  // char buf[512];
+  setbuf(stderr, err);
+  // }}}
   if (configfilepath != NULL) {
     char *configs[]={configfilepath};
     int configs_size = 1;
-    return api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
+    int ret = api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
+    return ret;
   } else {
-    return api->Init(tessdataprefix, languages);
+    int ret = api->Init(tessdataprefix, languages);
+    return ret;
   }
 }
 

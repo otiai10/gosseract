@@ -17,7 +17,8 @@ Options:
   --build|-b          Build testable images if provided, otherwise pull images.
   --push|-p           Push local images to dockerhub (for development purpose).
   --quiet|-q          Don't show verbose logs of setting VMs up.
-  --run|-R {case}     Run only specified cases which includes given pattern in the case name.
+  --run|-R {case}     Run only cases which have specified pattern in the case names.
+  --exclude|-X {case} Run only cases which DON'T have specified pattern in the case names.
   --rm                Remove VMs which are created by this runtime test.
   --help|-h           Show this message ;)
 
@@ -37,6 +38,7 @@ function parse_options() {
   PUSH=
   QUIET=
   MATCH=
+  EXCLUDE=
   while [[ $# -gt 0 ]]; do
   case "${1}" in
       --driver|-d)
@@ -63,6 +65,10 @@ function parse_options() {
       MATCH="${2}"
       shift && shift
       ;;
+      --exclude|-X)
+      EXCLUDE="${2}"
+      shift && shift
+      ;;
       --help|-h)
       help && exit 0
       ;;
@@ -80,6 +86,11 @@ function test_docker_runtimes() {
     testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
     if [ -n "${MATCH}" ]; then
       if [[ "${testcase}" != *${MATCH}* ]]; then
+        continue
+      fi
+    fi
+    if [ -n "${EXCLUDE}" ]; then
+      if [[ "${testcase}" == *${EXCLUDE}* ]]; then
         continue
       fi
     fi

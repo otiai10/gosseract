@@ -16,7 +16,7 @@ Options:
   --driver|-d {name}  Specify VM driver software, either of [docker, vagrant].
   --build|-b          Build testable images if provided, otherwise pull images.
   --push|-p           Push local images to dockerhub (for development purpose).
-  --verbose|-v        Show verbose logs of setting VMs up.
+  --quiet|-q          Don't show verbose logs of setting VMs up.
   --run|-R {case}     Run only specified cases which includes given pattern in the case name.
   --rm                Remove VMs which are created by this runtime test.
   --help|-h           Show this message ;)
@@ -35,7 +35,7 @@ function parse_options() {
   REMOVE=
   BUILD=
   PUSH=
-  QUIET="--quiet"
+  QUIET=
   MATCH=
   while [[ $# -gt 0 ]]; do
   case "${1}" in
@@ -55,8 +55,8 @@ function parse_options() {
       PUSH=YES
       shift
       ;;
-      --verbose|-v)
-      QUIET=
+      --quiet|-q)
+      QUIET="--quiet"
       shift
       ;;
       --run|-R)

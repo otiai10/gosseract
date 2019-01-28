@@ -127,7 +127,7 @@ function test_vagrant_runtimes() {
     echo "┌───────────── ${testcase}"
     echo "│ [Vagrant] Making VM up..."
     vboxname=gosseract-test-${testcase}
-    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up 1>/dev/null | sed "s/^/│ /"
+    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up --provider virtualbox | sed "s/^/│ /"
     VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant provision | sed "s/^/│ /"
     VAGRANT_VAGRANTFILE=${runtime} vagrant halt | sed "s/^/│ /"
     if [ -n "${REMOVE}" ]; then

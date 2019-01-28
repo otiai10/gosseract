@@ -16,8 +16,9 @@ Options:
   --driver|-d {name}  Specify VM driver software, either of [docker, vagrant].
   --build|-b          Build testable images if provided, otherwise pull images.
   --push|-p           Push local images to dockerhub (for development purpose).
-  --verbose|-v        Show verbose logs of setting VMs up.
-  --run|-R {case}     Run only specified cases which includes given pattern in the case name.
+  --quiet|-q          Don't show verbose logs of setting VMs up.
+  --run|-R {case}     Run only cases which have specified pattern in the case names.
+  --exclude|-X {case} Run only cases which DON'T have specified pattern in the case names.
   --rm                Remove VMs which are created by this runtime test.
   --help|-h           Show this message ;)
 
@@ -35,8 +36,9 @@ function parse_options() {
   REMOVE=
   BUILD=
   PUSH=
-  QUIET="--quiet"
+  QUIET=
   MATCH=
+  EXCLUDE=
   while [[ $# -gt 0 ]]; do
   case "${1}" in
       --driver|-d)
@@ -55,12 +57,16 @@ function parse_options() {
       PUSH=YES
       shift
       ;;
-      --verbose|-v)
-      QUIET=
+      --quiet|-q)
+      QUIET="--quiet"
       shift
       ;;
       --run|-R)
       MATCH="${2}"
+      shift && shift
+      ;;
+      --exclude|-X)
+      EXCLUDE="${2}"
       shift && shift
       ;;
       --help|-h)
@@ -80,6 +86,11 @@ function test_docker_runtimes() {
     testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
     if [ -n "${MATCH}" ]; then
       if [[ "${testcase}" != *${MATCH}* ]]; then
+        continue
+      fi
+    fi
+    if [ -n "${EXCLUDE}" ]; then
+      if [[ "${testcase}" == *${EXCLUDE}* ]]; then
         continue
       fi
     fi
@@ -116,7 +127,7 @@ function test_vagrant_runtimes() {
     echo "┌───────────── ${testcase}"
     echo "│ [Vagrant] Making VM up..."
     vboxname=gosseract-test-${testcase}
-    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up 1>/dev/null | sed "s/^/│ /"
+    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up --provider virtualbox | sed "s/^/│ /"
     VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant provision | sed "s/^/│ /"
     VAGRANT_VAGRANTFILE=${runtime} vagrant halt | sed "s/^/│ /"
     if [ -n "${REMOVE}" ]; then

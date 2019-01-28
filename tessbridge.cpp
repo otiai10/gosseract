@@ -7,6 +7,8 @@
 #endif
 
 #include "tessbridge.h"
+#include <stdio.h>
+#include <unistd.h>
 
 TessBaseAPI Create() {
   tesseract::TessBaseAPI * api = new tesseract::TessBaseAPI();
@@ -34,15 +36,33 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages) {
   return api->Init(tessdataprefix, languages);
 }
 
-int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilepath) {
+int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilepath, char* errbuf) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+
+  // {{{ Redirect STDERR to given buffer
+  fflush(stderr);
+  int original_stderr;
+  original_stderr = dup(STDERR_FILENO);
+  freopen("/dev/null", "a", stderr);
+  setbuf(stderr, errbuf);
+  // }}}
+
+  int ret;
   if (configfilepath != NULL) {
     char *configs[]={configfilepath};
     int configs_size = 1;
-    return api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
+    ret = api->Init(tessdataprefix, languages, tesseract::OEM_DEFAULT, configs, configs_size, NULL, NULL, false);
   } else {
-    return api->Init(tessdataprefix, languages);
+    ret = api->Init(tessdataprefix, languages);
   }
+
+  // {{{ Restore default stderr
+  freopen("/dev/null", "a", stderr);
+  dup2(original_stderr, STDERR_FILENO);
+  setbuf(stderr, NULL);
+  // }}}
+
+  return ret;
 }
 
 bool SetVariable(TessBaseAPI a, char* name, char* value) {

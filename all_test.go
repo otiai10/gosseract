@@ -162,7 +162,7 @@ func TestClient_SetBlacklist(t *testing.T) {
 func TestClient_SetLanguage(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
-	err := client.SetLanguage("deu")
+	err := client.SetLanguage("undefined-language")
 	Expect(t, err).ToBe(nil)
 	err = client.SetLanguage()
 	Expect(t, err).Not().ToBe(nil)
@@ -170,7 +170,7 @@ func TestClient_SetLanguage(t *testing.T) {
 	_, err = client.Text()
 	Expect(t, err).Not().ToBe(nil)
 	if os.Getenv("GOSSERACT_CPPSTDERR_NOT_CAPTURED") != "1" {
-		Expect(t, err).Match("Failed loading language 'deu'")
+		Expect(t, err).Match("Failed loading language 'undefined-language'")
 	}
 }
 

@@ -15,6 +15,7 @@ import (
 	"image"
 	"os"
 	"strings"
+	"sync"
 	"unsafe"
 )
 
@@ -35,6 +36,8 @@ func ClearPersistentCache() {
 
 // Client is argument builder for tesseract::TessBaseAPI.
 type Client struct {
+	mutex sync.Mutex
+
 	api C.TessBaseAPI
 
 	// Holds a reference to the pix image to be able to destroy on client close
@@ -92,6 +95,7 @@ func (client *Client) Close() (err error) {
 
 // SetImage sets path to image file to be processed OCR.
 func (client *Client) SetImage(imagepath string) error {
+	client.mutex.Lock()
 
 	if client.api == nil {
 		return fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
@@ -113,6 +117,8 @@ func (client *Client) SetImage(imagepath string) error {
 
 	img := C.CreatePixImageByFilePath(p)
 	client.pixImage = img
+
+	client.mutex.Unlock()
 
 	return nil
 }
@@ -248,6 +254,8 @@ func (client *Client) setVariablesToInitializedAPI() error {
 
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
 func (client *Client) Text() (out string, err error) {
+	client.mutex.Lock()
+
 	if err = client.init(); err != nil {
 		return
 	}
@@ -255,6 +263,9 @@ func (client *Client) Text() (out string, err error) {
 	if client.Trim {
 		out = strings.Trim(out, "\n")
 	}
+
+	client.mutex.Unlock()
+
 	return out, err
 }
 

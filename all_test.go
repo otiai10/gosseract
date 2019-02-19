@@ -1,15 +1,13 @@
 package gosseract
 
 import (
+	"encoding/xml"
 	"image"
 	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
-	"strings"
 	"testing"
-
-	"golang.org/x/net/html"
 
 	. "github.com/otiai10/mint"
 )
@@ -237,16 +235,11 @@ func TestClient_HTML(t *testing.T) {
 	out, err := client.HOCRText()
 	Expect(t, err).ToBe(nil)
 
-	tokenizer := html.NewTokenizer(strings.NewReader(out))
-
-	texts := []string{}
-	for ttype := tokenizer.Next(); ttype != html.ErrorToken; ttype = tokenizer.Next() {
-		token := tokenizer.Token()
-		if token.Type == html.TextToken && strings.TrimSpace(token.Data) != "" {
-			texts = append(texts, strings.Trim(token.Data, "\n"))
-		}
-	}
-	Expect(t, texts).ToBe([]string{"Hello,", "World!"})
+	page := new(Page)
+	err = xml.Unmarshal([]byte(out), page)
+	Expect(t, err).ToBe(nil)
+	Expect(t, page.Content.Par.Lines[0].Words[0].Characters).ToBe("Hello,")
+	Expect(t, page.Content.Par.Lines[0].Words[1].Characters).ToBe("World!")
 
 	When(t, "only invalid languages are given", func(t *testing.T) {
 		client := NewClient()

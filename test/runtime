@@ -73,7 +73,9 @@ function parse_options() {
       help && exit 0
       ;;
       *)
-      shift
+      printf "Unkown flag: ${1}\n\n"
+      help
+      exit 1
       ;;
   esac
   done

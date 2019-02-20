@@ -43,7 +43,7 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilep
   fflush(stderr);
   int original_stderr;
   original_stderr = dup(STDERR_FILENO);
-  freopen("/dev/null", "a", stderr);
+  (void) freopen("/dev/null", "a", stderr);
   setbuf(stderr, errbuf);
   // }}}
 
@@ -57,7 +57,7 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilep
   }
 
   // {{{ Restore default stderr
-  freopen("/dev/null", "a", stderr);
+  (void) freopen("/dev/null", "a", stderr);
   dup2(original_stderr, STDERR_FILENO);
   setbuf(stderr, NULL);
   // }}}

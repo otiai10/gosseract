@@ -19,6 +19,6 @@ before_script:
 script:
     - go test -v -bench .
     - go test -race -coverprofile=coverage.txt -covermode=atomic
-    - ./test/runtime --driver docker --verbose
+    - ./test/runtime --driver docker
 after_success:
     - bash <(curl -s https://codecov.io/bash)

@@ -1,9 +1,6 @@
 language: go
 go:
-    # - 1.7
-    - 1.8
-    - 1.9
-    - tip
+    - 1.11.x
 services:
     - docker
 compiler:
@@ -13,9 +10,11 @@ before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -y -qq libtesseract-dev libleptonica-dev tesseract-ocr-eng
 env:
-    - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+    global:
+        - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+        - GO111MODULE=on
 before_script:
-    - go get github.com/otiai10/mint
+    - go mod download -json
 script:
     - go test -v -bench .
     - go test -race -coverprofile=coverage.txt -covermode=atomic

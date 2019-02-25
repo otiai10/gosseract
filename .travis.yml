@@ -14,7 +14,7 @@ env:
         - LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
         - GO111MODULE=on
 before_script:
-    - go mod download -json
+    - go mod vendor -v
 script:
     - go test -v -bench .
     - go test -race -coverprofile=coverage.txt -covermode=atomic

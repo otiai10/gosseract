@@ -63,6 +63,10 @@ type Client struct {
 	// See http://www.sk-spell.sk.cx/tesseract-ocr-parameters-in-302-version
 	// TODO: Fix link to official page
 	ConfigFilePath string
+
+	// internal flag to check if the instance should be initialized again
+	// i.e, we should create a new gosseract client when language or config file change
+	shouldInit bool
 }
 
 // NewClient construct new Client. It's due to caller to Close this client.
@@ -71,6 +75,7 @@ func NewClient() *Client {
 		api:       C.Create(),
 		Variables: map[SettableVariable]string{},
 		Trim:      true,
+		shouldInit: true,
 	}
 	return client
 }
@@ -144,24 +149,40 @@ func (client *Client) SetLanguage(langs ...string) error {
 	if len(langs) == 0 {
 		return fmt.Errorf("languages cannot be empty")
 	}
+
 	client.Languages = langs
+
+	client.flagForInit()
+
 	return nil
 }
 
 func (client *Client) DisableOutput() error {
-	return client.SetVariable(DEBUG_FILE, os.DevNull)
+	err := client.SetVariable(DEBUG_FILE, os.DevNull)
+
+	client.setVariablesToInitializedAPIIfNeeded()
+
+	return err
 }
 
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) error {
-	return client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
+	err := client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
+	
+	client.setVariablesToInitializedAPIIfNeeded()
+
+	return err
 }
 
 // SetBlacklist sets whitelist chars.
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetBlacklist(whitelist string) error {
-	return client.SetVariable(TESSEDIT_CHAR_BLACKLIST, whitelist)
+	err := client.SetVariable(TESSEDIT_CHAR_BLACKLIST, whitelist)
+	
+	client.setVariablesToInitializedAPIIfNeeded()
+
+	return err
 }
 
 // SetVariable sets parameters, representing tesseract::TessBaseAPI->SetVariable.
@@ -170,6 +191,9 @@ func (client *Client) SetBlacklist(whitelist string) error {
 // Check `client.setVariablesToInitializedAPI` for more information.
 func (client *Client) SetVariable(key SettableVariable, value string) error {
 	client.Variables[key] = value
+
+	client.setVariablesToInitializedAPIIfNeeded()
+
 	return nil
 }
 
@@ -191,12 +215,20 @@ func (client *Client) SetConfigFile(fpath string) error {
 		return fmt.Errorf("the specified config file path seems to be a directory")
 	}
 	client.ConfigFilePath = fpath
+
+	client.flagForInit()
+
 	return nil
 }
 
 // Initialize tesseract::TessBaseAPI
 // TODO: add tessdata prefix
 func (client *Client) init() error {
+
+	if client.shouldInit == false {
+		C.SetPixImage(client.api, client.pixImage)
+		return nil
+	}
 
 	var languages *C.char
 	if len(client.Languages) != 0 {
@@ -225,9 +257,19 @@ func (client *Client) init() error {
 	if client.pixImage == nil {
 		return fmt.Errorf("PixImage is not set, use SetImage or SetImageFromBytes before Text or HOCRText")
 	}
+
 	C.SetPixImage(client.api, client.pixImage)
 
+	client.shouldInit = false
+
 	return nil
+}
+
+// This method flag the current instance to be initialized again on the next call to a function that
+// requires a gosseract API initialized: when user change the config file or the languages
+// the instance needs to init a new gosseract api
+func (client *Client) flagForInit() {
+	client.shouldInit = true
 }
 
 // This method sets all the sspecified variables to TessBaseAPI structure.
@@ -244,6 +286,18 @@ func (client *Client) setVariablesToInitializedAPI() error {
 			return fmt.Errorf("failed to set variable with key(%v) and value(%v)", key, value)
 		}
 	}
+	return nil
+}
+
+// Call setVariablesToInitializedAPI only if the API is initialized
+// it is useful to call when changing variables that does not requires
+// to init a new tesseract instance. Otherwise it is better to just flag
+// the instance for re-init (Client.flagForInit())
+func (client *Client) setVariablesToInitializedAPIIfNeeded() error {
+	if client.shouldInit == false {
+		return client.setVariablesToInitializedAPI()
+	}
+
 	return nil
 }
 

@@ -1,4 +1,4 @@
-FROM base/archlinux:latest
+FROM archlinux/base:latest
 
 RUN pacman -Sy --noconfirm \
   gcc \
@@ -40,19 +40,13 @@ RUN mkdir -p /tmp/tesseract && cd /tmp/tesseract \
   && make install
 
 # Languages
-RUN wget -nv https://github.com/tesseract-ocr/tessdata/blob/master/eng.traineddata?raw=true \
-  -O /usr/local/share/tessdata/eng.traineddata
-
 ENV TESSDATA_PREFIX=/usr/local/share/tessdata
-# RUN tesseract --version && tesseract --list-langs
-
-ENV GOPATH=${HOME}/go
+RUN wget -nv https://github.com/tesseract-ocr/tessdata/blob/master/eng.traineddata?raw=true -O ${TESSDATA_PREFIX}/eng.traineddata
+RUN tesseract --version && tesseract --list-langs
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
-ADD . ${GOPATH}/src/github.com/otiai10/gosseract
-WORKDIR ${GOPATH}/src/github.com/otiai10/gosseract
 
-# Dependencies for tests
-RUN go get github.com/otiai10/mint
-RUN go get golang.org/x/net/html
+ENV GO111MODULE=on
+ENV GOPATH=${HOME}/go
+ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
 CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]

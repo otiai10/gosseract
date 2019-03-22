@@ -36,3 +36,5 @@ gosseract.iml
 coverage.txt
 vendor
 
+# Editors
+.vscode

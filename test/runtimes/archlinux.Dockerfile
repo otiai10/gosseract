@@ -1,4 +1,4 @@
-FROM base/archlinux:latest
+FROM archlinux/base:latest
 
 RUN pacman -Sy -q --noconfirm \
   gcc \

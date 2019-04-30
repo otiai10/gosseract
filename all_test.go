@@ -212,6 +212,46 @@ func TestClientBoundingBox(t *testing.T) {
 	}
 }
 
+func TestClient_Alto(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+	client.SetImage("./test/data/001-helloworld.png")
+	client.SetWhitelist("Hello,World!")
+	out, err := client.AltoText()
+	Expect(t, err).ToBe(nil)
+
+	altoPage := new(AltoPage)
+	err = xml.Unmarshal([]byte(out), altoPage)
+
+	Expect(t, err).ToBe(nil)
+	Expect(t, altoPage.AttrHeight).ToBe("236")
+	Expect(t, altoPage.AttrWidth).ToBe("1174")
+	Expect(t, altoPage.AttrPhysicalImgNr).ToBe("0")
+	Expect(t, altoPage.AltoPrintSpace).Not().ToBe(nil)
+	Expect(t, altoPage.AltoPrintSpace.AttrHeight).ToBe("236")
+	Expect(t, altoPage.AltoPrintSpace.AttrWidth).ToBe("1174")
+	Expect(t, altoPage.AltoPrintSpace.AttrHpos).ToBe("0")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock).Not().ToBe(nil)
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AttrHpos).ToBe("74")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AttrVpos).ToBe("64")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AttrWidth).ToBe("1025")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AttrHeight).ToBe("126")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine).Not().ToBe(nil)
+	Expect(t, len(altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine)).ToBe(1)
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AttrHpos).ToBe("74")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AttrVpos).ToBe("64")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AttrWidth).ToBe("1025")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AttrHeight).ToBe("126")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString).Not().ToBe(nil)
+	Expect(t, len(altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString)).ToBe(1)
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString[0].AttrHpos).ToBe("74")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString[0].AttrVpos).ToBe("64")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString[0].AttrWidth).ToBe("1025")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString[0].AttrHeight).ToBe("126")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString[0].AttrWC).ToBe("0.0")
+	Expect(t, altoPage.AltoPrintSpace.AltoTextBlock.AltoTextLine[0].AltoString[0].AttrContent).ToBe("Hello,World!")
+}
+
 func TestClient_HTML(t *testing.T) {
 	client := NewClient()
 	defer client.Close()

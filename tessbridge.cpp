@@ -100,6 +100,11 @@ char* HOCRText(TessBaseAPI a) {
   return api->GetHOCRText(0);
 }
 
+char* AltoText(TessBaseAPI a) {
+  tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
+  return api->GetAltoText(0);
+}
+
 bounding_boxes* GetBoundingBoxes(TessBaseAPI a, int pageIteratorLevel) {
   tesseract::TessBaseAPI * api = (tesseract::TessBaseAPI*)a;
   struct bounding_boxes* box_array;

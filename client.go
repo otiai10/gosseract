@@ -169,7 +169,7 @@ func (client *Client) DisableOutput() error {
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) error {
 	err := client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
-	
+
 	client.setVariablesToInitializedAPIIfNeeded()
 
 	return err
@@ -179,7 +179,7 @@ func (client *Client) SetWhitelist(whitelist string) error {
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetBlacklist(whitelist string) error {
 	err := client.SetVariable(TESSEDIT_CHAR_BLACKLIST, whitelist)
-	
+
 	client.setVariablesToInitializedAPIIfNeeded()
 
 	return err
@@ -320,6 +320,15 @@ func (client *Client) HOCRText() (out string, err error) {
 		return
 	}
 	out = C.GoString(C.HOCRText(client.api))
+	return
+}
+
+// AltoText finally initialize tesseract::TessBaseAPI, execute OCR and returns Alto text.
+func (client *Client) AltoText() (out string, err error) {
+	if err = client.init(); err != nil {
+		return
+	}
+	out = C.GoString(C.AltoText(client.api))
 	return
 }
 

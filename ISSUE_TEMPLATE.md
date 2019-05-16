@@ -1,4 +1,4 @@
-> This file is generated based on `ISSUE_TEMPLATE.md`. The issue reporter must read and remove this block before submitting.
+> This text is generated based on `ISSUE_TEMPLATE.md`. The issue reporter must read and remove this block before submitting.
 
 # Summary
 
@@ -6,7 +6,7 @@
 
 # Reproducibility
 
-## Reproducility Frequency
+## Reproducibility Frequency
 
 - XX%
 

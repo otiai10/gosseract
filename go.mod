@@ -1,4 +1,4 @@
-module github.com/wangsongyan/gosseract
+module github.com/otiai10/gosseract
 
 require (
 	bou.ke/monkey v1.0.1 // indirect

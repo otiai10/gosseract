@@ -72,9 +72,9 @@ type Client struct {
 // NewClient construct new Client. It's due to caller to Close this client.
 func NewClient() *Client {
 	client := &Client{
-		api:       C.Create(),
-		Variables: map[SettableVariable]string{},
-		Trim:      true,
+		api:        C.Create(),
+		Variables:  map[SettableVariable]string{},
+		Trim:       true,
 		shouldInit: true,
 	}
 	return client
@@ -169,7 +169,7 @@ func (client *Client) DisableOutput() error {
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) error {
 	err := client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
-	
+
 	client.setVariablesToInitializedAPIIfNeeded()
 
 	return err
@@ -179,7 +179,7 @@ func (client *Client) SetWhitelist(whitelist string) error {
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetBlacklist(whitelist string) error {
 	err := client.SetVariable(TESSEDIT_CHAR_BLACKLIST, whitelist)
-	
+
 	client.setVariablesToInitializedAPIIfNeeded()
 
 	return err
@@ -222,11 +222,9 @@ func (client *Client) SetConfigFile(fpath string) error {
 }
 
 // Initialize tesseract::TessBaseAPI
-// TODO: add tessdata prefix
-func (client *Client) init() error {
+func (client *Client) Init() error {
 
 	if client.shouldInit == false {
-		C.SetPixImage(client.api, client.pixImage)
 		return nil
 	}
 
@@ -254,13 +252,24 @@ func (client *Client) init() error {
 		return err
 	}
 
+	client.shouldInit = false
+
+	return nil
+}
+
+// Initialize tesseract::TessBaseAPI
+// TODO: add tessdata prefix
+func (client *Client) init() error {
+
+	if err := client.Init(); err != nil {
+		return err
+	}
+
 	if client.pixImage == nil {
 		return fmt.Errorf("PixImage is not set, use SetImage or SetImageFromBytes before Text or HOCRText")
 	}
 
 	C.SetPixImage(client.api, client.pixImage)
-
-	client.shouldInit = false
 
 	return nil
 }

@@ -34,6 +34,13 @@ func TestNewClient(t *testing.T) {
 	Expect(t, client).TypeOf("*gosseract.Client")
 }
 
+func TestClient_Version(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+	version := client.Version()
+	Expect(t, version).Match("[0-9]{1}.[0-9]{1,2}(.[0-9a-z_-]*)?")
+}
+
 func TestClient_SetImage(t *testing.T) {
 	client := NewClient()
 	defer client.Close()

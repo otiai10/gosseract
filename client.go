@@ -169,17 +169,17 @@ func (client *Client) DisableOutput() error {
 // See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) error {
 	err := client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
-	
+
 	client.setVariablesToInitializedAPIIfNeeded()
 
 	return err
 }
 
-// SetBlacklist sets whitelist chars.
-// See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
-func (client *Client) SetBlacklist(whitelist string) error {
-	err := client.SetVariable(TESSEDIT_CHAR_BLACKLIST, whitelist)
-	
+// SetBlacklist sets blacklist chars.
+// See official documentation for blacklist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
+func (client *Client) SetBlacklist(blacklist string) error {
+	err := client.SetVariable(TESSEDIT_CHAR_BLACKLIST, blacklist)
+
 	client.setVariablesToInitializedAPIIfNeeded()
 
 	return err

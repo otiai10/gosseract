@@ -225,7 +225,7 @@ func (client *Client) SetConfigFile(fpath string) error {
 // TODO: add tessdata prefix
 func (client *Client) init() error {
 
-	if client.shouldInit == false {
+	if !client.shouldInit {
 		C.SetPixImage(client.api, client.pixImage)
 		return nil
 	}
@@ -282,7 +282,7 @@ func (client *Client) setVariablesToInitializedAPI() error {
 		defer C.free(unsafe.Pointer(k))
 		defer C.free(unsafe.Pointer(v))
 		res := C.SetVariable(client.api, k, v)
-		if bool(res) == false {
+		if !bool(res) {
 			return fmt.Errorf("failed to set variable with key(%v) and value(%v)", key, value)
 		}
 	}
@@ -294,7 +294,7 @@ func (client *Client) setVariablesToInitializedAPI() error {
 // to init a new tesseract instance. Otherwise it is better to just flag
 // the instance for re-init (Client.flagForInit())
 func (client *Client) setVariablesToInitializedAPIIfNeeded() error {
-	if client.shouldInit == false {
+	if !client.shouldInit {
 		return client.setVariablesToInitializedAPI()
 	}
 

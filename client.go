@@ -96,6 +96,12 @@ func (client *Client) Close() (err error) {
 	return err
 }
 
+// Version provides the version of Tesseract used by this client.
+func (client *Client) Version() string {
+	version := C.Version(client.api)
+	return C.GoString(version)
+}
+
 // SetImage sets path to image file to be processed OCR.
 func (client *Client) SetImage(imagepath string) error {
 

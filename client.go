@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"image"
 	"os"
+	"path/filepath"
 	"strings"
 	"unsafe"
 )
@@ -351,6 +352,21 @@ func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingB
 			Word:       C.GoString(box.word),
 			Confidence: float64(box.confidence),
 		})
+	}
+
+	return
+}
+
+// GetAvailableLanguages returns a list of available languages in the default tesspath
+func GetAvailableLanguages() (languages []string, err error) {
+	path := C.GoString(C.GetDataPath())
+	if languages, err = filepath.Glob(filepath.Join(path, "*.traineddata")); err != nil {
+		return
+	}
+	for i := 0; i < len(languages); i++ {
+		languages[i] = filepath.Base(languages[i])
+		idx := strings.Index(languages[i], ".")
+		languages[i] = languages[i][:idx]
 	}
 
 	return

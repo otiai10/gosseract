@@ -387,3 +387,18 @@ func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 
 	return
 }
+
+// GetAvailableLanguages returns a list of available languages in the default tesspath
+func (client *Client) GetAvailableLanguages() (languages []string, err error) {
+	path := C.GoString(C.GetDataPath())
+	if languages, err = filepath.Glob(filepath.Join(path, "*.traineddata")); err != nil {
+		return
+	}
+	for i := 0; i < len(languages); i++ {
+		languages[i] = filepath.Base(languages[i])
+		idx := strings.Index(languages[i], ".")
+		languages[i] = languages[i][:idx]
+	}
+
+	return
+}

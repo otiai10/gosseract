@@ -32,6 +32,7 @@ int GetPageSegMode(TessBaseAPI);
 char* UTF8Text(TessBaseAPI);
 char* HOCRText(TessBaseAPI);
 const char* Version(TessBaseAPI);
+const char* GetDataPath();
 
 PixImage CreatePixImageByFilePath(char*);
 PixImage CreatePixImageFromBytes(unsigned char*, int);

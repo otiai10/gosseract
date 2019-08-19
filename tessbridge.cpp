@@ -152,3 +152,9 @@ void DestroyPixImage(PixImage pix){
   Pix *img = (Pix*) pix;
   pixDestroy(&img);
 }
+
+const char* GetDataPath() {
+    static tesseract::TessBaseAPI api;
+    api.Init(nullptr, nullptr);
+    return api.GetDatapath();
+}

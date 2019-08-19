@@ -251,3 +251,9 @@ func TestClient_HTML(t *testing.T) {
 		Expect(t, err).Not().ToBe(nil)
 	})
 }
+
+func TestGetAvailableLangs(t *testing.T) {
+	langs, err := GetAvailableLanguages()
+	Expect(t, err).ToBe(nil)
+	Expect(t, len(langs)).ToBe(1) // eng only
+}

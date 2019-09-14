@@ -164,6 +164,7 @@ func (client *Client) SetLanguage(langs ...string) error {
 	return nil
 }
 
+// DisableOutput ...
 func (client *Client) DisableOutput() error {
 	err := client.SetVariable(DEBUG_FILE, os.DevNull)
 

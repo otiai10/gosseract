@@ -73,9 +73,9 @@ type Client struct {
 // NewClient construct new Client. It's due to caller to Close this client.
 func NewClient() *Client {
 	client := &Client{
-		api:       C.Create(),
-		Variables: map[SettableVariable]string{},
-		Trim:      true,
+		api:        C.Create(),
+		Variables:  map[SettableVariable]string{},
+		Trim:       true,
 		shouldInit: true,
 	}
 	return client
@@ -332,9 +332,10 @@ func (client *Client) HOCRText() (out string, err error) {
 
 // BoundingBox contains the position, confidence and UTF8 text of the recognized word
 type BoundingBox struct {
-	Box        image.Rectangle
-	Word       string
-	Confidence float64
+	Box                                image.Rectangle
+	Word                               string
+	Confidence                         float64
+	BlockNum, ParNum, LineNum, WordNum int
 }
 
 // GetBoundingBoxes returns bounding boxes for each matched word
@@ -364,16 +365,46 @@ func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingB
 }
 
 // GetAvailableLanguages returns a list of available languages in the default tesspath
-func GetAvailableLanguages() (languages []string, err error) {
+func GetAvailableLanguages() ([]string, error) {
 	path := C.GoString(C.GetDataPath())
-	if languages, err = filepath.Glob(filepath.Join(path, "*.traineddata")); err != nil {
-		return
+	languages, err := filepath.Glob(filepath.Join(path, "*.traineddata"))
+	if err != nil {
+		return languages, err
 	}
 	for i := 0; i < len(languages); i++ {
 		languages[i] = filepath.Base(languages[i])
 		idx := strings.Index(languages[i], ".")
 		languages[i] = languages[i][:idx]
 	}
+	return languages, nil
+}
 
+// GetBoundingBoxesVerbose returns bounding boxes at word level with block_num, par_num, line_num and word_num
+// according to the c++ api that returns a formatted TSV output. Reference: `TessBaseAPI::GetTSVText`.
+func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
+	if client.api == nil {
+		return out, fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+	}
+	if err = client.init(); err != nil {
+		return
+	}
+	boxArray := C.GetBoundingBoxesVerbose(client.api)
+	length := int(boxArray.length)
+	defer C.free(unsafe.Pointer(boxArray.boxes))
+	defer C.free(unsafe.Pointer(boxArray))
+
+	for i := 0; i < length; i++ {
+		// cast to bounding_box: boxes + i*sizeof(box)
+		box := (*C.struct_bounding_box)(unsafe.Pointer(uintptr(unsafe.Pointer(boxArray.boxes)) + uintptr(i)*unsafe.Sizeof(C.struct_bounding_box{})))
+		out = append(out, BoundingBox{
+			Box:        image.Rect(int(box.x1), int(box.y1), int(box.x2), int(box.y2)),
+			Word:       C.GoString(box.word),
+			Confidence: float64(box.confidence),
+			BlockNum:   int(box.block_num),
+			ParNum:     int(box.par_num),
+			LineNum:    int(box.line_num),
+			WordNum:    int(box.word_num),
+		})
+	}
 	return
 }

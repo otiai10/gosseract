@@ -230,7 +230,6 @@ func (client *Client) SetConfigFile(fpath string) error {
 }
 
 // Initialize tesseract::TessBaseAPI
-// TODO: add tessdata prefix
 func (client *Client) init() error {
 
 	if !client.shouldInit {
@@ -250,8 +249,14 @@ func (client *Client) init() error {
 	}
 	defer C.free(unsafe.Pointer(configfile))
 
+	tessdataPrefix := C.CString(os.Getenv("TESSERACT_PREFIX"))
+	if client.TessdataPrefix != nil {
+		tessdataPrefix = C.CString(*client.TessdataPrefix)
+	}
+	defer C.free(unsafe.Pointer(tessdataPrefix))
+
 	errbuf := [512]C.char{}
-	res := C.Init(client.api, nil, languages, configfile, &errbuf[0])
+	res := C.Init(client.api, tessdataPrefix, languages, configfile, &errbuf[0])
 	msg := C.GoString(&errbuf[0])
 
 	if res != 0 {

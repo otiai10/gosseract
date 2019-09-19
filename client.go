@@ -51,7 +51,7 @@ type Client struct {
 	// TessdataPrefix can indicate directory path to `tessdata`.
 	// It is set `/usr/local/share/tessdata/` or something like that, as default.
 	// TODO: Implement and test
-	TessdataPrefix *string
+	TessdataPrefix string
 
 	// Languages are languages to be detected. If not specified, it's gonna be "eng".
 	Languages []string
@@ -229,6 +229,17 @@ func (client *Client) SetConfigFile(fpath string) error {
 	return nil
 }
 
+// SetTessdataPrefix sets path to the models directory.
+// Environment variable TESSDATA_PREFIX is used as default.
+func (client *Client) SetTessdataPrefix(prefix string) error {
+	if prefix == "" {
+		return fmt.Errorf("tessdata prefix could not be empty")
+	}
+	client.TessdataPrefix = prefix
+	client.flagForInit()
+	return nil
+}
+
 // Initialize tesseract::TessBaseAPI
 func (client *Client) init() error {
 
@@ -249,9 +260,9 @@ func (client *Client) init() error {
 	}
 	defer C.free(unsafe.Pointer(configfile))
 
-	tessdataPrefix := C.CString(os.Getenv("TESSERACT_PREFIX"))
-	if client.TessdataPrefix != nil {
-		tessdataPrefix = C.CString(*client.TessdataPrefix)
+	var tessdataPrefix *C.char
+	if client.TessdataPrefix != "" {
+		tessdataPrefix = C.CString(client.TessdataPrefix)
 	}
 	defer C.free(unsafe.Pointer(tessdataPrefix))
 
@@ -372,8 +383,7 @@ func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingB
 
 // GetAvailableLanguages returns a list of available languages in the default tesspath
 func GetAvailableLanguages() ([]string, error) {
-	path := C.GoString(C.GetDataPath())
-	languages, err := filepath.Glob(filepath.Join(path, "*.traineddata"))
+	languages, err := filepath.Glob(filepath.Join(getDataPath(), "*.traineddata"))
 	if err != nil {
 		return languages, err
 	}
@@ -413,4 +423,10 @@ func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 		})
 	}
 	return
+}
+
+// getDataPath is useful hepler to determine where current tesseract
+// installation stores trained models
+func getDataPath() string {
+	return C.GoString(C.GetDataPath())
 }

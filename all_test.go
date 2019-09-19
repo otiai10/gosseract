@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	. "github.com/otiai10/mint"
@@ -36,20 +36,23 @@ func TestNewClient(t *testing.T) {
 	Expect(t, client).TypeOf("*gosseract.Client")
 }
 
-func TestNewClientWithDifferentTessdataPrefix(t *testing.T) {
+func TestClient_SetTessdataPrefix(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
 
-	testModelDir := "./test-model"
-	err := os.Mkdir(testModelDir, 0770)
+	cwd, err := os.Getwd()
 	Expect(t, err).ToBe(nil)
-	defer func() { os.RemoveAll(testModelDir) }()
+	testModelDir := filepath.Join(cwd, "test-model", "tessdata")
 
-	src, err := os.Open("/usr/share/tesseract-ocr/4.00/tessdata/eng.traineddata")
+	err = os.MkdirAll(testModelDir, 0770)
+	Expect(t, err).ToBe(nil)
+	defer os.RemoveAll(filepath.Dir(testModelDir))
+
+	src, err := os.Open(filepath.Join(getDataPath(), "eng.traineddata"))
 	Expect(t, err).ToBe(nil)
 	defer src.Close()
 
-	dst, err := os.Create(path.Join(testModelDir, "eng.traineddata"))
+	dst, err := os.Create(filepath.Join(testModelDir, "eng.traineddata"))
 	Expect(t, err).ToBe(nil)
 
 	_, err = io.Copy(dst, src)
@@ -58,14 +61,12 @@ func TestNewClientWithDifferentTessdataPrefix(t *testing.T) {
 
 	client.Trim = true
 	client.SetImage("./test/data/001-helloworld.png")
-	client.Languages = []string{"eng"}
-	client.TessdataPrefix = &testModelDir
-	client.SetWhitelist("HeloWrd,")
+	client.SetLanguage("eng")
+	client.SetTessdataPrefix(testModelDir)
+
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
-
-	// Expect(t, text).ToBe("Hello, Worldl")
-	Expect(t, text).Match("Hello, Worldl?")
+	Expect(t, text).ToBe("Hello, World!")
 }
 
 func TestClient_Version(t *testing.T) {

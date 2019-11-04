@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-PROJDIR=$(dirname $(cd $(dirname ${0}); pwd -P))
+PROJDIR=$(dirname "$(cd "$(dirname "${0}")"; pwd -P)")
 
 # {{{ Help message
 function help() {

@@ -15,6 +15,7 @@ such as OS, Go version and Tesseract version.
 Options:
   --driver|-d {name}  Specify VM driver software, either of [docker, vagrant].
   --build|-b          Build testable images if provided, otherwise pull images.
+  --no-cache|-c       Build testable images without layer cache (only available with -b)
   --push|-p           Push local images to dockerhub (for development purpose).
   --quiet|-q          Don't show verbose logs of setting VMs up.
   --run|-R {case}     Run only cases which have specified pattern in the case names.
@@ -35,6 +36,7 @@ function parse_options() {
   DRIVER=
   REMOVE=
   BUILD=
+  NO_CACHE=
   PUSH=
   QUIET=
   MATCH=
@@ -51,6 +53,10 @@ function parse_options() {
       ;;
       --build|-b)
       BUILD=YES
+      shift
+      ;;
+      --no-cache|-c)
+      NO_CACHE="--no-cache"
       shift
       ;;
       --push|-p)
@@ -99,7 +105,7 @@ function test_docker_runtimes() {
     echo "┌───────────── ${testcase}"
     if [ -n "${BUILD}" ]; then
       echo "│ [Docker] Building image..."
-      docker build . -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
+      docker build . ${NO_CACHE} -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
     else
       echo "│ [Docker] Pulling image..."
       docker pull gosseract/test:${testcase} | sed "s/^/│ /"

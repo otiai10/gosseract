@@ -11,6 +11,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :shell, :inline => '
     pkg install -y --quiet tesseract git go
+    mv /usr/local/share/tessdata/*.traineddata /tmp
+    mv /tmp/eng.traineddata /usr/local/share/tessdata/
     export GOPATH=~/go
     go get -t github.com/otiai10/gosseract
   '

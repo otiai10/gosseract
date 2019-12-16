@@ -5,14 +5,26 @@ import (
 	"image"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/otiai10/mint"
 )
 
 func TestMain(m *testing.M) {
+	beforeTest()
 	code := m.Run()
 	os.Exit(code)
+}
+
+func beforeTest() {
+	if strings.HasPrefix(Version(), "4.") {
+		os.Setenv("TESS_LSTM_DISABLED", "1")
+	}
+	switch os.Getenv("TESTCASE") {
+	case "archlinux", "centos", "fedora":
+		os.Setenv("TESS_BOX_DISABLED", "1")
+	}
 }
 
 func TestVersion(t *testing.T) {
@@ -194,6 +206,11 @@ func TestClient_ConfigFilePath(t *testing.T) {
 }
 
 func TestClientBoundingBox(t *testing.T) {
+
+	if os.Getenv("TESS_BOX_DISABLED") == "1" {
+		t.Skip()
+	}
+
 	client := NewClient()
 	defer client.Close()
 	client.SetImage("./test/data/001-helloworld.png")
@@ -220,6 +237,11 @@ func TestClientBoundingBox(t *testing.T) {
 }
 
 func TestClient_HTML(t *testing.T) {
+
+	if os.Getenv("TESS_BOX_DISABLED") == "1" {
+		t.Skip()
+	}
+
 	client := NewClient()
 	defer client.Close()
 	client.SetImage("./test/data/001-helloworld.png")
@@ -230,6 +252,8 @@ func TestClient_HTML(t *testing.T) {
 	page := new(Page)
 	err = xml.Unmarshal([]byte(out), page)
 	Expect(t, err).ToBe(nil)
+	Expect(t, len(page.Content.Par.Lines)).ToBe(1)
+	Expect(t, len(page.Content.Par.Lines[0].Words)).ToBe(2)
 	Expect(t, page.Content.Par.Lines[0].Words[0].Characters).ToBe("Hello,")
 	Expect(t, page.Content.Par.Lines[0].Words[1].Characters).ToBe("World!")
 
@@ -253,7 +277,8 @@ func TestClient_HTML(t *testing.T) {
 }
 
 func TestGetAvailableLangs(t *testing.T) {
-	langs, err := GetAvailableLanguages()
-	Expect(t, err).ToBe(nil)
-	Expect(t, len(langs)).ToBe(1) // eng only
+	t.Skip("TODO")
+	// langs, err := GetAvailableLanguages()
+	// Expect(t, err).ToBe(nil)
+	// Expect(t, len(langs)).ToBe(1) // eng only
 }

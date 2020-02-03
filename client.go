@@ -351,7 +351,7 @@ func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingB
 	length := int(boxArray.length)
 	defer C.free(unsafe.Pointer(boxArray.boxes))
 	defer C.free(unsafe.Pointer(boxArray))
-
+	out = make([]BoundingBox, 0, length)
 	for i := 0; i < length; i++ {
 		// cast to bounding_box: boxes + i*sizeof(box)
 		box := (*C.struct_bounding_box)(unsafe.Pointer(uintptr(unsafe.Pointer(boxArray.boxes)) + uintptr(i)*unsafe.Sizeof(C.struct_bounding_box{})))
@@ -393,7 +393,7 @@ func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 	length := int(boxArray.length)
 	defer C.free(unsafe.Pointer(boxArray.boxes))
 	defer C.free(unsafe.Pointer(boxArray))
-
+	out = make([]BoundingBox, 0, length)
 	for i := 0; i < length; i++ {
 		// cast to bounding_box: boxes + i*sizeof(box)
 		box := (*C.struct_bounding_box)(unsafe.Pointer(uintptr(unsafe.Pointer(boxArray.boxes)) + uintptr(i)*unsafe.Sizeof(C.struct_bounding_box{})))

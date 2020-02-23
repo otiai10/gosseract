@@ -19,7 +19,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/otiai10/gosseract"
+	"github.com/otiai10/gosseract/v2"
 )
 
 func main() {

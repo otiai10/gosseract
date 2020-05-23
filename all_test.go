@@ -3,8 +3,10 @@ package gosseract
 import (
 	"encoding/xml"
 	"image"
+	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -44,6 +46,39 @@ func TestNewClient(t *testing.T) {
 	defer client.Close()
 
 	Expect(t, client).TypeOf("*gosseract.Client")
+}
+
+func TestClient_SetTessdataPrefix(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+
+	cwd, err := os.Getwd()
+	Expect(t, err).ToBe(nil)
+	testModelDir := filepath.Join(cwd, "test-model", "tessdata")
+
+	err = os.MkdirAll(testModelDir, 0770)
+	Expect(t, err).ToBe(nil)
+	defer os.RemoveAll(filepath.Dir(testModelDir))
+
+	src, err := os.Open(filepath.Join(getDataPath(), "eng.traineddata"))
+	Expect(t, err).ToBe(nil)
+	defer src.Close()
+
+	dst, err := os.Create(filepath.Join(testModelDir, "eng.traineddata"))
+	Expect(t, err).ToBe(nil)
+
+	_, err = io.Copy(dst, src)
+	Expect(t, err).ToBe(nil)
+	dst.Close()
+
+	client.Trim = true
+	client.SetImage("./test/data/001-helloworld.png")
+	client.SetLanguage("eng")
+	client.SetTessdataPrefix(testModelDir)
+
+	text, err := client.Text()
+	Expect(t, err).ToBe(nil)
+	Expect(t, text).ToBe("Hello, World!")
 }
 
 func TestClient_Version(t *testing.T) {

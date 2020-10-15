@@ -250,12 +250,10 @@ func (client *Client) init() error {
 	}
 	defer C.free(unsafe.Pointer(configfile))
 
-	errbuf := [512]C.char{}
-	res := C.Init(client.api, nil, languages, configfile, &errbuf[0])
-	msg := C.GoString(&errbuf[0])
+	res := C.Init(client.api, nil, languages, configfile)
 
 	if res != 0 {
-		return fmt.Errorf("failed to initialize TessBaseAPI with code %d: %s", res, msg)
+		return fmt.Errorf("failed to initialize TessBaseAPI with code %d", res)
 	}
 
 	if err := client.setVariablesToInitializedAPI(); err != nil {

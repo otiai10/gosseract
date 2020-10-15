@@ -22,7 +22,7 @@ TessBaseAPI Create(void);
 void Free(TessBaseAPI);
 void Clear(TessBaseAPI);
 void ClearPersistentCache(TessBaseAPI);
-int Init(TessBaseAPI, char*, char*, char*, char*);
+int Init(TessBaseAPI, char*, char*, char*);
 struct bounding_boxes* GetBoundingBoxes(TessBaseAPI, int);
 struct bounding_boxes* GetBoundingBoxesVerbose(TessBaseAPI);
 bool SetVariable(TessBaseAPI, char*, char*);

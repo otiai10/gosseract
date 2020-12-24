@@ -74,4 +74,7 @@ ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 WORKDIR ${GOPATH}/src/github.com/otiai10/gosseract
 RUN go get -t -v ./...
 
-CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]
+RUN tesseract --version
+
+# CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]
+CMD ["go", "test", "-v", "./..."]

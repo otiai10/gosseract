@@ -28,9 +28,6 @@ func ExampleClient_Text() {
 
 	text, err := client.Text()
 	fmt.Println(text, err)
-	// OUTPUT:
-	// Hello, World! <nil>
-
 }
 
 func ExampleClient_SetWhitelist() {
@@ -50,7 +47,4 @@ func ExampleClient_SetWhitelist() {
 	text2, _ := client.Text()
 
 	fmt.Println(text1, text2)
-	// OUTPUT:
-	// IO- IOO 10-100
-
 }

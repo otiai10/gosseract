@@ -264,6 +264,9 @@ func TestClientBoundingBox(t *testing.T) {
 		image.Rect(74, 64, 1099, 190),
 	}
 
+	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
+		t.Skip()
+	}
 	for i, box := range boxes {
 		Expect(t, box.Word).ToBe(words[i])
 		Expect(t, box.Box).ToBe(coords[i])
@@ -287,8 +290,11 @@ func TestClient_HTML(t *testing.T) {
 	err = xml.Unmarshal([]byte(out), page)
 	Expect(t, err).ToBe(nil)
 	Expect(t, len(page.Content.Par.Lines)).ToBe(1)
-	Expect(t, len(page.Content.Par.Lines[0].Words)).ToBe(1)
-	Expect(t, page.Content.Par.Lines[0].Words[0].Characters).ToBe("Hello,World!")
+
+	if os.Getenv("TESS_LSTM_DISABLED") != "1" {
+		Expect(t, len(page.Content.Par.Lines[0].Words)).ToBe(1)
+		Expect(t, page.Content.Par.Lines[0].Words[0].Characters).ToBe("Hello,World!")
+	}
 
 	When(t, "only invalid languages are given", func(t *testing.T) {
 		client := NewClient()

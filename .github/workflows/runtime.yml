@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 5'
+  push:
+    branches: [main, develop]
 
 jobs:
   test:
@@ -23,4 +25,4 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: ${{ matrix.runtime }}
-        run: ./test/runtime -d docker -R ${{ matrix.runtime }}
+        run: bash ./test/runtime --driver docker --build --run ${{ matrix.runtime }}

@@ -1,11 +1,12 @@
 FROM ubuntu:latest
 
-RUN apt-get update -qq
-RUN apt-get install -yq \
-  git \
-  golang \
-  libtesseract-dev \
-  libleptonica-dev
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq \
+    && apt-get install -yq \
+      git \
+      golang \
+      libtesseract-dev \
+      libleptonica-dev
 
 # Load languages
 RUN apt-get install -y \

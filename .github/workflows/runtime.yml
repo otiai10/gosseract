@@ -1,0 +1,24 @@
+name: Runtime Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 5'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runtime:
+          - ubuntu
+          - alpine
+          - archlinux
+          - centos
+          - debian
+          - fedora
+          - mingw
+          - quickstart
+    steps:
+      - name: ${{ matrix.runtime }}
+        run: ./test/runtime -d docker -R ${{ matrix.runtime }}

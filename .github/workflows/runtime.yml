@@ -5,9 +5,27 @@ on:
   schedule:
     - cron: '0 0 * * 5'
   push:
-    branches: [main, develop]
+    branches: [master, main, develop]
 
 jobs:
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        go: ['1.14', '1.15']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Install tesseract
+        run: brew install tesseract
+      - name: Install pkg
+        run: go get -u -v -t ./...
+      - name: Test
+        run: go test -v -cover ./...
   test:
     runs-on: ubuntu-latest
     strategy:

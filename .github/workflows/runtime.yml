@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         go: ['1.14', '1.15']
+    name: macOS Go${{ matrix.go }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -26,7 +27,7 @@ jobs:
         run: go get -u -v -t ./...
       - name: Test
         run: go test -v -cover ./...
-  test:
+  docker-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -39,9 +40,23 @@ jobs:
           - fedora
           - mingw
           - quickstart
+    name: Docker ${{ matrix.runtime }}
     steps:
       - name: checkout
         uses: actions/checkout@v2
       - name: ${{ matrix.runtime }}
         shell: 'script -q -e -c "bash {0}"'
         run: bash ./test/runtime --driver docker --build --run ${{ matrix.runtime }}
+
+  vagrant-test:
+    runs-on: macos-10.15
+    strategy:
+      matrix:
+        runtime:
+          - freebsd
+    name: Vagrant ${{ matrix.runtime }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: ${{ matrix.runtime }}
+        run: bash ./test/runtime --driver vagrant --build --run ${{ matrix.runtime }}

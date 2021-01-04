@@ -16,7 +16,10 @@ Vagrant.configure("2") do |config|
     mv /usr/local/share/tessdata/*.traineddata /tmp
     mv /tmp/eng.traineddata /usr/local/share/tessdata/
     cd $GOPATH/src/github.com/otiai10/gosseract
-    go get -t -v ./...
-    go test -v -cover github.com/otiai10/gosseract
-  ', :env => {"GOPATH" => "/home/vagrant/go"}
+    go test -v -cover ./...
+    echo $? > /vagrant/test/runtimes/TESTRESULT.freebsd.txt
+  ', :env => {
+    "GOPATH" => "/home/vagrant/go",
+    "GO111MODULE" => "on",
+  }
 end

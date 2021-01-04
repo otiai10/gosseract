@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-set -o pipefail
+# set -o pipefail
 
 PROJDIR=$(dirname "$(cd "$(dirname "${0}")"; pwd -P)")
 
@@ -136,11 +136,15 @@ function test_vagrant_runtimes() {
     echo "│ [Vagrant] Making VM up..."
     vboxname=gosseract-test-${testcase}
     VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up --provider virtualbox | sed "s/^/│ /"
-    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant provision | sed "s/^/│ /"
+    TESTRESULT=`cat test/runtimes/TESTRESULT.${testcase}.txt`
     VAGRANT_VAGRANTFILE=${runtime} vagrant halt | sed "s/^/│ /"
     if [ -n "${REMOVE}" ]; then
       echo "│ [Vagrant] Removing VM..."
       VAGRANT_VAGRANTFILE=${runtime} vagrant destroy -f | sed "s/^/│ /"
+    fi
+    if [ "${TESTRESULT}" != "0" ]; then
+      echo "Test failed: ${TESTCASE}"
+      exit 1
     fi
     echo "└───────────── ${testcase} [OK]"
   done

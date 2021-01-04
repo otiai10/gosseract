@@ -32,4 +32,4 @@ RUN go get -t github.com/otiai10/gosseract
 RUN cd ${GOPATH}/src/github.com/otiai10/gosseract && go test
 
 # Now, you've got complete environment to play with "gosseract"!
-# For other OS, check https://github.com/otiai10/gosseract/tree/master/test/runtimes
+# For other OS, check https://github.com/otiai10/gosseract/tree/main/test/runtimes

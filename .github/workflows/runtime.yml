@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: '0 0 * * 5'
   push:
-    branches: [master, main, develop]
+    branches: [main, develop]
 
 jobs:
   macos:
@@ -27,6 +27,13 @@ jobs:
         run: go get -u -v -t ./...
       - name: Test
         run: go test -v -cover ./...
+      - name: Coverage
+        run: go test -v -cover -race -coverprofile=coverage -covermode=atomic
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage
+          verbose: true
   docker-test:
     runs-on: ubuntu-latest
     strategy:

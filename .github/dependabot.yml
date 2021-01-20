@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#package-ecosystem
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    target-branch: main
+    reviewers:
+      - otiai10
+    assignees:
+      - otiai10

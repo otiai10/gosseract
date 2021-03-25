@@ -1,0 +1,30 @@
+name: Docker Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 5'
+  push:
+    branches: [main, develop]
+
+jobs:
+  docker-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runtime:
+          - ubuntu
+          - alpine
+          - archlinux
+          - centos
+          - debian
+          - fedora
+          - mingw
+          - quickstart
+    name: Docker ${{ matrix.runtime }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: ${{ matrix.runtime }}
+        shell: 'script -q -e -c "bash {0}"'
+        run: bash ./test/runtime --driver docker --build --run ${{ matrix.runtime }}

@@ -1,0 +1,36 @@
+name: Go Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 5'
+  push:
+    branches: [main, develop]
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        go: ['1.14', '1.15']
+    name: macOS Go${{ matrix.go }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Install tesseract
+        run: brew install tesseract
+      - name: Install pkg
+        run: go get -u -v -t ./...
+      - name: Test
+        run: go test -v -cover ./...
+      - name: Coverage
+        run: go test -v -cover -race -coverprofile=coverage -covermode=atomic
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage
+          verbose: true

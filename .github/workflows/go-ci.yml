@@ -6,6 +6,8 @@ on:
     - cron: '0 0 * * 5'
   push:
     branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
 
 jobs:
   macos:

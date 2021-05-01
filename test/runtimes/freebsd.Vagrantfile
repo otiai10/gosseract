@@ -20,6 +20,5 @@ Vagrant.configure("2") do |config|
     echo $? > /vagrant/test/runtimes/TESTRESULT.freebsd.txt
   ', :env => {
     "GOPATH" => "/home/vagrant/go",
-    "GO111MODULE" => "on",
   }
 end

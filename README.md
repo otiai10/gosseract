@@ -8,6 +8,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/351d9027a3c517505094/maintainability)](https://codeclimate.com/github/otiai10/gosseract/maintainability)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/otiai10/gosseract/blob/main/LICENSE)
 [![Go Reference](https://pkg.go.dev/badge/github.com/otiai10/gosseract/v2.svg)](https://pkg.go.dev/github.com/otiai10/gosseract/v2)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fotiai10%2Fgosseract.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fotiai10%2Fgosseract?ref=badge_shield)
 
 Golang OCR package, by using Tesseract C++ library.
 
@@ -64,3 +65,7 @@ Check [./test/runtimes](https://github.com/otiai10/gosseract/tree/main/test/runt
 # Issues
 
 - [https://github.com/otiai10/gosseract/issues](https://github.com/otiai10/gosseract/issues?utf8=%E2%9C%93&q=is%3Aissue)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fotiai10%2Fgosseract.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fotiai10%2Fgosseract?ref=badge_large)

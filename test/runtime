@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+# set -e
 # set -o pipefail
 
 PROJDIR=$(dirname "$(cd "$(dirname "${0}")"; pwd -P)")
@@ -111,7 +111,13 @@ function test_docker_runtimes() {
       docker pull gosseract/test:${testcase} | sed "s/^/│ /"
     fi
     echo "│ [Docker] Running tests..."
-    docker run -i -t -e "TESTCASE=${testcase}" --rm gosseract/test:${testcase} | sed "s/^/│ [${testcase}] /"
+    docker run -i -t -e "TESTCASE=${testcase}" --rm gosseract/test:${testcase} 1>./test/runtimes/TESTRESULT.${testcase}.txt 2>&1
+    EXIT_CODE=$?
+    cat ./test/runtimes/TESTRESULT.${testcase}.txt | sed "s/^/│ [${testcase}] /"
+    if [ ${EXIT_CODE} -gt 0 ]; then
+      echo "Test failed: ${testcase}"
+      exit ${EXIT_CODE}
+    fi
     if [ -n "${PUSH}" ]; then
       echo "│ [Docker] Pushing the image..."
       docker push gosseract/test:${testcase} | sed "s/^/│ /"

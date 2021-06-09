@@ -5,6 +5,16 @@
 
 PROJDIR=$(dirname "$(cd "$(dirname "${0}")"; pwd -P)")
 
+# {{{ Colors
+RED='\033[0;31m'
+BOLD_RED='\033[1;31m'
+GREEN='\033[0;32m'
+BOLD_GREEN='\033[1;32m'
+YELLOW='\033[0;33m'
+BOLD_YELLOW='\033[1;33m'
+RESET='\033[0m'
+# }}}
+
 # {{{ Help message
 function help() {
   cat >&2 << EOF
@@ -108,14 +118,15 @@ function test_docker_runtimes() {
       docker build . ${NO_CACHE} -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
     else
       echo "│ [Docker] Pulling image..."
-      docker pull gosseract/test:${testcase} | sed "s/^/│ /"
+      docker pull gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"
     fi
     echo "│ [Docker] Running tests..."
     docker run -i -t -e "TESTCASE=${testcase}" --rm gosseract/test:${testcase} 1>./test/runtimes/TESTRESULT.${testcase}.txt 2>&1
     EXIT_CODE=$?
     cat ./test/runtimes/TESTRESULT.${testcase}.txt | sed "s/^/│ [${testcase}] /"
     if [ ${EXIT_CODE} -gt 0 ]; then
-      echo "Test failed: ${testcase}"
+      printf "│ ${BOLD_RED}RUNTIME TEST FAILED! ${testcase}${RESET}\n"
+      printf "└───────────── ${testcase} ${BOLD_RED}[NG]${RESET}\n"
       exit ${EXIT_CODE}
     fi
     if [ -n "${PUSH}" ]; then
@@ -126,7 +137,7 @@ function test_docker_runtimes() {
       echo "│ [Docker] Removing image..."
       docker rmi gosseract/test:${testcase} 1>/dev/null
     fi
-    echo "└───────────── ${testcase} [OK]"
+    printf "└───────────── ${testcase} ${BOLD_GREEN}[OK]${RESET}\n"
   done
 }
 # }}}
@@ -149,10 +160,11 @@ function test_vagrant_runtimes() {
       VAGRANT_VAGRANTFILE=${runtime} vagrant destroy -f | sed "s/^/│ /"
     fi
     if [ "${TESTRESULT}" != "0" ]; then
-      echo "Test failed: ${TESTCASE}"
+      printf "│ ${BOLD_RED}RUNTIME TEST FAILED! ${testcase}${RESET}\n"
+      printf "└───────────── ${testcase} ${BOLD_RED}[NG]${RESET}\n"
       exit 1
     fi
-    echo "└───────────── ${testcase} [OK]"
+    printf "└───────────── ${testcase} ${BOLD_GREEN}[OK]${RESET}\n"
   done
 }
 # }}}

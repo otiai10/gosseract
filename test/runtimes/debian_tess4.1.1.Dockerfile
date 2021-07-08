@@ -1,14 +1,13 @@
-FROM debian:latest
+FROM debian:bullseye-slim
 
 RUN apt-get update -qq
 RUN apt-get install -y \
   git \
   golang \
-  libtesseract-dev \
+  libtesseract-dev=4.1.1-2.1 \
   tesseract-ocr-eng
 
 ENV GOPATH=/root/go
-ENV GO111MODULE=on
 
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 WORKDIR ${GOPATH}/src/github.com/otiai10/gosseract

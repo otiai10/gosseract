@@ -9,11 +9,9 @@ RUN apk add \
   tesseract-ocr-dev
 
 ENV GOPATH=/root/go
-RUN go get -u github.com/otiai10/mint golang.org/x/net/html
-ADD . ${GOPATH}/src/github.com/otiai10/gosseract
 
-RUN tesseract --version
+ADD . ${GOPATH}/src/github.com/otiai10/gosseract
+WORKDIR ${GOPATH}/src/github.com/otiai10/gosseract
 
 ENV GOSSERACT_CPPSTDERR_NOT_CAPTURED=1
-ENV TESS_LSTM_DISABLED=1
-CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]
+CMD ["go", "test", "-v", "./..."]

@@ -10,6 +10,7 @@ RUN pacman -Sy -q --noconfirm \
 
 ENV TESSDATA_PREFIX=/usr/share/tessdata
 ENV GOPATH=${HOME}/go
+ENV GO111MODULE=on
 
 # Dependencies for tests
 RUN go get -u github.com/otiai10/mint golang.org/x/net/html

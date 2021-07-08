@@ -13,12 +13,11 @@ RUN apt-get install -y \
   tesseract-ocr-eng
 
 ENV GOPATH=/root/go
-
-# Dependencies for tests
-RUN go get github.com/otiai10/mint golang.org/x/net/html
+ENV GO111MODULE=on
 
 # Mount source code of gosseract project
 ADD . ${GOPATH}/src/github.com/otiai10/gosseract
+WORKDIR ${GOPATH}/src/github.com/otiai10/gosseract
 
 ENV TESS_LSTM_DISABLED=1
-CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]
+CMD ["go", "test", "-v", "./..."]

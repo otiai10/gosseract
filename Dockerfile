@@ -8,7 +8,7 @@ FROM golang:latest
 LABEL maintainer="Hiromu Ochiai <otiai10@gmail.com>"
 
 RUN apt-get update -qq
-
+ENV GO111MODULE=off
 # You need librariy files and headers of tesseract and leptonica.
 # When you miss these or LD_LIBRARY_PATH is not set to them,
 # you would face an error: "tesseract/baseapi.h: No such file or directory"

@@ -67,5 +67,5 @@ Check [./test/runtimes](https://github.com/otiai10/gosseract/tree/main/test/runt
 - [https://github.com/otiai10/gosseract/issues](https://github.com/otiai10/gosseract/issues?utf8=%E2%9C%93&q=is%3Aissue)
 
 
-## License
+# License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fotiai10%2Fgosseract.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fotiai10%2Fgosseract?ref=badge_large)

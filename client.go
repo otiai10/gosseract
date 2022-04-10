@@ -16,6 +16,7 @@ import (
 	"image"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"unsafe"
 )
@@ -79,6 +80,8 @@ func NewClient() *Client {
 		shouldInit: true,
 		Languages:  []string{"eng"},
 	}
+	// set a finalizer to close the client when it's unused and not closed by the user
+	runtime.SetFinalizer(client, (*Client).Close)
 	return client
 }
 
@@ -95,6 +98,8 @@ func (client *Client) Close() (err error) {
 		C.DestroyPixImage(client.pixImage)
 		client.pixImage = nil
 	}
+	// no need for a finalizer anymore
+	runtime.SetFinalizer(client, nil)
 	return err
 }
 

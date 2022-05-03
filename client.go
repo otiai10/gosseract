@@ -77,6 +77,7 @@ func NewClient() *Client {
 		Variables:  map[SettableVariable]string{},
 		Trim:       true,
 		shouldInit: true,
+		Languages:  []string{"eng"},
 	}
 	return client
 }

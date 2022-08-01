@@ -156,10 +156,10 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 	})
 }
 
-func TestClient_SetWhitelist(t *testing.T) {
+func TestClient_SetAllowlist(t *testing.T) {
 
 	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
-		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
+		t.Skip("Allowlist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
 
 	client := NewClient()
@@ -168,7 +168,7 @@ func TestClient_SetWhitelist(t *testing.T) {
 	client.Trim = true
 	client.SetImage("./test/data/001-helloworld.png")
 	client.Languages = []string{"eng"}
-	client.SetWhitelist("HeloWrd,")
+	client.SetAllowlist("HeloWrd,")
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
 
@@ -176,10 +176,10 @@ func TestClient_SetWhitelist(t *testing.T) {
 	Expect(t, text).Match("Hello, ?Worldl?")
 }
 
-func TestClient_SetBlacklist(t *testing.T) {
+func TestClient_SetBlocklist(t *testing.T) {
 
 	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
-		t.Skip("Blacklist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
+		t.Skip("Blocklist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
 
 	client := NewClient()
@@ -189,7 +189,7 @@ func TestClient_SetBlacklist(t *testing.T) {
 	err := client.SetImage("./test/data/001-helloworld.png")
 	Expect(t, err).ToBe(nil)
 	client.Languages = []string{"eng"}
-	err = client.SetBlacklist("l")
+	err = client.SetBlocklist("l")
 	Expect(t, err).ToBe(nil)
 	text, err := client.Text()
 	Expect(t, err).ToBe(nil)
@@ -214,7 +214,7 @@ func TestClient_SetLanguage(t *testing.T) {
 func TestClient_ConfigFilePath(t *testing.T) {
 
 	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
-		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
+		t.Skip("Allowlist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
 
 	client := NewClient()
@@ -249,7 +249,7 @@ func TestClientBoundingBox(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
 	client.SetImage("./test/data/001-helloworld.png")
-	client.SetWhitelist("Hello,World!")
+	client.SetAllowlist("Hello,World!")
 	boxes, err := client.GetBoundingBoxes(RIL_WORD)
 	Expect(t, err).ToBe(nil)
 
@@ -282,7 +282,7 @@ func TestClient_HTML(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
 	client.SetImage("./test/data/001-helloworld.png")
-	client.SetWhitelist("Hello,World!")
+	client.SetAllowlist("Hello,World!")
 	out, err := client.HOCRText()
 	Expect(t, err).ToBe(nil)
 

@@ -30,7 +30,7 @@ func ExampleClient_Text() {
 	fmt.Println(text, err)
 }
 
-func ExampleClient_SetWhitelist() {
+func ExampleClient_SetAllowlist() {
 
 	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
 		os.Exit(0)
@@ -40,10 +40,10 @@ func ExampleClient_SetWhitelist() {
 	defer client.Close()
 	client.SetImage("./test/data/002-confusing.png")
 
-	client.SetWhitelist("IO-")
+	client.SetAllowlist("IO-")
 	text1, _ := client.Text()
 
-	client.SetWhitelist("10-")
+	client.SetAllowlist("10-")
 	text2, _ := client.Text()
 
 	fmt.Println(text1, text2)

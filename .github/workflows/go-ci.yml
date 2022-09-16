@@ -11,11 +11,12 @@ on:
 
 jobs:
   macos:
-    runs-on: macos-latest
     strategy:
       matrix:
+        os: [macos-latest, macos-12]
         go: ['1.14', '1.15']
-    name: macOS Go${{ matrix.go }}
+    runs-on: ${{ matrix.os }}
+    name: macOS Go${{ matrix.go }} on ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2

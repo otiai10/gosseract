@@ -175,7 +175,7 @@ func (client *Client) DisableOutput() error {
 }
 
 // SetWhitelist sets whitelist chars.
-// See official documentation for whitelist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
+// See official documentation for whitelist here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) error {
 	err := client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
 
@@ -185,7 +185,7 @@ func (client *Client) SetWhitelist(whitelist string) error {
 }
 
 // SetBlacklist sets blacklist chars.
-// See official documentation for blacklist here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
+// See official documentation for blacklist here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetBlacklist(blacklist string) error {
 	err := client.SetVariable(TESSEDIT_CHAR_BLACKLIST, blacklist)
 
@@ -207,7 +207,7 @@ func (client *Client) SetVariable(key SettableVariable, value string) error {
 }
 
 // SetPageSegMode sets "Page Segmentation Mode" (PSM) to detect layout of characters.
-// See official documentation for PSM here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method
+// See official documentation for PSM here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#page-segmentation-method
 // See https://github.com/otiai10/gosseract/issues/52 for more information.
 func (client *Client) SetPageSegMode(mode PageSegMode) error {
 	C.SetPageSegMode(client.api, C.int(mode))

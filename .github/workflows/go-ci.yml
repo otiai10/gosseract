@@ -14,12 +14,12 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, macos-12]
-        go: ['1.16', '1.17']
+        go: ['1.17', '1.18', '1.19']
     runs-on: ${{ matrix.os }}
     name: macOS Go${{ matrix.go }} on ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Go
         uses: actions/setup-go@v3
         with:
@@ -30,10 +30,24 @@ jobs:
         run: go get -u -v -t ./...
       - name: Test
         run: go test -v -cover ./...
-      - name: Coverage
+
+  coverage:
+    needs: [macos]
+    runs-on: macos-latest
+    name: Report Coverage
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Prepare Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Install Tesseract
+        run: brew install tesseract
+      - name: Collect coverage
         run: go test -v -cover -race -coverprofile=coverage -covermode=atomic
       - name: Upload coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage
           verbose: true

@@ -15,18 +15,19 @@ jobs:
     strategy:
       matrix:
         runtime:
-          - ubuntu
           - alpine
           - archlinux
           - centos
+          - clearlinux
           - debian
           - fedora
           - mingw
+          - ubuntu
           - quickstart
     name: Docker ${{ matrix.runtime }}
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: ${{ matrix.runtime }}
         shell: 'script -q -e -c "bash {0}"'
         run: bash ./test/runtime --driver docker --build --run ${{ matrix.runtime }}

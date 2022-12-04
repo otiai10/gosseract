@@ -30,21 +30,25 @@ jobs:
         run: go get -u -v -t ./...
       - name: Test
         run: go test -v -cover ./...
-
   coverage:
-    needs: [macos]
-    runs-on: macos-latest
-    name: Report Coverage
+    runs-on: ubuntu-latest
+    name: Ubuntu for Coverage
+    needs: macos
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
-      - name: Prepare Go
+      - name: Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.19
-      - name: Install Tesseract
-        run: brew install tesseract
-      - name: Collect coverage
+          go-version: '1.18'
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libtesseract-dev \
+            libleptonica-dev \
+            tesseract-ocr-eng
+      - name: Coverage Test
         run: go test -v -cover -race -coverprofile=coverage -covermode=atomic
       - name: Upload coverage
         uses: codecov/codecov-action@v3

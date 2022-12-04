@@ -14,12 +14,12 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, macos-12]
-        go: ['1.16', '1.17']
+        go: ['1.16', '1.17', '1.18']
     runs-on: ${{ matrix.os }}
     name: macOS Go${{ matrix.go }} on ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Go
         uses: actions/setup-go@v3
         with:
@@ -30,10 +30,28 @@ jobs:
         run: go get -u -v -t ./...
       - name: Test
         run: go test -v -cover ./...
-      - name: Coverage
+  coverage:
+    runs-on: ubuntu-latest
+    name: Ubuntu for Coverage
+    needs: macos
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libtesseract-dev \
+            libleptonica-dev \
+            tesseract-ocr-eng
+      - name: Coverage Test
         run: go test -v -cover -race -coverprofile=coverage -covermode=atomic
       - name: Upload coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage
           verbose: true

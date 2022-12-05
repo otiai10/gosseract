@@ -167,10 +167,10 @@ func (client *Client) DisableOutput() error {
 	return err
 }
 
-
 // SetAllowlist sets allow-list chars.
 // See official documentation for allow-list here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetAllowlist(allowlist string) error {
+	err := client.SetVariable(TESSEDIT_CHAR_ALLOWLIST, allowlist)
 
 	client.setVariablesToInitializedAPIIfNeeded()
 

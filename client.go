@@ -1,12 +1,5 @@
 package gosseract
 
-// #if __FreeBSD__ >= 10
-// #cgo LDFLAGS: -L/usr/local/lib -llept -ltesseract
-// #else
-// #cgo CXXFLAGS: -std=c++0x
-// #cgo LDFLAGS: -llept -ltesseract
-// #cgo CPPFLAGS: -Wno-unused-result
-// #endif
 // #include <stdlib.h>
 // #include <stdbool.h>
 // #include "tessbridge.h"
@@ -174,10 +167,10 @@ func (client *Client) DisableOutput() error {
 	return err
 }
 
+
 // SetAllowlist sets allow-list chars.
 // See official documentation for allow-list here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetAllowlist(allowlist string) error {
-	err := client.SetVariable(TESSEDIT_CHAR_ALLOWLIST, allowlist)
 
 	client.setVariablesToInitializedAPIIfNeeded()
 
@@ -207,7 +200,7 @@ func (client *Client) SetVariable(key SettableVariable, value string) error {
 }
 
 // SetPageSegMode sets "Page Segmentation Mode" (PSM) to detect layout of characters.
-// See official documentation for PSM here https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method
+// See official documentation for PSM here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#page-segmentation-method
 // See https://github.com/otiai10/gosseract/issues/52 for more information.
 func (client *Client) SetPageSegMode(mode PageSegMode) error {
 	C.SetPageSegMode(client.api, C.int(mode))

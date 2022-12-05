@@ -1,13 +1,10 @@
-name: Vagrant Test
+name: Vagrant Debug
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 5'
   push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
+    branches:
+      - 'vagrant/*'
 
 jobs:
   vagrant-test:
@@ -21,6 +18,6 @@ jobs:
     name: Vagrant ${{ matrix.runtime }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
       - name: ${{ matrix.runtime }}
         run: bash ./test/runtime --driver vagrant --build --run ${{ matrix.runtime }}

@@ -67,12 +67,12 @@ type SettableVariable string
 const (
 	// DEBUG_FILE - File to send output to.
 	DEBUG_FILE SettableVariable = "debug_file"
-	// TESSEDIT_CHAR_WHITELIST - Whitelist of chars to recognize
+	// TESSEDIT_CHAR_ALLOWLIST - Allow-list of chars to recognize
 	// There is a known issue in 4.00 with LSTM
 	// https://github.com/tesseract-ocr/tesseract/issues/751
-	TESSEDIT_CHAR_WHITELIST SettableVariable = "tessedit_char_whitelist"
-	// TESSEDIT_CHAR_BLACKLIST - Blacklist of chars not to recognize
+	TESSEDIT_CHAR_ALLOWLIST SettableVariable = "tessedit_char_whitelist"
+	// TESSEDIT_CHAR_BLOCKLIST - Blocklist of chars not to recognize
 	// There is a known issue in 4.00 with LSTM
 	// https://github.com/tesseract-ocr/tesseract/issues/751
-	TESSEDIT_CHAR_BLACKLIST SettableVariable = "tessedit_char_blacklist"
+	TESSEDIT_CHAR_BLOCKLIST SettableVariable = "tessedit_char_blacklist"
 )

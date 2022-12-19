@@ -28,7 +28,7 @@ RUN apt-get install -y -qq \
 # If you want to download these traineddata via `wget`, don't forget to locate
 # downloaded traineddata under ${TESSDATA_PREFIX}/tessdata.
 
-RUN go get -t github.com/otiai10/gosseract
+RUN go get -t github.com/otiai10/gosseract/v2
 RUN cd ${GOPATH}/src/github.com/otiai10/gosseract && go test
 
 # Now, you've got complete environment to play with "gosseract"!

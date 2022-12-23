@@ -31,3 +31,13 @@ jobs:
       - name: ${{ matrix.runtime }}
         shell: 'script -q -e -c "bash {0}"'
         run: bash ./test/runtime --driver docker --build --run ${{ matrix.runtime }}
+  example-docker:
+    runs-on: ubuntu-latest
+    name: Test Dockerfile on the repo root
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Build
+        run: docker build . -t otiai10/gosseract
+      - name: Test Run
+        run: docker run -i --rm otiai10/gosseract

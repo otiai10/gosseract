@@ -28,8 +28,15 @@ RUN apt-get install -y -qq \
 # If you want to download these traineddata via `wget`, don't forget to locate
 # downloaded traineddata under ${TESSDATA_PREFIX}/tessdata.
 
+# Setup your cool project with go.mod.
+WORKDIR ${GOPATH}/src/github.com/ghost/cool-project
+RUN go mod init
+
+# Let's have gosseract in your project and test it.
 RUN go get -t github.com/otiai10/gosseract/v2
-RUN cd ${GOPATH}/src/github.com/otiai10/gosseract && go test
 
 # Now, you've got complete environment to play with "gosseract"!
 # For other OS, check https://github.com/otiai10/gosseract/tree/main/test/runtimes
+
+# Try `docker run -it --rm otiai10/gosseract` to test this environment.
+CMD go test -v github.com/otiai10/gosseract/v2

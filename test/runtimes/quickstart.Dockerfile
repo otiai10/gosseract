@@ -8,7 +8,7 @@ RUN apt-get update -qq \
       tesseract-ocr-eng
 
 ENV GO111MODULE=auto
-RUN go get -u -v -t github.com/otiai10/gosseract
+RUN go get -u -v -t github.com/otiai10/gosseract/v2
 
 # Test it!
 CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]

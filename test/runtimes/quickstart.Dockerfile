@@ -7,8 +7,10 @@ RUN apt-get update -qq \
       libleptonica-dev \
       tesseract-ocr-eng
 
-ENV GO111MODULE=auto
-RUN go get -u -v -t github.com/otiai10/gosseract
+WORKDIR $GOPATH/src/your-project
+RUN go mod init
+
+RUN go get -u -v -t github.com/otiai10/gosseract/v2
 
 # Test it!
-CMD ["go", "test", "-v", "github.com/otiai10/gosseract"]
+CMD ["go", "test", "-v", "github.com/otiai10/gosseract/v2"]

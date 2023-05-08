@@ -4,10 +4,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 5'
+  # TODO: https://github.com/otiai10/gosseract/issues/262
+  # push:
+  #   branches: [main, develop, windows/*]
+  # pull_request:
+  #   branches: [main, develop]
   push:
-    branches: [main, develop, windows/*]
-  pull_request:
-    branches: [main, develop]
+    branches: [windows/*]
 
 jobs:
   windows-test:

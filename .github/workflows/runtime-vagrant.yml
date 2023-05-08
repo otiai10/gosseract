@@ -11,9 +11,10 @@ on:
 
 jobs:
   vagrant-test:
-    runs-on: macos-10.15
+    runs-on: macos-12
     # runs-on: macos-latest
     # @see https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-software
+    # @see https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md
     strategy:
       matrix:
         runtime:

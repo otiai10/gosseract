@@ -1,0 +1,30 @@
+name: Windows Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 5'
+  # TODO: https://github.com/otiai10/gosseract/issues/262
+  # push:
+  #   branches: [main, develop, windows/*]
+  # pull_request:
+  #   branches: [main, develop]
+  push:
+    branches: [windows/*]
+
+jobs:
+  windows-test:
+    runs-on: windows-latest
+    name: Windows Test
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+    - name: Install Tesseract
+      run: |
+        vcpkg install tesseract:x64-windows --head
+    - name: Test Gosseract
+      run: go test -v -cover ./...

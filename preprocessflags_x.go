@@ -1,10 +1,8 @@
 package gosseract
 
 // #cgo CXXFLAGS: -std=c++0x
-// #cgo LDFLAGS: -llept -ltesseract
+// #cgo CPPFLAGS: -I/usr/local/include
 // #cgo CPPFLAGS: -Wno-unused-result
-//
-// #ifdef __APPLE__
-//   #cgo LDFLAGS: -L/usr/local/lib -llept -ltesseract
-// #endif
+// #cgo darwin LDFLAGS: -L/usr/local/lib -llept -ltesseract
+// #cgo !darwin LDFLAGS: -L/usr/local/lib -lleptonica -ltesseract
 import "C"

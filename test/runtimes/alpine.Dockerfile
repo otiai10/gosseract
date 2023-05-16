@@ -7,6 +7,7 @@ RUN apk add \
   musl-dev \
   go \
   tesseract-ocr-dev
+RUN apk add tesseract-ocr-data-eng
 
 ENV GOPATH=/root/go
 

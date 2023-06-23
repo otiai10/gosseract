@@ -31,6 +31,7 @@ Options:
   --run|-R {case}     Run only cases which have specified pattern in the case names.
   --exclude|-X {case} Run only cases which DON'T have specified pattern in the case names.
   --rm                Remove VMs which are created by this runtime test.
+  --list|-l           Just list runtimes
   --help|-h           Show this message ;)
 
 Examples:
@@ -51,6 +52,7 @@ function parse_options() {
   QUIET=
   MATCH=
   EXCLUDE=
+  LIST=
   while [[ $# -gt 0 ]]; do
   case "${1}" in
       --driver|-d)
@@ -85,6 +87,10 @@ function parse_options() {
       EXCLUDE="${2}"
       shift && shift
       ;;
+      --list|-l)
+      LIST=YES
+      shift
+      ;;
       --help|-h)
       help && exit 0
       ;;
@@ -100,6 +106,15 @@ function parse_options() {
 
 # {{{ Runner function for "--driver docker"
 function test_docker_runtimes() {
+  if [ -n "${LIST}" ]; then
+    echo "Available runtimes (docker):"
+    for runtime in `ls ${PROJDIR}/test/runtimes/*.Dockerfile`; do
+      testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
+      echo "  ${testcase}"
+    done
+    return 0
+  fi
+
   for runtime in `ls ${PROJDIR}/test/runtimes/*.Dockerfile`; do
     testcase=`basename ${runtime} | sed -e s/\.Dockerfile$//`
     if [ -n "${MATCH}" ]; then
@@ -144,6 +159,15 @@ function test_docker_runtimes() {
 
 # {{{ Runner function for "--driver vagrant"
 function test_vagrant_runtimes() {
+  if [ -n "${LIST}" ]; then
+    echo "Available runtimes (vagrant):"
+    for runtime in `ls ${PROJDIR}/test/runtimes/*.Vagrantfile`; do
+      testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
+      echo "  ${testcase}"
+    done
+    return 0
+  fi
+
   for runtime in `ls ${PROJDIR}/test/runtimes/*.Vagrantfile`; do
     testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
     if [ -n "${MATCH}" ]; then

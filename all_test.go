@@ -315,6 +315,16 @@ func TestClient_HTML(t *testing.T) {
 	})
 }
 
+func TestClient_DetectOrientationScript(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+	client.SetImage("./test/data/004-rotated-text.png")
+	deg, _, script_name, _, err := client.DetectOrientationScript()
+	Expect(t, err).ToBe(nil)
+	Expect(t, deg).ToBe(180)
+	Expect(t, script_name).ToBe("Latin")
+}
+
 func TestGetAvailableLangs(t *testing.T) {
 	t.Skip("TODO")
 	// langs, err := GetAvailableLanguages()

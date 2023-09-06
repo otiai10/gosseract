@@ -13,8 +13,8 @@ jobs:
   macos:
     strategy:
       matrix:
-        os: [macos-latest, macos-12]
-        go: ['1.17', '1.18', '1.19']
+        os: [macos-latest, macos-13]
+        go: ['1.19', '1.20', '1.21']
     runs-on: ${{ matrix.os }}
     name: macOS Go${{ matrix.go }} on ${{ matrix.os }}
     steps:

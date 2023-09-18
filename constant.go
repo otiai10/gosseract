@@ -3,11 +3,10 @@ package gosseract
 // PageSegMode represents tesseract::PageSegMode.
 // See https://github.com/tesseract-ocr/tesseract/wiki/ImproveQuality#page-segmentation-method and
 // https://github.com/tesseract-ocr/tesseract/blob/a18620cfea33d03032b71fe1b9fc424777e34252/ccstruct/publictypes.h#L158-L183 for more information.
-type PageSegMode int
 
 const (
 	// PSM_OSD_ONLY - Orientation and script detection (OSD) only.
-	PSM_OSD_ONLY PageSegMode = iota
+	PSM_OSD_ONLY  = iota
 	// PSM_AUTO_OSD - Automatic page segmentation with OSD.
 	PSM_AUTO_OSD
 	// PSM_AUTO_ONLY - Automatic page segmentation, but no OSD, or OCR.
@@ -42,11 +41,11 @@ const (
 // PageIteratorLevel maps directly to tesseracts enum tesseract::PageIteratorLevel
 // represents the hierarchy of the page elements used in ResultIterator.
 // https://github.com/tesseract-ocr/tesseract/blob/a18620cfea33d03032b71fe1b9fc424777e34252/ccstruct/publictypes.h#L219-L225
-type PageIteratorLevel int
+
 
 const (
 	// RIL_BLOCK - Block of text/image/separator line.
-	RIL_BLOCK PageIteratorLevel = iota
+	RIL_BLOCK  = iota
 	// RIL_PARA - Paragraph within a block.
 	RIL_PARA
 	// RIL_TEXTLINE - Line within a paragraph.

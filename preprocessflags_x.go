@@ -1,3 +1,5 @@
+//go:build !darwin
+
 package gosseract
 
 // #cgo CXXFLAGS: -std=c++0x

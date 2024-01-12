@@ -119,6 +119,10 @@ func (client *Client) SetImage(imagepath string) error {
 	defer C.free(unsafe.Pointer(p))
 
 	img := C.CreatePixImageByFilePath(p)
+	if img == nil {
+		return fmt.Errorf("failed to create PixImage from file path: %s", imagepath)
+	}
+
 	client.pixImage = img
 
 	return nil
@@ -140,6 +144,10 @@ func (client *Client) SetImageFromBytes(data []byte) error {
 	}
 
 	img := C.CreatePixImageFromBytes((*C.uchar)(unsafe.Pointer(&data[0])), C.int(len(data)))
+	if img == nil {
+		return fmt.Errorf("failed to create PixImage from bytes")
+	}
+
 	client.pixImage = img
 
 	return nil

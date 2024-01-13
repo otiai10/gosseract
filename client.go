@@ -145,7 +145,7 @@ func (client *Client) SetImageFromBytes(data []byte) error {
 
 	img := C.CreatePixImageFromBytes((*C.uchar)(unsafe.Pointer(&data[0])), C.int(len(data)))
 	if img == nil {
-		return fmt.Errorf("failed to create PixImage from bytes")
+		return fmt.Errorf("failed to create PixImage from bytes: %d", len(data))
 	}
 
 	client.pixImage = img

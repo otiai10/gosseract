@@ -14,6 +14,11 @@ import (
 	"unsafe"
 )
 
+var (
+	// ErrClientNotConstructed is returned when a client is not constructed
+	ErrClientNotConstructed = fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+)
+
 // Version returns the version of Tesseract-OCR
 func Version() string {
 	api := C.Create()
@@ -80,14 +85,15 @@ func NewClient() *Client {
 
 // Close frees allocated API. This MUST be called for ANY client constructed by "NewClient" function.
 func (client *Client) Close() (err error) {
+	if client.api == nil {
+		return nil // already closed or not constructed
+	}
 	// defer func() {
 	// 	if e := recover(); e != nil {
 	// 		err = fmt.Errorf("%v", e)
 	// 	}
 	// }()
-	if client.api == nil {
-		return nil
-	}
+
 	C.Clear(client.api)
 	C.Free(client.api)
 	client.api = nil
@@ -103,6 +109,9 @@ func (client *Client) Close() (err error) {
 
 // Version provides the version of Tesseract used by this client.
 func (client *Client) Version() string {
+	if client.api == nil {
+		return ""
+	}
 	version := C.Version(client.api)
 	return C.GoString(version)
 }
@@ -111,7 +120,7 @@ func (client *Client) Version() string {
 func (client *Client) SetImage(imagepath string) error {
 
 	if client.api == nil {
-		return fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+		return ErrClientNotConstructed
 	}
 	if imagepath == "" {
 		return fmt.Errorf("image path cannot be empty")
@@ -142,7 +151,7 @@ func (client *Client) SetImage(imagepath string) error {
 func (client *Client) SetImageFromBytes(data []byte) error {
 
 	if client.api == nil {
-		return fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+		return ErrClientNotConstructed
 	}
 	if len(data) == 0 {
 		return fmt.Errorf("image data cannot be empty")
@@ -165,6 +174,9 @@ func (client *Client) SetImageFromBytes(data []byte) error {
 
 // SetLanguage sets languages to use. English as default.
 func (client *Client) SetLanguage(langs ...string) error {
+	if client.api == nil {
+		return ErrClientNotConstructed
+	}
 	if len(langs) == 0 {
 		return fmt.Errorf("languages cannot be empty")
 	}
@@ -178,31 +190,19 @@ func (client *Client) SetLanguage(langs ...string) error {
 
 // DisableOutput ...
 func (client *Client) DisableOutput() error {
-	err := client.SetVariable(DEBUG_FILE, os.DevNull)
-
-	client.setVariablesToInitializedAPIIfNeeded()
-
-	return err
+	return client.SetVariable(DEBUG_FILE, os.DevNull)
 }
 
 // SetWhitelist sets whitelist chars.
 // See official documentation for whitelist here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetWhitelist(whitelist string) error {
-	err := client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
-
-	client.setVariablesToInitializedAPIIfNeeded()
-
-	return err
+	return client.SetVariable(TESSEDIT_CHAR_WHITELIST, whitelist)
 }
 
 // SetBlacklist sets blacklist chars.
 // See official documentation for blacklist here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#dictionaries-word-lists-and-patterns
 func (client *Client) SetBlacklist(blacklist string) error {
-	err := client.SetVariable(TESSEDIT_CHAR_BLACKLIST, blacklist)
-
-	client.setVariablesToInitializedAPIIfNeeded()
-
-	return err
+	return client.SetVariable(TESSEDIT_CHAR_BLACKLIST, blacklist)
 }
 
 // SetVariable sets parameters, representing tesseract::TessBaseAPI->SetVariable.
@@ -210,23 +210,30 @@ func (client *Client) SetBlacklist(blacklist string) error {
 // Because `api->SetVariable` must be called after `api->Init`, this method cannot detect unexpected key for variables.
 // Check `client.setVariablesToInitializedAPI` for more information.
 func (client *Client) SetVariable(key SettableVariable, value string) error {
+	if client.api == nil {
+		return ErrClientNotConstructed
+	}
 	client.Variables[key] = value
 
-	client.setVariablesToInitializedAPIIfNeeded()
-
-	return nil
+	return client.setVariablesToInitializedAPIIfNeeded()
 }
 
 // SetPageSegMode sets "Page Segmentation Mode" (PSM) to detect layout of characters.
 // See official documentation for PSM here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#page-segmentation-method
 // See https://github.com/otiai10/gosseract/issues/52 for more information.
 func (client *Client) SetPageSegMode(mode PageSegMode) error {
+	if client.api == nil {
+		return ErrClientNotConstructed
+	}
 	C.SetPageSegMode(client.api, C.int(mode))
 	return nil
 }
 
 // SetConfigFile sets the file path to config file.
 func (client *Client) SetConfigFile(fpath string) error {
+	if client.api == nil {
+		return ErrClientNotConstructed
+	}
 	info, err := os.Stat(fpath)
 	if err != nil {
 		return err
@@ -244,6 +251,9 @@ func (client *Client) SetConfigFile(fpath string) error {
 // SetTessdataPrefix sets path to the models directory.
 // Environment variable TESSDATA_PREFIX is used as default.
 func (client *Client) SetTessdataPrefix(prefix string) error {
+	if client.api == nil {
+		return ErrClientNotConstructed
+	}
 	if prefix == "" {
 		return fmt.Errorf("tessdata prefix could not be empty")
 	}
@@ -339,6 +349,9 @@ func (client *Client) setVariablesToInitializedAPIIfNeeded() error {
 
 // Text finally initialize tesseract::TessBaseAPI, execute OCR and extract text detected as string.
 func (client *Client) Text() (out string, err error) {
+	if client.api == nil {
+		return out, ErrClientNotConstructed
+	}
 	if err = client.init(); err != nil {
 		return
 	}
@@ -352,6 +365,9 @@ func (client *Client) Text() (out string, err error) {
 // HOCRText finally initialize tesseract::TessBaseAPI, execute OCR and returns hOCR text.
 // See https://en.wikipedia.org/wiki/HOCR for more information of hOCR.
 func (client *Client) HOCRText() (out string, err error) {
+	if client.api == nil {
+		return out, ErrClientNotConstructed
+	}
 	if err = client.init(); err != nil {
 		return
 	}
@@ -370,7 +386,7 @@ type BoundingBox struct {
 // GetBoundingBoxes returns bounding boxes for each matched word
 func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingBox, err error) {
 	if client.api == nil {
-		return out, fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+		return out, ErrClientNotConstructed
 	}
 	if err = client.init(); err != nil {
 		return
@@ -411,7 +427,7 @@ func GetAvailableLanguages() ([]string, error) {
 // according to the c++ api that returns a formatted TSV output. Reference: `TessBaseAPI::GetTSVText`.
 func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 	if client.api == nil {
-		return out, fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
+		return out, ErrClientNotConstructed
 	}
 	if err = client.init(); err != nil {
 		return

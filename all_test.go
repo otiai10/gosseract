@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"image"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -46,6 +45,12 @@ func TestNewClient(t *testing.T) {
 	defer client.Close()
 
 	Expect(t, client).TypeOf("*gosseract.Client")
+}
+
+func TestDoubleClose(t *testing.T) {
+	client := NewClient()
+	client.Close()
+	client.Close()
 }
 
 func TestClient_SetTessdataPrefix(t *testing.T) {
@@ -127,7 +132,7 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
 
-	content, err := ioutil.ReadFile("./test/data/001-helloworld.png")
+	content, err := os.ReadFile("./test/data/001-helloworld.png")
 	if err != nil {
 		t.Fatalf("could not read test file")
 	}

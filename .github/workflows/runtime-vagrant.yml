@@ -22,6 +22,6 @@ jobs:
     name: Vagrant ${{ matrix.runtime }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: ${{ matrix.runtime }}
         run: bash ./test/runtime --driver vagrant --build --run ${{ matrix.runtime }}

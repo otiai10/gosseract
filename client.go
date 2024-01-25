@@ -85,8 +85,11 @@ func NewClient() *Client {
 
 // Close frees allocated API. This MUST be called for ANY client constructed by "NewClient" function.
 func (client *Client) Close() (err error) {
+	// no need for a finalizer anymore
+	runtime.SetFinalizer(client, nil)
 	if client.api == nil {
-		return nil // already closed or not constructed
+		// already closed or not constructed
+		return nil
 	}
 	// defer func() {
 	// 	if e := recover(); e != nil {
@@ -102,8 +105,6 @@ func (client *Client) Close() (err error) {
 		C.DestroyPixImage(client.pixImage)
 		client.pixImage = nil
 	}
-	// no need for a finalizer anymore
-	runtime.SetFinalizer(client, nil)
 	return err
 }
 

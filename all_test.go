@@ -48,6 +48,12 @@ func TestNewClient(t *testing.T) {
 	Expect(t, client).TypeOf("*gosseract.Client")
 }
 
+func TestDoubleClose(t *testing.T) {
+	client := NewClient()
+	client.Close()
+	client.Close()
+}
+
 func TestClient_SetTessdataPrefix(t *testing.T) {
 	client := NewClient()
 	defer client.Close()

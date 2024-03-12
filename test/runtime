@@ -23,7 +23,7 @@ The "runtime test" is to test gosseract package in specific environments,
 such as OS, Go version and Tesseract version.
 
 Options:
-  --driver|-d {name}  Specify VM driver software, either of [docker, vagrant].
+  --driver|-d {name}  Specify VM driver software, either of [docker].
   --build|-b          Build testable images if provided, otherwise pull images.
   --no-cache|-c       Build testable images without layer cache (only available with -b)
   --push|-p           Push local images to dockerhub (for development purpose).
@@ -53,7 +53,6 @@ function parse_options() {
   MATCH=
   EXCLUDE=
   LIST=
-  VAGRANT_DEBUG="--debug"
   while [[ $# -gt 0 ]]; do
   case "${1}" in
       --driver|-d)
@@ -78,7 +77,6 @@ function parse_options() {
       ;;
       --quiet|-q)
       QUIET="--quiet"
-      VAGRANT_DEBUG=""
       shift
       ;;
       --run|-R)
@@ -160,49 +158,49 @@ function test_docker_runtimes() {
 # }}}
 
 # {{{ Runner function for "--driver vagrant"
-function test_vagrant_runtimes() {
-  if [ -n "${LIST}" ]; then
-    echo "Available runtimes (vagrant):"
-    for runtime in `ls ${PROJDIR}/test/runtimes/*.Vagrantfile`; do
-      testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
-      echo "  ${testcase}"
-    done
-    return 0
-  fi
-
-  for runtime in `ls ${PROJDIR}/test/runtimes/*.Vagrantfile`; do
-    testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
-    if [ -n "${MATCH}" ]; then
-      if [[ "${testcase}" != *${MATCH}* ]]; then continue; fi
-    fi
-    echo "┌───────────── ${testcase}"
-    echo "│ [Vagrant] Making VM up..."
-    vboxname=gosseract-test-${testcase}
-    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up ${VAGRANT_DEBUG} --provision --provider virtualbox # | sed "s/^/│ /"
-    TESTRESULT="${?}"
-    echo "[DEBUG] VAGRANT_VAGRANTFILE: " ${runtime}
-    echo "[DEBUG] VIRTUALBOX_NAME:     " ${vboxname}
-    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant ssh-config
-    echo "[DEBUG] ssh"
-    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant ssh -c "echo 'Hello, world!'"
-    echo "[DEBUG] /end"
-    if [ "${TESTRESULT}" != "0" ]; then
-      echo "│ [Vagrant] An error detected while upping VM"
-    fi
-    echo "│ [Vagrant] Stopping VM..."
-    VAGRANT_VAGRANTFILE=${runtime} vagrant halt # | sed "s/^/│ /"
-    if [ -n "${REMOVE}" ]; then
-      echo "│ [Vagrant] Removing VM..."
-      VAGRANT_VAGRANTFILE=${runtime} vagrant destroy -f # | sed "s/^/│ /"
-    fi
-    if [ "${TESTRESULT}" != "0" ]; then
-      printf "│ ${BOLD_RED}RUNTIME TEST FAILED! ${testcase}${RESET}\n"
-      printf "└───────────── ${testcase} ${BOLD_RED}[NG]${RESET}\n"
-      exit 1
-    fi
-    printf "└───────────── ${testcase} ${BOLD_GREEN}[OK]${RESET}\n"
-  done
-}
+# function test_vagrant_runtimes() {
+#   if [ -n "${LIST}" ]; then
+#     echo "Available runtimes (vagrant):"
+#     for runtime in `ls ${PROJDIR}/test/runtimes/*.Vagrantfile`; do
+#       testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
+#       echo "  ${testcase}"
+#     done
+#     return 0
+#   fi
+# 
+#   for runtime in `ls ${PROJDIR}/test/runtimes/*.Vagrantfile`; do
+#     testcase=`basename ${runtime} | sed -e s/\.Vagrantfile$//`
+#     if [ -n "${MATCH}" ]; then
+#       if [[ "${testcase}" != *${MATCH}* ]]; then continue; fi
+#     fi
+#     echo "┌───────────── ${testcase}"
+#     echo "│ [Vagrant] Making VM up..."
+#     vboxname=gosseract-test-${testcase}
+#     VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up ${VAGRANT_DEBUG} --provision --provider virtualbox # | sed "s/^/│ /"
+#     TESTRESULT="${?}"
+#     echo "[DEBUG] VAGRANT_VAGRANTFILE: " ${runtime}
+#     echo "[DEBUG] VIRTUALBOX_NAME:     " ${vboxname}
+#     VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant ssh-config
+#     echo "[DEBUG] ssh"
+#     VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant ssh -c "echo 'Hello, world!'"
+#     echo "[DEBUG] /end"
+#     if [ "${TESTRESULT}" != "0" ]; then
+#       echo "│ [Vagrant] An error detected while upping VM"
+#     fi
+#     echo "│ [Vagrant] Stopping VM..."
+#     VAGRANT_VAGRANTFILE=${runtime} vagrant halt # | sed "s/^/│ /"
+#     if [ -n "${REMOVE}" ]; then
+#       echo "│ [Vagrant] Removing VM..."
+#       VAGRANT_VAGRANTFILE=${runtime} vagrant destroy -f # | sed "s/^/│ /"
+#     fi
+#     if [ "${TESTRESULT}" != "0" ]; then
+#       printf "│ ${BOLD_RED}RUNTIME TEST FAILED! ${testcase}${RESET}\n"
+#       printf "└───────────── ${testcase} ${BOLD_RED}[NG]${RESET}\n"
+#       exit 1
+#     fi
+#     printf "└───────────── ${testcase} ${BOLD_GREEN}[OK]${RESET}\n"
+#   done
+# }
 # }}}
 
 # {{{ Main procedure
@@ -212,12 +210,12 @@ function __main__() {
     docker)
     test_docker_runtimes
     ;;
-    vagrant)
-    test_vagrant_runtimes
-    ;;
+    # vagrant)
+    # test_vagrant_runtimes
+    # ;;
     *)
     test_docker_runtimes
-    test_vagrant_runtimes
+    # test_vagrant_runtimes
     ;;
   esac
 }

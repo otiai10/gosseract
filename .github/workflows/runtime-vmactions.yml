@@ -1,0 +1,32 @@
+name: BSD Test
+
+on:
+  push:
+    branches:
+    - main
+    - develop
+    - bsd/*
+
+jobs:
+  free_bsd_test:
+    runs-on: ubuntu-latest
+    name: A job to run test in FreeBSD
+    env:
+      GOPATH: /home/runner/go
+    steps:
+    - uses: actions/checkout@v4
+    - name: Test in FreeBSD
+      id: test
+      uses: vmactions/freebsd-vm@v1
+      with:
+        envs: 'GOPATH'
+        usesh: true
+        prepare: |
+          pkg install -y curl tesseract tesseract-data git go
+        run: |
+          freebsd-version
+          mkdir -p ${GOPATH}/src/github.com/otiai10
+          cp -r .  ${GOPATH}/src/github.com/otiai10/gosseract
+          cd ${GOPATH}/src/github.com/otiai10/gosseract
+          go get -v -t -d ./...
+          go test -v -cover ./...

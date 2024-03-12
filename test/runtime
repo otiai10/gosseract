@@ -53,6 +53,7 @@ function parse_options() {
   MATCH=
   EXCLUDE=
   LIST=
+  VAGRANT_DEBUG="--debug"
   while [[ $# -gt 0 ]]; do
   case "${1}" in
       --driver|-d)
@@ -77,6 +78,7 @@ function parse_options() {
       ;;
       --quiet|-q)
       QUIET="--quiet"
+      VAGRANT_DEBUG=""
       shift
       ;;
       --run|-R)
@@ -176,8 +178,14 @@ function test_vagrant_runtimes() {
     echo "┌───────────── ${testcase}"
     echo "│ [Vagrant] Making VM up..."
     vboxname=gosseract-test-${testcase}
-    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up --provision --provider virtualbox # | sed "s/^/│ /"
+    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant up ${VAGRANT_DEBUG} --provision --provider virtualbox # | sed "s/^/│ /"
     TESTRESULT="${?}"
+    echo "[DEBUG] VAGRANT_VAGRANTFILE: " ${runtime}
+    echo "[DEBUG] VIRTUALBOX_NAME:     " ${vboxname}
+    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant ssh-config
+    echo "[DEBUG] ssh"
+    VAGRANT_VAGRANTFILE=${runtime} VIRTUALBOX_NAME=${vboxname} vagrant ssh -c "echo 'Hello, world!'"
+    echo "[DEBUG] /end"
     if [ "${TESTRESULT}" != "0" ]; then
       echo "│ [Vagrant] An error detected while upping VM"
     fi

@@ -414,6 +414,7 @@ func (client *Client) DetectOrientationScript() (int, float32, string, float32, 
 		script_name *C.char
 		script_conf C.float
 	)
+	defer C.free(unsafe.Pointer(script_name))
 	C.DetectOrientationScript(client.api, &orient_deg, &orient_conf, &script_name, &script_conf)
 	if script_name == nil {
 		return int(orient_deg), float32(orient_conf), "", float32(script_conf), fmt.Errorf("script name is null")

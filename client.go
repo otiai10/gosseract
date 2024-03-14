@@ -312,6 +312,34 @@ func (client *Client) init() error {
 	return nil
 }
 
+// Initialize tesseract::TessBaseAPI for OSD (Orientation and Script Detection)
+func (client *Client) initOsd() error {
+	var tessdataPrefix *C.char
+	if client.TessdataPrefix != "" {
+		tessdataPrefix = C.CString(client.TessdataPrefix)
+	}
+	defer C.free(unsafe.Pointer(tessdataPrefix))
+
+	res := C.Init(client.api, tessdataPrefix, C.CString("osd"), nil, nil)
+	if res != 0 {
+		return fmt.Errorf("failed to initialize TessBaseAPI with code %d", res)
+	}
+
+	if err := client.setVariablesToInitializedAPI(); err != nil {
+		return err
+	}
+
+	if client.pixImage == nil {
+		return fmt.Errorf("PixImage is not set, use SetImage or SetImageFromBytes before DetectOrientationScript")
+	}
+
+	C.SetPixImage(client.api, client.pixImage)
+
+	client.shouldInit = true
+
+	return nil
+}
+
 // This method flag the current instance to be initialized again on the next call to a function that
 // requires a gosseract API initialized: when user change the config file or the languages
 // the instance needs to init a new gosseract api
@@ -319,7 +347,7 @@ func (client *Client) flagForInit() {
 	client.shouldInit = true
 }
 
-// This method sets all the sspecified variables to TessBaseAPI structure.
+// This method sets all the specified variables to TessBaseAPI structure.
 // Because `api->SetVariable` must be called after `api->Init()`,
 // gosseract.Client.SetVariable cannot call `api->SetVariable` directly.
 // See https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
@@ -374,6 +402,25 @@ func (client *Client) HOCRText() (out string, err error) {
 	}
 	out = C.GoString(C.HOCRText(client.api))
 	return
+}
+
+func (client *Client) DetectOrientationScript() (int, float32, string, float32, error) {
+	if err := client.initOsd(); err != nil {
+		return 0, 0, "", 0, err
+	}
+	var (
+		orient_deg  C.int
+		orient_conf C.float
+		script_name *C.char
+		script_conf C.float
+	)
+	defer C.free(unsafe.Pointer(script_name))
+	C.DetectOrientationScript(client.api, &orient_deg, &orient_conf, &script_name, &script_conf)
+	if script_name == nil {
+		return int(orient_deg), float32(orient_conf), "", float32(script_conf), fmt.Errorf("script name is null")
+	}
+
+	return int(orient_deg), float32(orient_conf), C.GoString(script_name), float32(script_conf), nil
 }
 
 // BoundingBox contains the position, confidence and UTF8 text of the recognized word

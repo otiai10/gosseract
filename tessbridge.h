@@ -31,6 +31,7 @@ void SetPageSegMode(TessBaseAPI, int);
 int GetPageSegMode(TessBaseAPI);
 char* UTF8Text(TessBaseAPI);
 char* HOCRText(TessBaseAPI);
+void DetectOrientationScript(TessBaseAPI, int*, float*, const char**, float*);
 const char* Version(TessBaseAPI);
 const char* GetDataPath();
 

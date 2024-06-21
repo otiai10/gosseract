@@ -5,9 +5,14 @@ on:
   schedule:
     - cron: '0 0 * * 5'
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+      - docker/*
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
 
 jobs:
   docker-test:

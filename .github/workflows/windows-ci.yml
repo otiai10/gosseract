@@ -10,7 +10,8 @@ on:
   # pull_request:
   #   branches: [main, develop]
   push:
-    branches: [windows/*]
+    branches:
+      - windows/*
 
 jobs:
   windows-test:

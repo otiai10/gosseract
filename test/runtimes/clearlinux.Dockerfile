@@ -1,8 +1,12 @@
-FROM clearlinux/golang
+FROM clearlinux:latest
+
+RUN swupd update
+RUN swupd bundle-add \
+    go-basic
 
 RUN swupd bundle-add \
-    devpkg-tesseract
-# RUN tesseract -v
+    devpkg-tesseract \
+    devpkg-leptonica
 
 # {{{ TODO: Do not use wget.
 #     This part should be replaced by curl,

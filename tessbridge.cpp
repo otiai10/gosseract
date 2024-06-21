@@ -105,11 +105,6 @@ char* HOCRText(TessBaseAPI a) {
     return api->GetHOCRText(0);
 }
 
-void DetectOrientationScript(TessBaseAPI a, int* orient_deg, float* orient_conf, const char** script_name, float* script_conf) {
-    tesseract::TessBaseAPI* api = (tesseract::TessBaseAPI*)a;
-    api->DetectOrientationScript(orient_deg, orient_conf, script_name, script_conf);
-}
-
 bounding_boxes* GetBoundingBoxesVerbose(TessBaseAPI a) {
     using namespace tesseract;
     tesseract::TessBaseAPI* api = (tesseract::TessBaseAPI*)a;

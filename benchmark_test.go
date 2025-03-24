@@ -37,3 +37,12 @@ func BenchmarkClient_GetBoundingBoxesVerbose(b *testing.B) {
 		client.Close()
 	}
 }
+
+func BenchmarkClient_GetOrientation(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		client := NewClient()
+		client.SetImage("./test/data/003-longer-text.png")
+		client.GetOrientation()
+		client.Close()
+	}
+}

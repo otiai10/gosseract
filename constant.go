@@ -57,6 +57,39 @@ const (
 	RIL_SYMBOL
 )
 
+// PageOrientation represents the oritentation of a page and maps
+// directly to enum tesseract::Orientation.
+// See https://github.com/tesseract-ocr/tesseract/blob/f96cb8d9cb6e7958ddaa52cbbb33792b5d111913/include/tesseract/publictypes.h#L114
+type PageOrientation int
+
+const (
+	ORIENTATION_PAGE_UP PageOrientation = iota
+	ORIENTATION_PAGE_RIGHT
+	ORIENTATION_PAGE_DOWN
+	ORIENTATION_PAGE_LEFT
+)
+
+// WritingDirection represents the direction in which grapheme clusters
+// within a line of text are laid out logically. Maps directly to enum
+// tesseract::WritingDirection. See https://github.com/tesseract-ocr/tesseract/blob/f96cb8d9cb6e7958ddaa52cbbb33792b5d111913/include/tesseract/publictypes.h#L129
+type WritingDirection int
+
+const (
+	WRITING_DIRECTION_LEFT_TO_RIGHT WritingDirection = iota
+	WRITING_DIRECTION_RIGHT_TO_LEFT
+	WRITING_DIRECTION_TOP_TO_BOTTOM
+)
+
+// TextlineOrder represents the sequence in which lines are read. Maps
+// directly to tesseract::TextlineOrder. See https://github.com/tesseract-ocr/tesseract/blob/f96cb8d9cb6e7958ddaa52cbbb33792b5d111913/include/tesseract/publictypes.h#L146
+type TextlineOrder int
+
+const (
+	TEXTLINE_ORDER_LEFT_TO_RIGHT TextlineOrder = iota
+	TEXTLINE_ORDER_RIGHT_TO_LEFT
+	TEXTLINE_ORDER_TOP_TO_BOTTOM
+)
+
 // SettableVariable represents available strings for TessBaseAPI::SetVariable.
 // See https://groups.google.com/forum/#!topic/tesseract-ocr/eHTBzrBiwvQ
 // and https://github.com/tesseract-ocr/tesseract/blob/master/src/ccmain/tesseractclass.h

@@ -282,10 +282,10 @@ func TestClient_GetOrientation(t *testing.T) {
 	o, err := client.GetOrientation()
 	Expect(t, err).ToBe(nil)
 	Expect(t, o).ToBe(Orientation{
-		page:         ORIENTATION_PAGE_UP,
-		writing:      WRITING_DIRECTION_LEFT_TO_RIGHT,
-		line:         TEXTLINE_ORDER_TOP_TO_BOTTOM,
-		deskew_angle: 0.0,
+		Page:        ORIENTATION_PAGE_UP,
+		Writing:     WRITING_DIRECTION_LEFT_TO_RIGHT,
+		Line:        TEXTLINE_ORDER_TOP_TO_BOTTOM,
+		DeskewAngle: 0.0,
 	})
 }
 

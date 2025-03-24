@@ -451,12 +451,13 @@ func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 }
 
 type Orientation struct {
-	page         PageOrientation
-	writing      WritingDirection
-	line         TextlineOrder
-	deskew_angle float32
+	Page        PageOrientation
+	Writing     WritingDirection
+	Line        TextlineOrder
+	DeskewAngle float32
 }
 
+// GetOrientation returns the orientation of the block.
 func (client *Client) GetOrientation() (Orientation, error) {
 	if client.api == nil {
 		return Orientation{}, ErrClientNotConstructed
@@ -468,10 +469,10 @@ func (client *Client) GetOrientation() (Orientation, error) {
 
 	o := C.GetOrientation(client.api)
 	return Orientation{
-		page:         PageOrientation(o.page),
-		writing:      WritingDirection(o.writing),
-		line:         TextlineOrder(o.line),
-		deskew_angle: float32(o.deskew_angle),
+		Page:        PageOrientation(o.page),
+		Writing:     WritingDirection(o.writing),
+		Line:        TextlineOrder(o.line),
+		DeskewAngle: float32(o.deskew_angle),
 	}, nil
 }
 

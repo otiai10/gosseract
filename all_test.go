@@ -163,7 +163,6 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 }
 
 func TestClient_SetWhitelist(t *testing.T) {
-
 	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
 		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
@@ -183,7 +182,6 @@ func TestClient_SetWhitelist(t *testing.T) {
 }
 
 func TestClient_SetBlacklist(t *testing.T) {
-
 	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
 		t.Skip("Blacklist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
@@ -218,7 +216,6 @@ func TestClient_SetLanguage(t *testing.T) {
 }
 
 func TestClient_ConfigFilePath(t *testing.T) {
-
 	if os.Getenv("TESS_LSTM_DISABLED") == "1" {
 		t.Skip("Whitelist with LSTM is not working for now. Please check https://github.com/tesseract-ocr/tesseract/issues/751")
 	}
@@ -243,11 +240,9 @@ func TestClient_ConfigFilePath(t *testing.T) {
 		err := client.SetConfigFile("./test/config/02.config")
 		Expect(t, err).Not().ToBe(nil)
 	})
-
 }
 
 func TestClientBoundingBox(t *testing.T) {
-
 	if os.Getenv("TESS_BOX_DISABLED") == "1" {
 		t.Skip()
 	}
@@ -279,8 +274,22 @@ func TestClientBoundingBox(t *testing.T) {
 	}
 }
 
-func TestClient_HTML(t *testing.T) {
+func TestClient_GetOrientation(t *testing.T) {
+	client := NewClient()
+	defer client.Close()
+	client.SetImage("./test/data/003-longer-text.png")
 
+	o, err := client.GetOrientation()
+	Expect(t, err).ToBe(nil)
+	Expect(t, o).ToBe(Orientation{
+		page:         ORIENTATION_PAGE_UP,
+		writing:      WRITING_DIRECTION_LEFT_TO_RIGHT,
+		line:         TEXTLINE_ORDER_TOP_TO_BOTTOM,
+		deskew_angle: 0.0,
+	})
+}
+
+func TestClient_HTML(t *testing.T) {
 	if os.Getenv("TESS_BOX_DISABLED") == "1" {
 		t.Skip()
 	}

@@ -4,6 +4,7 @@ package gosseract
 // #include <stdbool.h>
 // #include "tessbridge.h"
 import "C"
+
 import (
 	"fmt"
 	"image"
@@ -14,10 +15,8 @@ import (
 	"unsafe"
 )
 
-var (
-	// ErrClientNotConstructed is returned when a client is not constructed
-	ErrClientNotConstructed = fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
-)
+// ErrClientNotConstructed is returned when a client is not constructed
+var ErrClientNotConstructed = fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
 
 // Version returns the version of Tesseract-OCR
 func Version() string {
@@ -119,7 +118,6 @@ func (client *Client) Version() string {
 
 // SetImage sets path to image file to be processed OCR.
 func (client *Client) SetImage(imagepath string) error {
-
 	if client.api == nil {
 		return ErrClientNotConstructed
 	}
@@ -150,7 +148,6 @@ func (client *Client) SetImage(imagepath string) error {
 
 // SetImageFromBytes sets the image data to be processed OCR.
 func (client *Client) SetImageFromBytes(data []byte) error {
-
 	if client.api == nil {
 		return ErrClientNotConstructed
 	}
@@ -265,7 +262,6 @@ func (client *Client) SetTessdataPrefix(prefix string) error {
 
 // Initialize tesseract::TessBaseAPI
 func (client *Client) init() error {
-
 	if !client.shouldInit {
 		C.SetPixImage(client.api, client.pixImage)
 		return nil
@@ -452,6 +448,31 @@ func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 		})
 	}
 	return
+}
+
+type Orientation struct {
+	page         PageOrientation
+	writing      WritingDirection
+	line         TextlineOrder
+	deskew_angle float32
+}
+
+func (client *Client) GetOrientation() (Orientation, error) {
+	if client.api == nil {
+		return Orientation{}, ErrClientNotConstructed
+	}
+
+	if err := client.init(); err != nil {
+		return Orientation{}, err
+	}
+
+	o := C.GetOrientation(client.api)
+	return Orientation{
+		page:         PageOrientation(o.page),
+		writing:      WritingDirection(o.writing),
+		line:         TextlineOrder(o.line),
+		deskew_angle: float32(o.deskew_angle),
+	}, nil
 }
 
 // getDataPath is useful hepler to determine where current tesseract

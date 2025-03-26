@@ -45,6 +45,10 @@ func main() {
 Please check this [Dockerfile](https://github.com/otiai10/gosseract/blob/main/Dockerfile) to get started.
 Alternatively, you can deploy the pre-existing Docker image by invoking `docker run -it --rm otiai10/gosseract`.
 
+# Statically linked go build
+
+[Gosseract](https://github.com/otiai10/gosseract) uses the native C api to use tesseract. To build a statically linked go binary, you have to first build both tesseract and leptonica statically. Checkout the [Dockerfile.static](https://github.com/otiai10/gosseract/blob/main/Dockerfile.static) file for step-by-step instructions. The same steps can also be followed in Ubuntu.
+
 # Test
 
 In case you have [tesseract-ocr](https://github.com/tesseract-ocr/tessdoc) installed on your local environment, you can run the tests with:

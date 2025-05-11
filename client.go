@@ -463,9 +463,15 @@ func (client *Client) GetOrientation() (Orientation, error) {
 		return Orientation{}, ErrClientNotConstructed
 	}
 
+	// Because https://github.com/otiai10/gosseract/issues/167
+	// we have to get and set PSM again.
+	psm := C.GetPageSegMode(client.api)
+
 	if err := client.init(); err != nil {
 		return Orientation{}, err
 	}
+
+	C.SetPageSegMode(client.api, psm)
 
 	o := C.GetOrientation(client.api)
 	return Orientation{

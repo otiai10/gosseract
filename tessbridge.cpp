@@ -208,6 +208,7 @@ orientation GetOrientation(TessBaseAPI a) {
     tesseract::WritingDirection writing;
     tesseract::TextlineOrder line;
     float deskew_angle;
+
     tesseract::PageIterator *it = api->AnalyseLayout();
     it->Orientation(&page, &writing, &line, &deskew_angle);
     orientation o = {.page = page,

@@ -277,16 +277,28 @@ func TestClientBoundingBox(t *testing.T) {
 func TestClient_GetOrientation(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
-	client.SetImage("./test/data/003-longer-text.png")
 
+	client.SetPageSegMode(PSM_AUTO_OSD)
+
+	client.SetImage("./test/data/003-longer-text.png")
 	o, err := client.GetOrientation()
 	Expect(t, err).ToBe(nil)
-	Expect(t, o).ToBe(Orientation{
-		Page:        ORIENTATION_PAGE_UP,
-		Writing:     WRITING_DIRECTION_LEFT_TO_RIGHT,
-		Line:        TEXTLINE_ORDER_TOP_TO_BOTTOM,
-		DeskewAngle: 0.0,
-	})
+	Expect(t, o.Page).ToBe(ORIENTATION_PAGE_UP)
+	Expect(t, o.Writing).ToBe(WRITING_DIRECTION_LEFT_TO_RIGHT)
+	Expect(t, o.Line).ToBe(TEXTLINE_ORDER_TOP_TO_BOTTOM)
+	if !(-0.1 <= o.DeskewAngle && o.DeskewAngle <= 0.1) {
+		t.Fatalf("Expected DeskewAngle to be within [-0.1, 0.1] but is %f", o.DeskewAngle)
+	}
+
+	client.SetImage("./test/data/004-longer-text-rot-left.png")
+	o, err = client.GetOrientation()
+	Expect(t, err).ToBe(nil)
+	Expect(t, o.Page).ToBe(ORIENTATION_PAGE_LEFT)
+	Expect(t, o.Writing).ToBe(WRITING_DIRECTION_LEFT_TO_RIGHT)
+	Expect(t, o.Line).ToBe(TEXTLINE_ORDER_TOP_TO_BOTTOM)
+	if !(-0.1 <= o.DeskewAngle && o.DeskewAngle <= 0.1) {
+		t.Fatalf("Expected DeskewAngle to be within [-0.1, 0.1] but is %f", o.DeskewAngle)
+	}
 }
 
 func TestClient_HTML(t *testing.T) {

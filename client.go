@@ -230,6 +230,12 @@ func (client *Client) SetPageSegMode(mode PageSegMode) error {
 	return nil
 }
 
+// PageSegMode returns the "Page Segmentation Mode" (PSM)
+// See official documentation for PSM here https://tesseract-ocr.github.io/tessdoc/ImproveQuality#page-segmentation-method
+func (client *Client) PageSegMode() PageSegMode {
+	return PageSegMode(C.GetPageSegMode(client.api))
+}
+
 // SetConfigFile sets the file path to config file.
 func (client *Client) SetConfigFile(fpath string) error {
 	if client.api == nil {

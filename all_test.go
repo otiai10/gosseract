@@ -246,6 +246,22 @@ func TestClient_ConfigFilePath(t *testing.T) {
 
 }
 
+func TestClient_PSMNotResetInFirstInitCall(t *testing.T) {
+	// see https://github.com/otiai10/gosseract/issues/167
+	psm := PSM_SINGLE_BLOCK_VERT_TEXT
+	client := NewClient()
+	defer client.Close()
+
+	err := client.SetPageSegMode(psm) //set 5
+	Expect(t, err).ToBe(nil)
+	Expect(t, client.PageSegMode()).ToBe(psm)
+
+	client.SetImage("./test/data/001-helloworld.png")
+	_, err = client.Text() //This step will execute client.init() before outputting the OCR text.
+	Expect(t, err).ToBe(nil)
+	Expect(t, client.PageSegMode()).ToBe(psm)
+}
+
 func TestClientBoundingBox(t *testing.T) {
 
 	if os.Getenv("TESS_BOX_DISABLED") == "1" {

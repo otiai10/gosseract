@@ -5,6 +5,7 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"os"
@@ -407,6 +408,49 @@ func FromRectangle(word string, r image.Rectangle, conf float32, block, par, lin
 		LineNum:    int32(line),
 		WordNum:    int32(wordNum),
 	}
+}
+
+// bboxJSON: This struct is used to provide a backwards-compatible interaface, so that downstream
+// consumers may still rely on the old interface, if they're serializing these structs
+type bboxJSON struct {
+	Word       string          `json:"word"`
+	Box        image.Rectangle `json:"box"`
+	Confidence float32         `json:"confidence"`
+	BlockNum   int32           `json:"block_num,omitempty"`
+	ParNum     int32           `json:"par_num,omitempty"`
+	LineNum    int32           `json:"line_num,omitempty"`
+	WordNum    int32           `json:"word_num,omitempty"`
+}
+
+func (b BoundingBox) MarshalJSON() ([]byte, error) {
+	bj := bboxJSON{
+		Word:       b.Word,
+		Box:        b.Rect(),
+		Confidence: b.Confidence,
+		BlockNum:   b.BlockNum,
+		ParNum:     b.ParNum,
+		LineNum:    b.LineNum,
+		WordNum:    b.WordNum,
+	}
+	return json.Marshal(bj)
+}
+
+func (b *BoundingBox) UnmarshalJSON(data []byte) error {
+	var bj bboxJSON
+	if err := json.Unmarshal(data, &bj); err != nil {
+		return err
+	}
+	b.Word = bj.Word
+	b.Confidence = bj.Confidence
+	b.BlockNum = bj.BlockNum
+	b.ParNum = bj.ParNum
+	b.LineNum = bj.LineNum
+	b.WordNum = bj.WordNum
+	b.X0 = int32(bj.Box.Min.X)
+	b.Y0 = int32(bj.Box.Min.Y)
+	b.X1 = int32(bj.Box.Max.X)
+	b.Y1 = int32(bj.Box.Max.Y)
+	return nil
 }
 
 // GetBoundingBoxes returns bounding boxes for each matched word

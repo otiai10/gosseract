@@ -275,7 +275,7 @@ func TestClientBoundingBox(t *testing.T) {
 	}
 	for i, box := range boxes {
 		Expect(t, box.Word).ToBe(words[i])
-		Expect(t, box.Box).ToBe(coords[i])
+		Expect(t, box.Rect()).ToBe(coords[i])
 	}
 }
 

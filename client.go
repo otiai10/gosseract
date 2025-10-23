@@ -327,10 +327,11 @@ func (client *Client) flagForInit() {
 // See https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
 func (client *Client) setVariablesToInitializedAPI() error {
 	for key, value := range client.Variables {
-		k, v := C.CString(string(key)), C.CString(value)
-		defer C.free(unsafe.Pointer(k))
-		defer C.free(unsafe.Pointer(v))
+		k := C.CString(string(key))
+		v := C.CString(value)
 		res := C.SetVariable(client.api, k, v)
+		C.free(unsafe.Pointer(k))
+		C.free(unsafe.Pointer(v))
 		if !bool(res) {
 			return fmt.Errorf("failed to set variable with key(%v) and value(%v)", key, value)
 		}

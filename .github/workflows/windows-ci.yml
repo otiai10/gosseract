@@ -78,11 +78,12 @@ jobs:
         ls -la /c/vcpkg/installed/x64-windows/lib/*.lib 2>/dev/null || echo "No .lib files"
 
     - name: Test Gosseract
+      shell: bash
       env:
         PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
         CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
         CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
-        PATH: C:/vcpkg/installed/x64-windows/bin;${{ env.PATH }}
+        PATH: C:/vcpkg/installed/x64-windows/bin:$PATH
       run: |
         echo "=== CGO Environment ==="
         go env CGO_CFLAGS

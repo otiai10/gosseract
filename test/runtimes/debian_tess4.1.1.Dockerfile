@@ -4,6 +4,8 @@ RUN apt-get update -qq
 RUN apt-get install -y \
   wget \
   git \
+  gcc \
+  g++ \
   libtesseract-dev=4.1.1-2.1 \
   tesseract-ocr-eng
 

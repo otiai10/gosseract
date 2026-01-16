@@ -129,10 +129,6 @@ function test_runtimes() {
       fi
     fi
     echo "┌───────────── ${testcase}"
-    # q: Is following line correct?
-    # XXX: Since clearlinux docker image doesn't support ARM64 architecture, as of 2024-07-26a,
-    #      we need to add `--platform linux/amd64` to the `docker build` command when we build it on macos M3 chip.
-    # if [ ${testcase} == "clearlinux" ]; then DOCKER_PLATFORM_ARG="--platform linux/amd64"; fi
     if [ -n "${BUILD}" ]; then
       echo "│ [${ENGINE}] Building image..."
       ${ENGINE} build . ${NO_CACHE} -f ${runtime} -t gosseract/test:${testcase} ${QUIET} | sed "s/^/│ /"

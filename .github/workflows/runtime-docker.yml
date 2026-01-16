@@ -23,7 +23,6 @@ jobs:
           - alpine
           - archlinux
           - centos
-          - clearlinux
           - debian
           - fedora
           - mingw

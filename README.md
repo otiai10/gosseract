@@ -62,6 +62,8 @@ If you **DON'T** want to install tesseract-ocr on your local environment, run `.
 
 Check [./test/runtimes](https://github.com/otiai10/gosseract/tree/main/test/runtimes) for more information about runtime tests.
 
+> **Note**: Clear Linux support was removed in January 2026 as [Intel discontinued the distribution in July 2025](https://www.phoronix.com/news/Intel-Linux-News-2025).
+
 # Issues
 
 - [https://github.com/otiai10/gosseract/issues](https://github.com/otiai10/gosseract/issues?utf8=%E2%9C%93&q=is%3Aissue)

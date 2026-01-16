@@ -51,6 +51,7 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilep
     setbuf(stderr, errbuf);
     // }}}
 
+    int psm = GetPageSegMode(api);
     int ret;
     if (configfilepath != NULL) {
         char* configs[] = {configfilepath};
@@ -59,6 +60,7 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilep
     } else {
         ret = api->Init(tessdataprefix, languages);
     }
+    SetPageSegMode(api, psm);
 
     // {{{ Restore default stderr
     (void)freopen("/dev/null", "a", stderr);

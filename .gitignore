@@ -40,3 +40,4 @@ test/runtimes/TESTRESULT.*.txt
 
 # Editors
 .vscode
+.claude/settings.local.json

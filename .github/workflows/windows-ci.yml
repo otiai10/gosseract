@@ -84,15 +84,16 @@ jobs:
         PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
         CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
         CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
-        PATH: C:/vcpkg/installed/x64-windows/bin:$PATH
+        PATH: C:/mingw64/bin:C:/vcpkg/installed/x64-windows/bin:$PATH
       run: |
         echo "=== CGO Environment ==="
         go env CGO_CFLAGS
         go env CGO_LDFLAGS
         go env CGO_ENABLED
         go env CC
-        which gcc || echo "gcc not found in PATH"
+        which gcc
+        gcc --version
         echo "=== Attempting build ==="
-        go build -v -x . 2>&1 || echo "Build failed, check errors above"
+        go build -v . 2>&1 || echo "Build failed, check errors above"
         echo "=== Running tests ==="
         go test -v -cover ./...

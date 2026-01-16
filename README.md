@@ -3,9 +3,9 @@
 [![Go Test](https://github.com/otiai10/gosseract/actions/workflows/go-ci.yml/badge.svg)](https://github.com/otiai10/gosseract/actions/workflows/go-ci.yml)
 [![Docker Test](https://github.com/otiai10/gosseract/actions/workflows/runtime-docker.yml/badge.svg)](https://github.com/otiai10/gosseract/actions/workflows/runtime-docker.yml)
 [![BSD Test](https://github.com/otiai10/gosseract/actions/workflows/runtime-vmactions.yml/badge.svg)](https://github.com/otiai10/gosseract/actions/workflows/runtime-vmactions.yml)
+[![Windows Test](https://github.com/otiai10/gosseract/actions/workflows/windows-ci.yml/badge.svg)](https://github.com/otiai10/gosseract/actions/workflows/windows-ci.yml)
 [![codecov](https://codecov.io/gh/otiai10/gosseract/branch/main/graph/badge.svg)](https://codecov.io/gh/otiai10/gosseract)
 [![Go Report Card](https://goreportcard.com/badge/github.com/otiai10/gosseract)](https://goreportcard.com/report/github.com/otiai10/gosseract)
-[![Maintainability](https://api.codeclimate.com/v1/badges/351d9027a3c517505094/maintainability)](https://codeclimate.com/github/otiai10/gosseract/maintainability)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/otiai10/gosseract/blob/main/LICENSE)
 [![Go Reference](https://pkg.go.dev/badge/github.com/otiai10/gosseract/v2.svg)](https://pkg.go.dev/github.com/otiai10/gosseract/v2)
 

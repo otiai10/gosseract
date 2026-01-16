@@ -28,4 +28,8 @@ jobs:
       run: |
         vcpkg install tesseract:x64-windows --head
     - name: Test Gosseract
+      env:
+        PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
+        CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
+        CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
       run: go test -v -cover ./...

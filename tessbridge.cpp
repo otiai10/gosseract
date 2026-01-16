@@ -7,7 +7,17 @@
 #endif
 
 #include <stdio.h>
+#ifdef _WIN32
+#include <io.h>
+#define dup _dup
+#define dup2 _dup2
+#define close _close
+#define STDERR_FILENO 2
+#define NULL_DEVICE "NUL"
+#else
 #include <unistd.h>
+#define NULL_DEVICE "/dev/null"
+#endif
 #include "tessbridge.h"
 
 TessBaseAPI Create() {
@@ -47,7 +57,7 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilep
     fflush(stderr);
     int original_stderr;
     original_stderr = dup(STDERR_FILENO);
-    (void)freopen("/dev/null", "a", stderr);
+    (void)freopen(NULL_DEVICE, "a", stderr);
     setbuf(stderr, errbuf);
     // }}}
 
@@ -61,7 +71,7 @@ int Init(TessBaseAPI a, char* tessdataprefix, char* languages, char* configfilep
     }
 
     // {{{ Restore default stderr
-    (void)freopen("/dev/null", "a", stderr);
+    (void)freopen(NULL_DEVICE, "a", stderr);
     dup2(original_stderr, STDERR_FILENO);
     close(original_stderr);
     setbuf(stderr, NULL);

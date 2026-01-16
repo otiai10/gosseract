@@ -56,11 +56,15 @@ In case you have [tesseract-ocr](https://github.com/tesseract-ocr/tessdoc) insta
 If you **DON'T** want to install tesseract-ocr on your local environment, run `./test/runtime` which utilises Docker and Vagrant to test the source code on some runtimes.
 
 ```
-% ./test/runtime --driver docker
-% ./test/runtime --driver vagrant
+% ./test/runtime --engine docker
+% ./test/runtime --engine vagrant
 ```
 
 Check [./test/runtimes](https://github.com/otiai10/gosseract/tree/main/test/runtimes) for more information about runtime tests.
+
+> **Note**: Clear Linux support was removed in January 2026 as [Intel discontinued the distribution in July 2025](https://www.phoronix.com/news/Intel-Linux-News-2025).
+
+> **Note**: Arch Linux support was removed in January 2026 as the official image does not provide ARM64 architecture support.
 
 # Issues
 

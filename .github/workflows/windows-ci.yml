@@ -86,13 +86,16 @@ jobs:
         PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
         CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
         CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
-        PATH: C:/mingw64/bin:C:/vcpkg/installed/x64-windows/bin:$PATH
       run: |
+        # Add MinGW and vcpkg bins to PATH for DLL discovery
+        export PATH="/c/mingw64/bin:/c/vcpkg/installed/x64-windows/bin:$PATH"
         echo "=== CGO Environment ==="
         go env CC
         go env CGO_CFLAGS
         go env CGO_LDFLAGS
         go env CGO_ENABLED
         $CC --version
+        echo "=== Verifying DLLs ==="
+        ls -la /c/vcpkg/installed/x64-windows/bin/*.dll | head -10
         echo "=== Running tests ==="
         go test -v -cover ./...

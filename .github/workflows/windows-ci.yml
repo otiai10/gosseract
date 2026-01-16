@@ -56,10 +56,10 @@ jobs:
 
         # Create standard symlinks for linker compatibility
         cd ../lib
-        for f in libtesseract*.a; do
+        for f in libtesseract[0-9]*.a; do
           [ -f "$f" ] && ln -sf "$f" libtesseract.a
         done
-        for f in libleptonica*.a; do
+        for f in libleptonica-*.a; do
           [ -f "$f" ] && ln -sf "$f" libleptonica.a
         done
 

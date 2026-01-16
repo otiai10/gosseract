@@ -4,14 +4,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 5'
-  # TODO: https://github.com/otiai10/gosseract/issues/262
-  # push:
-  #   branches: [main, develop, windows/*]
-  # pull_request:
-  #   branches: [main, develop]
   push:
     branches:
+      - main
       - windows/*
+  pull_request:
+    branches:
+      - main
 
 jobs:
   windows-test:
@@ -38,8 +37,7 @@ jobs:
           vcpkg-${{ runner.os }}-tesseract-
 
     - name: Install Tesseract via vcpkg
-      run: |
-        vcpkg install tesseract:x64-windows
+      run: vcpkg install tesseract:x64-windows
 
     - name: Create MinGW import libraries
       shell: bash
@@ -51,7 +49,6 @@ jobs:
             base="${dll%.dll}"
             gendef "$dll"
             dlltool -d "${base}.def" -l "lib${base}.a" -D "$dll"
-            echo "Created lib${base}.a from $dll"
           fi
         done
         # Move import libraries to lib directory
@@ -60,29 +57,17 @@ jobs:
         # Create standard symlinks for linker compatibility
         cd ../lib
         for f in libtesseract*.a; do
-          [ -f "$f" ] && ln -sf "$f" libtesseract.a && echo "Linked $f -> libtesseract.a"
+          [ -f "$f" ] && ln -sf "$f" libtesseract.a
         done
         for f in libleptonica*.a; do
-          [ -f "$f" ] && ln -sf "$f" libleptonica.a && echo "Linked $f -> libleptonica.a"
+          [ -f "$f" ] && ln -sf "$f" libleptonica.a
         done
-        ls -la *.a 2>/dev/null || echo "No .a files created"
-
-    - name: Debug - Check headers and libraries
-      shell: bash
-      run: |
-        echo "=== Checking header files ==="
-        ls -la /c/vcpkg/installed/x64-windows/include/tesseract/ || echo "No tesseract headers"
-        ls -la /c/vcpkg/installed/x64-windows/include/leptonica/ || echo "No leptonica headers"
-        echo "=== Checking library files ==="
-        ls -la /c/vcpkg/installed/x64-windows/lib/*.a 2>/dev/null || echo "No .a files"
-        ls -la /c/vcpkg/installed/x64-windows/lib/*.lib 2>/dev/null || echo "No .lib files"
 
     - name: Download Tesseract language data
       shell: bash
       run: |
         mkdir -p /c/tessdata
-        curl -L -o /c/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
-        ls -la /c/tessdata/
+        curl -sL -o /c/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
 
     - name: Test Gosseract
       shell: bash
@@ -90,18 +75,9 @@ jobs:
         CGO_ENABLED: "1"
         CC: C:/mingw64/bin/gcc.exe
         CXX: C:/mingw64/bin/g++.exe
-        PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
         CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
         CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
         TESSDATA_PREFIX: C:/tessdata
       run: |
-        # Add MinGW and vcpkg bins to PATH for DLL discovery
         export PATH="/c/mingw64/bin:/c/vcpkg/installed/x64-windows/bin:$PATH"
-        echo "=== CGO Environment ==="
-        go env CC
-        go env CGO_CFLAGS
-        go env CGO_LDFLAGS
-        go env CGO_ENABLED
-        echo "TESSDATA_PREFIX=$TESSDATA_PREFIX"
-        echo "=== Running tests ==="
         go test -v -cover ./...

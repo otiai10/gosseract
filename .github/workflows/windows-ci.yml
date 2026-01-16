@@ -4,14 +4,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 5'
-  # TODO: https://github.com/otiai10/gosseract/issues/262
-  # push:
-  #   branches: [main, develop, windows/*]
-  # pull_request:
-  #   branches: [main, develop]
   push:
     branches:
+      - main
       - windows/*
+  pull_request:
+    branches:
+      - main
 
 jobs:
   windows-test:
@@ -20,12 +19,65 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
     - name: Setup Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.24'
-    - name: Install Tesseract
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          C:/vcpkg/installed
+          C:/vcpkg/packages
+          C:/vcpkg/buildtrees
+        key: vcpkg-${{ runner.os }}-tesseract-${{ hashFiles('.github/workflows/windows-ci.yml') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-tesseract-
+
+    - name: Install Tesseract via vcpkg
+      run: vcpkg install tesseract:x64-windows
+
+    - name: Create MinGW import libraries
+      shell: bash
       run: |
-        vcpkg install tesseract:x64-windows --head
+        cd /c/vcpkg/installed/x64-windows/bin
+        # Generate .def files from DLLs and create MinGW .a import libraries
+        for dll in tesseract*.dll leptonica*.dll; do
+          if [ -f "$dll" ]; then
+            base="${dll%.dll}"
+            gendef "$dll"
+            dlltool -d "${base}.def" -l "lib${base}.a" -D "$dll"
+          fi
+        done
+        # Move import libraries to lib directory
+        mv lib*.a ../lib/ 2>/dev/null || true
+
+        # Create standard symlinks for linker compatibility
+        cd ../lib
+        for f in libtesseract[0-9]*.a; do
+          [ -f "$f" ] && ln -sf "$f" libtesseract.a
+        done
+        for f in libleptonica-*.a; do
+          [ -f "$f" ] && ln -sf "$f" libleptonica.a
+        done
+
+    - name: Download Tesseract language data
+      shell: bash
+      run: |
+        mkdir -p /c/tessdata
+        curl -sL -o /c/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
+
     - name: Test Gosseract
-      run: go test -v -cover ./...
+      shell: bash
+      env:
+        CGO_ENABLED: "1"
+        CC: C:/mingw64/bin/gcc.exe
+        CXX: C:/mingw64/bin/g++.exe
+        CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
+        CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
+        TESSDATA_PREFIX: C:/tessdata
+      run: |
+        export PATH="/c/mingw64/bin:/c/vcpkg/installed/x64-windows/bin:$PATH"
+        go test -v -cover ./...

@@ -39,11 +39,55 @@ func main() {
 
 # Installation
 
-1. [tesseract-ocr](https://github.com/tesseract-ocr/tessdoc), including library and headers
-2. `go get -t github.com/otiai10/gosseract/v2`
+## macOS
+
+```bash
+brew install tesseract
+go get -t github.com/otiai10/gosseract/v2
+```
+
+## Linux (Debian/Ubuntu)
+
+```bash
+sudo apt-get install -y libtesseract-dev libleptonica-dev tesseract-ocr-eng
+go get -t github.com/otiai10/gosseract/v2
+```
 
 Please check this [Dockerfile](https://github.com/otiai10/gosseract/blob/main/Dockerfile) to get started.
 Alternatively, you can deploy the pre-existing Docker image by invoking `docker run -it --rm otiai10/gosseract`.
+
+## Windows
+
+Windows support requires [vcpkg](https://vcpkg.io/) and [MinGW-w64](https://www.mingw-w64.org/):
+
+```bash
+# Install Tesseract via vcpkg
+vcpkg install tesseract:x64-windows
+
+# Create MinGW import libraries from vcpkg DLLs
+cd C:/vcpkg/installed/x64-windows/bin
+gendef tesseract55.dll leptonica-1.87.0.dll
+dlltool -d tesseract55.def -l libtesseract.a -D tesseract55.dll
+dlltool -d leptonica-1.87.0.def -l libleptonica.a -D leptonica-1.87.0.dll
+mv *.a ../lib/
+
+# Download language data
+mkdir C:/tessdata
+curl -L -o C:/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
+```
+
+Set environment variables before building:
+
+```bash
+export CGO_ENABLED=1
+export CC=C:/mingw64/bin/gcc.exe
+export CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
+export CGO_LDFLAGS="-LC:/vcpkg/installed/x64-windows/lib"
+export TESSDATA_PREFIX="C:/tessdata"
+export PATH="/c/mingw64/bin:/c/vcpkg/installed/x64-windows/bin:$PATH"
+```
+
+For detailed troubleshooting, see [knowledge/windows-support.md](./knowledge/windows-support.md).
 
 # Test
 

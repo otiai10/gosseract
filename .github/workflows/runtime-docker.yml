@@ -22,7 +22,7 @@ jobs:
         runtime:
           - alpine
           - archlinux
-          - centos
+          - rockylinux
           - debian
           - fedora
           - mingw

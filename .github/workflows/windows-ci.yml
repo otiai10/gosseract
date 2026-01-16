@@ -67,10 +67,27 @@ jobs:
         done
         ls -la *.a 2>/dev/null || echo "No .a files created"
 
+    - name: Debug - Check headers and libraries
+      shell: bash
+      run: |
+        echo "=== Checking header files ==="
+        ls -la /c/vcpkg/installed/x64-windows/include/tesseract/ || echo "No tesseract headers"
+        ls -la /c/vcpkg/installed/x64-windows/include/leptonica/ || echo "No leptonica headers"
+        echo "=== Checking library files ==="
+        ls -la /c/vcpkg/installed/x64-windows/lib/*.a 2>/dev/null || echo "No .a files"
+        ls -la /c/vcpkg/installed/x64-windows/lib/*.lib 2>/dev/null || echo "No .lib files"
+
     - name: Test Gosseract
       env:
         PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
         CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
         CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
         PATH: C:/vcpkg/installed/x64-windows/bin;${{ env.PATH }}
-      run: go test -v -cover ./...
+      run: |
+        echo "=== CGO Environment ==="
+        go env CGO_CFLAGS
+        go env CGO_LDFLAGS
+        echo "=== Building with verbose output ==="
+        go build -x . 2>&1 | head -100 || true
+        echo "=== Running tests ==="
+        go test -v -cover ./...

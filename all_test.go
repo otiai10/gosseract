@@ -295,9 +295,15 @@ func TestClient_HTML(t *testing.T) {
 	page := new(Page)
 	err = xml.Unmarshal([]byte(out), page)
 	Expect(t, err).ToBe(nil)
+	if len(page.Content.Par.Lines) == 0 {
+		t.Fatal("Expected at least 1 line in HOCR output, got 0")
+	}
 	Expect(t, len(page.Content.Par.Lines)).ToBe(1)
 
 	if os.Getenv("TESS_LSTM_DISABLED") != "1" {
+		if len(page.Content.Par.Lines[0].Words) == 0 {
+			t.Fatal("Expected at least 1 word in HOCR output, got 0")
+		}
 		Expect(t, len(page.Content.Par.Lines[0].Words)).ToBe(1)
 		Expect(t, page.Content.Par.Lines[0].Words[0].Characters).ToBe("Hello,World!")
 	}

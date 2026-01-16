@@ -56,7 +56,16 @@ jobs:
         done
         # Move import libraries to lib directory
         mv lib*.a ../lib/ 2>/dev/null || true
-        ls -la ../lib/*.a 2>/dev/null || echo "No .a files created"
+
+        # Create standard symlinks for linker compatibility
+        cd ../lib
+        for f in libtesseract*.a; do
+          [ -f "$f" ] && ln -sf "$f" libtesseract.a && echo "Linked $f -> libtesseract.a"
+        done
+        for f in libleptonica*.a; do
+          [ -f "$f" ] && ln -sf "$f" libleptonica.a && echo "Linked $f -> libleptonica.a"
+        done
+        ls -la *.a 2>/dev/null || echo "No .a files created"
 
     - name: Test Gosseract
       env:

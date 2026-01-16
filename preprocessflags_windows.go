@@ -2,6 +2,6 @@
 
 package gosseract
 
-// #cgo CXXFLAGS: -std=c++11
-// #cgo pkg-config: tesseract lept
+// #cgo CFLAGS: -Wno-unused-result
+// #cgo LDFLAGS: -ltesseract -lleptonica
 import "C"

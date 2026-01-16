@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"image"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -133,7 +132,7 @@ func TestClient_SetImageFromBytes(t *testing.T) {
 	client := NewClient()
 	defer client.Close()
 
-	content, err := ioutil.ReadFile("./test/data/001-helloworld.png")
+	content, err := os.ReadFile("./test/data/001-helloworld.png")
 	if err != nil {
 		t.Fatalf("could not read test file")
 	}

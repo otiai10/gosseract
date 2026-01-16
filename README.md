@@ -64,6 +64,8 @@ Check [./test/runtimes](https://github.com/otiai10/gosseract/tree/main/test/runt
 
 > **Note**: Clear Linux support was removed in January 2026 as [Intel discontinued the distribution in July 2025](https://www.phoronix.com/news/Intel-Linux-News-2025).
 
+> **Note**: Arch Linux support was removed in January 2026 as the official image does not provide ARM64 architecture support.
+
 # Issues
 
 - [https://github.com/otiai10/gosseract/issues](https://github.com/otiai10/gosseract/issues?utf8=%E2%9C%93&q=is%3Aissue)

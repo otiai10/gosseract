@@ -77,6 +77,13 @@ jobs:
         ls -la /c/vcpkg/installed/x64-windows/lib/*.a 2>/dev/null || echo "No .a files"
         ls -la /c/vcpkg/installed/x64-windows/lib/*.lib 2>/dev/null || echo "No .lib files"
 
+    - name: Download Tesseract language data
+      shell: bash
+      run: |
+        mkdir -p /c/tessdata
+        curl -L -o /c/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
+        ls -la /c/tessdata/
+
     - name: Test Gosseract
       shell: bash
       env:
@@ -86,6 +93,7 @@ jobs:
         PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
         CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
         CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
+        TESSDATA_PREFIX: C:/tessdata
       run: |
         # Add MinGW and vcpkg bins to PATH for DLL discovery
         export PATH="/c/mingw64/bin:/c/vcpkg/installed/x64-windows/bin:$PATH"
@@ -94,8 +102,6 @@ jobs:
         go env CGO_CFLAGS
         go env CGO_LDFLAGS
         go env CGO_ENABLED
-        $CC --version
-        echo "=== Verifying DLLs ==="
-        ls -la /c/vcpkg/installed/x64-windows/bin/*.dll | head -10
+        echo "TESSDATA_PREFIX=$TESSDATA_PREFIX"
         echo "=== Running tests ==="
         go test -v -cover ./...

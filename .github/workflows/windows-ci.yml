@@ -20,16 +20,48 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
     - name: Setup Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.24'
-    - name: Install Tesseract
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          C:/vcpkg/installed
+          C:/vcpkg/packages
+          C:/vcpkg/buildtrees
+        key: vcpkg-${{ runner.os }}-tesseract-${{ hashFiles('.github/workflows/windows-ci.yml') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-tesseract-
+
+    - name: Install Tesseract via vcpkg
       run: |
-        vcpkg install tesseract:x64-windows --head
+        vcpkg install tesseract:x64-windows
+
+    - name: Create MinGW import libraries
+      shell: bash
+      run: |
+        cd /c/vcpkg/installed/x64-windows/bin
+        # Generate .def files from DLLs and create MinGW .a import libraries
+        for dll in tesseract*.dll leptonica*.dll; do
+          if [ -f "$dll" ]; then
+            base="${dll%.dll}"
+            gendef "$dll"
+            dlltool -d "${base}.def" -l "lib${base}.a" -D "$dll"
+            echo "Created lib${base}.a from $dll"
+          fi
+        done
+        # Move import libraries to lib directory
+        mv lib*.a ../lib/ 2>/dev/null || true
+        ls -la ../lib/*.a 2>/dev/null || echo "No .a files created"
+
     - name: Test Gosseract
       env:
         PKG_CONFIG_PATH: C:/vcpkg/installed/x64-windows/lib/pkgconfig
         CGO_CFLAGS: -IC:/vcpkg/installed/x64-windows/include
         CGO_LDFLAGS: -LC:/vcpkg/installed/x64-windows/lib
+        PATH: C:/vcpkg/installed/x64-windows/bin;${{ env.PATH }}
       run: go test -v -cover ./...

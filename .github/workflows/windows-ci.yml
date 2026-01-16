@@ -88,7 +88,10 @@ jobs:
         echo "=== CGO Environment ==="
         go env CGO_CFLAGS
         go env CGO_LDFLAGS
-        echo "=== Building with verbose output ==="
-        go build -x . 2>&1 | head -100 || true
+        go env CGO_ENABLED
+        echo "=== Verifying tessbridge files ==="
+        ls -la tessbridge.*
+        echo "=== Attempting direct CGO compilation ==="
+        go build -v -x . 2>&1 || echo "Build failed, check errors above"
         echo "=== Running tests ==="
         go test -v -cover ./...

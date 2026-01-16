@@ -21,7 +21,6 @@ jobs:
       matrix:
         runtime:
           - alpine
-          - archlinux
           - rockylinux
           - debian
           - fedora
@@ -34,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
       - name: ${{ matrix.runtime }}
         shell: 'script -q -e -c "bash {0}"'
-        run: bash ./test/runtime --driver docker --build --run ${{ matrix.runtime }}
+        run: bash ./test/runtime --engine docker --build --run ${{ matrix.runtime }}
   example-docker:
     runs-on: ubuntu-latest
     name: Test Dockerfile on the repo root

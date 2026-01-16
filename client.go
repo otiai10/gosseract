@@ -4,6 +4,7 @@ package gosseract
 // #include <stdbool.h>
 // #include "tessbridge.h"
 import "C"
+
 import (
 	"fmt"
 	"image"
@@ -14,10 +15,8 @@ import (
 	"unsafe"
 )
 
-var (
-	// ErrClientNotConstructed is returned when a client is not constructed
-	ErrClientNotConstructed = fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
-)
+// ErrClientNotConstructed is returned when a client is not constructed
+var ErrClientNotConstructed = fmt.Errorf("TessBaseAPI is not constructed, please use `gosseract.NewClient`")
 
 // Version returns the version of Tesseract-OCR
 func Version() string {
@@ -119,7 +118,6 @@ func (client *Client) Version() string {
 
 // SetImage sets path to image file to be processed OCR.
 func (client *Client) SetImage(imagepath string) error {
-
 	if client.api == nil {
 		return ErrClientNotConstructed
 	}
@@ -150,7 +148,6 @@ func (client *Client) SetImage(imagepath string) error {
 
 // SetImageFromBytes sets the image data to be processed OCR.
 func (client *Client) SetImageFromBytes(data []byte) error {
-
 	if client.api == nil {
 		return ErrClientNotConstructed
 	}
@@ -265,7 +262,6 @@ func (client *Client) SetTessdataPrefix(prefix string) error {
 
 // Initialize tesseract::TessBaseAPI
 func (client *Client) init() error {
-
 	if !client.shouldInit {
 		C.SetPixImage(client.api, client.pixImage)
 		return nil
@@ -452,6 +448,38 @@ func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 		})
 	}
 	return
+}
+
+type Orientation struct {
+	Page        PageOrientation
+	Writing     WritingDirection
+	Line        TextlineOrder
+	DeskewAngle float32
+}
+
+// GetOrientation returns the orientation of the block.
+func (client *Client) GetOrientation() (Orientation, error) {
+	if client.api == nil {
+		return Orientation{}, ErrClientNotConstructed
+	}
+
+	// Because https://github.com/otiai10/gosseract/issues/167
+	// we have to get and set PSM again.
+	psm := C.GetPageSegMode(client.api)
+
+	if err := client.init(); err != nil {
+		return Orientation{}, err
+	}
+
+	C.SetPageSegMode(client.api, psm)
+
+	o := C.GetOrientation(client.api)
+	return Orientation{
+		Page:        PageOrientation(o.page),
+		Writing:     WritingDirection(o.writing),
+		Line:        TextlineOrder(o.line),
+		DeskewAngle: float32(o.deskew_angle),
+	}, nil
 }
 
 // getDataPath is useful hepler to determine where current tesseract

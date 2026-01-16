@@ -202,6 +202,23 @@ bounding_boxes* GetBoundingBoxes(TessBaseAPI a, int pageIteratorLevel) {
     return box_array;
 }
 
+orientation GetOrientation(TessBaseAPI a) {
+    tesseract::TessBaseAPI *api = (tesseract::TessBaseAPI *)a;
+    tesseract::Orientation page;
+    tesseract::WritingDirection writing;
+    tesseract::TextlineOrder line;
+    float deskew_angle;
+
+    tesseract::PageIterator *it = api->AnalyseLayout();
+    it->Orientation(&page, &writing, &line, &deskew_angle);
+    orientation o = {.page = page,
+                     .writing = writing,
+                     .line = line,
+                     .deskew_angle = deskew_angle};
+    delete it;
+    return o;
+}
+
 const char* Version(TessBaseAPI a) {
     tesseract::TessBaseAPI* api = (tesseract::TessBaseAPI*)a;
     const char* v = api->Version();

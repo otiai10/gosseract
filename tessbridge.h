@@ -17,6 +17,13 @@ struct bounding_boxes {
     struct bounding_box* boxes;
 };
 
+struct orientation {
+    int page;
+    int writing;
+    int line;
+    float deskew_angle;
+};
+
 TessBaseAPI Create(void);
 
 void Free(TessBaseAPI);
@@ -25,6 +32,7 @@ void ClearPersistentCache(TessBaseAPI);
 int Init(TessBaseAPI, char*, char*, char*, char*);
 struct bounding_boxes* GetBoundingBoxes(TessBaseAPI, int);
 struct bounding_boxes* GetBoundingBoxesVerbose(TessBaseAPI);
+struct orientation GetOrientation(TessBaseAPI);
 bool SetVariable(TessBaseAPI, char*, char*);
 void SetPixImage(TessBaseAPI a, PixImage pix);
 void SetPageSegMode(TessBaseAPI, int);

@@ -89,6 +89,10 @@ export PATH="/c/mingw64/bin:/c/vcpkg/installed/x64-windows/bin:$PATH"
 
 For detailed troubleshooting, see [knowledge/windows-support.md](./knowledge/windows-support.md).
 
+# Statically linked go build
+
+[Gosseract](https://github.com/otiai10/gosseract) uses the native C api to use tesseract. To build a statically linked go binary, you have to first build both tesseract and leptonica statically. Checkout the [Dockerfile.static](https://github.com/otiai10/gosseract/blob/main/Dockerfile.static) file for step-by-step instructions. The same steps can also be followed in Ubuntu.
+
 # Test
 
 In case you have [tesseract-ocr](https://github.com/tesseract-ocr/tessdoc) installed on your local environment, you can run the tests with:

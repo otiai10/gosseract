@@ -5,6 +5,7 @@ package gosseract
 // #include "tessbridge.h"
 import "C"
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"os"
@@ -42,11 +43,6 @@ type Client struct {
 	// or when a new image is set
 	pixImage C.PixImage
 
-	// Trim specifies characters to trim, which would be trimed from result string.
-	// As results of OCR, text often contains unnecessary characters, such as newlines, on the head/foot of string.
-	// If `Trim` is set, this client will remove specified characters from the result.
-	Trim bool
-
 	// TessdataPrefix can indicate directory path to `tessdata`.
 	// It is set `/usr/local/share/tessdata/` or something like that, as default.
 	// TODO: Implement and test
@@ -63,6 +59,13 @@ type Client struct {
 	// See http://www.sk-spell.sk.cx/tesseract-ocr-parameters-in-302-version
 	// TODO: Fix link to official page
 	ConfigFilePath string
+
+	/* Small fields last to avoid padding before big fields */
+
+	// Trim specifies characters to trim, which would be trimed from result string.
+	// As results of OCR, text often contains unnecessary characters, such as newlines, on the head/foot of string.
+	// If `Trim` is set, this client will remove specified characters from the result.
+	Trim bool
 
 	// internal flag to check if the instance should be initialized again
 	// i.e, we should create a new gosseract client when language or config file change
@@ -325,10 +328,11 @@ func (client *Client) flagForInit() {
 // See https://zdenop.github.io/tesseract-doc/classtesseract_1_1_tess_base_a_p_i.html#a2e09259c558c6d8e0f7e523cbaf5adf5
 func (client *Client) setVariablesToInitializedAPI() error {
 	for key, value := range client.Variables {
-		k, v := C.CString(string(key)), C.CString(value)
-		defer C.free(unsafe.Pointer(k))
-		defer C.free(unsafe.Pointer(v))
+		k := C.CString(string(key))
+		v := C.CString(value)
 		res := C.SetVariable(client.api, k, v)
+		C.free(unsafe.Pointer(k))
+		C.free(unsafe.Pointer(v))
 		if !bool(res) {
 			return fmt.Errorf("failed to set variable with key(%v) and value(%v)", key, value)
 		}
@@ -376,12 +380,77 @@ func (client *Client) HOCRText() (out string, err error) {
 	return
 }
 
-// BoundingBox contains the position, confidence and UTF8 text of the recognized word
 type BoundingBox struct {
-	Box                                image.Rectangle
-	Word                               string
-	Confidence                         float64
-	BlockNum, ParNum, LineNum, WordNum int
+	Word       string
+	X0, Y0     int32
+	X1, Y1     int32
+	Confidence float32
+	BlockNum   int32
+	ParNum     int32
+	LineNum    int32
+	WordNum    int32
+}
+
+func (b BoundingBox) Rect() image.Rectangle {
+	return image.Rect(int(b.X0), int(b.Y0), int(b.X1), int(b.Y1))
+}
+
+func FromRectangle(word string, r image.Rectangle, conf float32, block, par, line, wordNum int) BoundingBox {
+	return BoundingBox{
+		Word:       word,
+		X0:         int32(r.Min.X),
+		Y0:         int32(r.Min.Y),
+		X1:         int32(r.Max.X),
+		Y1:         int32(r.Max.Y),
+		Confidence: conf,
+		BlockNum:   int32(block),
+		ParNum:     int32(par),
+		LineNum:    int32(line),
+		WordNum:    int32(wordNum),
+	}
+}
+
+// bboxJSON: This struct is used to provide a backwards-compatible interaface, so that downstream
+// consumers may still rely on the old interface, if they're serializing these structs
+type bboxJSON struct {
+	Word       string          `json:"word"`
+	Box        image.Rectangle `json:"box"`
+	Confidence float32         `json:"confidence"`
+	BlockNum   int32           `json:"block_num,omitempty"`
+	ParNum     int32           `json:"par_num,omitempty"`
+	LineNum    int32           `json:"line_num,omitempty"`
+	WordNum    int32           `json:"word_num,omitempty"`
+}
+
+func (b BoundingBox) MarshalJSON() ([]byte, error) {
+	bj := bboxJSON{
+		Word:       b.Word,
+		Box:        b.Rect(),
+		Confidence: b.Confidence,
+		BlockNum:   b.BlockNum,
+		ParNum:     b.ParNum,
+		LineNum:    b.LineNum,
+		WordNum:    b.WordNum,
+	}
+	return json.Marshal(bj)
+}
+
+func (b *BoundingBox) UnmarshalJSON(data []byte) error {
+	var bj bboxJSON
+	if err := json.Unmarshal(data, &bj); err != nil {
+		return err
+	}
+	b.Word = bj.Word
+	b.Confidence = bj.Confidence
+	b.BlockNum = bj.BlockNum
+	b.ParNum = bj.ParNum
+	b.LineNum = bj.LineNum
+	b.WordNum = bj.WordNum
+	b.X0 = int32(bj.Box.Min.X)
+	b.Y0 = int32(bj.Box.Min.Y)
+	b.X1 = int32(bj.Box.Max.X)
+	b.Y1 = int32(bj.Box.Max.Y)
+	return nil
 }
 
 // GetBoundingBoxes returns bounding boxes for each matched word
@@ -401,9 +470,16 @@ func (client *Client) GetBoundingBoxes(level PageIteratorLevel) (out []BoundingB
 		// cast to bounding_box: boxes + i*sizeof(box)
 		box := (*C.struct_bounding_box)(unsafe.Pointer(uintptr(unsafe.Pointer(boxArray.boxes)) + uintptr(i)*unsafe.Sizeof(C.struct_bounding_box{})))
 		out = append(out, BoundingBox{
-			Box:        image.Rect(int(box.x1), int(box.y1), int(box.x2), int(box.y2)),
 			Word:       C.GoString(box.word),
-			Confidence: float64(box.confidence),
+			X0:         int32(box.x1),
+			Y0:         int32(box.y1),
+			X1:         int32(box.x2),
+			Y1:         int32(box.y2),
+			Confidence: float32(box.confidence),
+			BlockNum:   int32(box.block_num),
+			ParNum:     int32(box.par_num),
+			LineNum:    int32(box.line_num),
+			WordNum:    int32(box.word_num),
 		})
 	}
 
@@ -442,13 +518,16 @@ func (client *Client) GetBoundingBoxesVerbose() (out []BoundingBox, err error) {
 		// cast to bounding_box: boxes + i*sizeof(box)
 		box := (*C.struct_bounding_box)(unsafe.Pointer(uintptr(unsafe.Pointer(boxArray.boxes)) + uintptr(i)*unsafe.Sizeof(C.struct_bounding_box{})))
 		out = append(out, BoundingBox{
-			Box:        image.Rect(int(box.x1), int(box.y1), int(box.x2), int(box.y2)),
 			Word:       C.GoString(box.word),
-			Confidence: float64(box.confidence),
-			BlockNum:   int(box.block_num),
-			ParNum:     int(box.par_num),
-			LineNum:    int(box.line_num),
-			WordNum:    int(box.word_num),
+			X0:         int32(box.x1),
+			Y0:         int32(box.y1),
+			X1:         int32(box.x2),
+			Y1:         int32(box.y2),
+			Confidence: float32(box.confidence),
+			BlockNum:   int32(box.block_num),
+			ParNum:     int32(box.par_num),
+			LineNum:    int32(box.line_num),
+			WordNum:    int32(box.word_num),
 		})
 	}
 	return
